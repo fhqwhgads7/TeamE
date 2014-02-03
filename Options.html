@@ -11,7 +11,12 @@
 		
 			var TheServer;
 			var Self;
-			var databaseOfOptions = new LocalStorageDB('OptionsDB');
+			
+			var GameDifficulty;			//EASY, NORMAL, HARD, LUNATIC
+			var CPUIntelligence;		//BEGINNER, STANDARD, EXPERT
+			var NumberOfRounds;			//Between 40 and 60
+			var PatentingEnabled;		//true/false
+			var RetirementMinimum;		//401k, 500k, 600k, 700k, 800k, 900k, 1m, 999999999
 			
 			function Initialize()
 			{
@@ -20,7 +25,7 @@
 				Self=new Client("me");
 				Self.ConnectTo(TheServer);
 				alert(TheServer.Clients);
-				alert(databaseOfOptions);
+				alert(GameDifficulty + " " + CPUIntelligence + " " + NumberOfRounds + " " + PatentingEnabled + " " + RetirementMinimum);
 				localStorage.RememberedServer=JSON.stringify(TheServer);
 				localStorage.RememberedClient=JSON.stringify(Self);
 				Self.SendToHost("INITIALIZATION_REQUEST",[]);
@@ -32,11 +37,62 @@
 			
 			function LoadOptions()
 			{
-				//databaseOfOptions.CREATE('OptionsDB', {id: 0, GameDifficulty: "Normal", CPUIntelligence: "Standard", NumberOfRounds: 40, PatentingEnabled: true, RetirementMinimum: 401000});
+				if (localStorage.getItem('GameDifficulty') == null)
+					localStorage.setItem('GameDifficulty','NORMAL');
+				if (localStorage.getItem('CPUIntelligence') == null)
+					localStorage.setItem('CPUIntelligence','STANDARD');
+				if (localStorage.getItem('NumberOfRounds') == null)
+					localStorage.setItem('NumberOfRounds','40');
+				if (localStorage.getItem('PatentingEnabled') == null)
+					localStorage.setItem('PatentingEnabled','true');
+				if (localStorage.getItem('RetirementMinimum') == null)
+					localStorage.setItem('RetirementMinimum','401000');
+					
+				GameDifficulty = localStorage.getItem('GameDifficulty');
+				CPUIntelligence = localStorage.getItem('CPUIntelligence');
+				NumberOfRounds = parseInt(localStorage.getItem('NumberOfRounds'));
+				PatentingEnabled = (localStorage.getItem('PatentingEnabled') == 'true');
+				RetirementMinimum = parseInt(localStorage.getItem('RetirementMinimum'));
+				
+				$( "#GameDifficulty").val(GameDifficulty);
+				$( "#CPUIntelligence").val(CPUIntelligence);
+				$( "#NumberOfRounds").val(NumberOfRounds);
+				if (PatentingEnabled)
+					$( "#Patenting").val("On");
+				else
+					$( "#Patenting").val("Off");
+				$( "#RetirementMinimum").val(RetirementMinimum);
 			}
-			function SaveOptions(){
-				//alert("Options not saved yet./nMostly because the programmer is a git.");
+			function SaveOptions()
+			{
+				localStorage.setItem('GameDifficulty',GameDifficulty);
+				localStorage.setItem('CPUIntelligence',CPUIntelligence);
+				localStorage.setItem('NumberOfRounds',NumberOfRounds.toString());
+				localStorage.setItem('PatentingEnabled',PatentingEnabled.toString());
+				localStorage.setItem('RetirementMinimum',RetirementMinimum.toString());
+				
+				alert("Your preferences have been saved.");
 			}
+			function RestorePrevious()
+			{
+				LoadOptions();
+				alert("Your previous settings have been restored.");
+			}
+			
+			function ValueToDropDownSelection(theValue, dropdown)
+			{
+				$('[id=dropdown] option').filter(function() { 
+					return ($(this).value() == theValue);
+				}).prop('selected', true);
+			}
+			
+			//STV = Selection to Value
+			
+			function STV_GameDifficulty() { GameDifficulty = $( "#GameDifficulty").val(); }
+			function STV_CPUIntelligence() { CPUIntelligence = $( "#CPUIntelligence").val(); }
+			function STV_NumberOfRounds() { NumberOfRounds = parseInt($( "#NumberOfRounds").val()); }
+			function STV_PatentingEnabled() { PatentingEnabled = ($( "#Patenting").val() == 'On'); }
+			function STV_RetirementMinimum() { RetirementMinimum = parseInt($( "#RetirementMinimum").val()); }
 			
 		</script>
 		<style>
@@ -123,11 +179,44 @@
 		<div id="MainBackground">
 			<div class="OptionsBox" id="OptionsBox" style="left:20%;top:20%;">
 			
-				<div class="SmallText" style="left:3%;top:5%;">CPU Intelligence</div>
-				<div class="SmallText" style="left:3%;top:14%;">Game Difficulty</div>
+				<div class="SmallText" style="left:3%;top:5%;">Game Difficulty</div>
+				<div class="SmallText" style="left:3%;top:14%;">CPU Intelligence</div>
 				<div class="SmallText" style="left:3%;top:23%;">Product Patenting</div>
 				<div class="SmallText" style="left:3%;top:32%;">Number of Rounds</div>
 				<div class="SmallText" style="left:3%;top:41%;">Retirement Minimum</div>
+				
+				<select class="Options" id="GameDifficulty" style="top:5%;" onchange="STV_GameDifficulty()">
+						<option value="EASY">Easy</option>
+						<option value="NORMAL" selected="selected">Normal</option>
+						<option value="HARD">Hard</option>
+						<option value="LUNATIC">Lunatic</option>
+					</select>
+					<select class="Options" id="CPUIntelligence" style="top:14%;" onchange="STV_CPUIntelligence()">
+						<option value="BEGINNER">Beginner</option>
+						<option value="STANDARD" selected="selected">Standard</option>
+						<option value="EXPERT">Expert</option>
+					</select>
+					<select class="Options" id="Patenting" style="top:23%;" onchange="STV_PatentingEnabled()">
+						<option value="On" selected="selected">On</option>
+						<option value="Off">Off</option>
+					</select>
+					<select class="Options" id="NumberOfRounds" style="top:32%;" onchange="STV_NumberOfRounds()">
+						<option value=40 selected="selected">40</option>
+						<option value=45>45</option>
+						<option value=50>50</option>
+						<option value=55>55</option>
+						<option value=60>60</option>
+					</select>
+					<select class="Options" id="RetirementMinimum" style="top:41%;" onchange="STV_RetirementMinimum()">
+						<option value=401000 selected="selected">$401,000</option>
+						<option value=500000>$500,000</option>
+						<option value=600000>$600,000</option>
+						<option value=700000>$700,000</option>
+						<option value=800000>$800,000</option>
+						<option value=900000>$900,000</option>
+						<option value=1000000>$1,000,000</option>
+						<option value=999999999>$999,999,999</option>
+					</select>
 				
 				<form>
 
@@ -159,8 +248,8 @@
 				
 			</div>
 			<div class="BigText" id="MainTitle" style="left:40%;top:10%;">Options</div>
-			<button class="Medium RoundEdge" onclick="SaveChanges()" style="left:20%;top:84%;">Save Changes</button>
-			<button class="Medium RoundEdge" onclick="LoadOptions()" style="left:40.5%;top:84%;">Restore Default</button>
+			<button class="Medium RoundEdge" onclick="SaveOptions()" style="left:20%;top:84%;">Save Changes</button>
+			<button class="Medium RoundEdge" onclick="RestorePrevious()" style="left:40.5%;top:84%;">Restore Previous</button>
 			<button class="Medium RoundEdge" onclick="GoToMenu()" style="left:61%;top:84%;">Return to Menu</button>
 		</div>
 	</body>

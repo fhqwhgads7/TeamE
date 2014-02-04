@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="Client.js"></script>
+		<script src="jquery.js"></script>
+		<script src="Server.js"></script>
+		<script src="LocalStorageDB.js"></script>
+		<script type="text/javascript" src="Shared.js"></script>
+		<link rel="stylesheet" type="text/css" href="Shared.css"></link>
+		<style>
+			#MainBackground{
+				background-image:url('game_background.png');
+				position:fixed;
+				top:10px;
+				left:10px;
+				width:800px;
+				height:600px;
+				overflow:hidden;
+			}
+			div.OptionsBox{
+				position:absolute;
+				border-style:solid;
+				border-width:5px;
+				width:60%;
+				height:60%;
+				box-shadow: 0px 0px 40px 5px #AAAAAA;
+			}
+			.BigText{
+				font-family:"Times New Roman";
+				font-size:50px;
+				font-weight:900;
+				text-align:center;
+				color:white;
+			}
+			div.SmallText{
+				position:absolute;
+				font-family:"Arial";
+				font-size:20px;
+				font-weight:900;
+				text-align:center;
+				color:white;
+			}
+			button.Medium{
+				position:absolute;
+				text-align:center;
+				font-family:"Arial";
+				font-weight:700;
+				font-size:15px;
+				color:rgb(0,0,0);
+				background-image:-moz-linear-gradient(top,rgba(170,170,170,1),rgba(70,70,70,1) 100%);
+				background-image:-webkit-linear-gradient(top,rgba(170,170,170,1),rgba(70,70,70,1) 100%);
+				width:20%;
+				height:7%;
+				border-width:5px;
+				border-style:solid;
+				border-color:rgba(120,120,120,1);
+				outline:none;
+				-moz-border-radius:20px;
+				-webkit-border-radius:20px;
+				border-radius:20px;
+			}
+			button.Medium:hover{
+				color:rgb(255,255,255);
+			}
+			button.Medium:active{
+				background-image:-moz-linear-gradient(top,rgba(80,80,80,1),rgba(150,150,150,1) 100%);
+				background-image:-webkit-linear-gradient(top,rgba(80,80,80,1),rgba(150,150,150,1) 100%);
+				color:rgb(180,180,180);
+			}
+			button.Medium:disabled{
+				background-color:rgb(140,140,140);
+				color:rgb(110,110,110);
+				background-image:none;
+			}
+			.Options{
+				position:absolute;
+				right:3%;
+				width:28%;
+				font-family:"Arial";
+				font-size:15px;
+				font-weight:900;
+			}
+			.roundSlider{
+				position:absolute;
+				width:100px;
+			}
+			ol {
+				color: white;
+			}
+		</style>
+	</head>
+	<body onload="Initialize()">
+		<div id="MainBackground">
+			<h1 class="BigText" id="MainTitle">Save/Load</h1>
+			<div class="OptionsBox" id="OptionsBox" style="left:20%;top:20%;">
+				<ol>
+					<li>Game 1 (2014-02-03 17:54)</li>
+					<li>Game 2 (2014-02-04 03:16)</li>
+				</ol>
+			</div>
+		</div>
+	</body>
+</html>

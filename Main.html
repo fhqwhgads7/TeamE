@@ -11,21 +11,10 @@
 			Parse.initialize("xjUxyY8bghFGuSnM3ptEZkV3BiWOlD3VhkRLt4kz", "iZCS2S7ZuWn9keMoooLaHMlB7HMXpcqD1M60JVjp");
 			var Server;
 			var Self;
-<<<<<<< HEAD
 			
-			function Initialize()
-			{
-				checkOptions();
-				TheServer=new Server();
-				Self=new Client("me");
-				Self.ConnectTo(TheServer);
-				alert(TheServer.Clients);
-				localStorage.RememberedServer=JSON.stringify(TheServer);
-				localStorage.RememberedClient=JSON.stringify(Self);
-				Self.SendToHost("INITIALIZATION_REQUEST",[]);
-=======
 			var SaveGameParseID;
 			function Initialize(){
+				checkOptions();
 				var SavedGame=Parse.Object.extend("SavedGame");
 				var savedGame=new SavedGame();
 				savedGame.save({
@@ -44,7 +33,6 @@
 						alert(error.description);
 					}
 				});
->>>>>>> d74b57bcb74ed3f90bb9a75b98b7b60a0242abcf
 			}
 			
 			function checkOptions()

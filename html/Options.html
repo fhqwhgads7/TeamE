@@ -35,18 +35,7 @@
 			}
 			
 			function LoadOptions()
-			{
-				if (localStorage.getItem('GameDifficulty') == null)
-					localStorage.setItem('GameDifficulty','NORMAL');
-				if (localStorage.getItem('CPUIntelligence') == null)
-					localStorage.setItem('CPUIntelligence','STANDARD');
-				if (localStorage.getItem('NumberOfRounds') == null)
-					localStorage.setItem('NumberOfRounds','40');
-				if (localStorage.getItem('PatentingEnabled') == null)
-					localStorage.setItem('PatentingEnabled','true');
-				if (localStorage.getItem('RetirementMinimum') == null)
-					localStorage.setItem('RetirementMinimum','401000');
-					
+			{		
 				GameDifficulty = localStorage.getItem('GameDifficulty');
 				CPUIntelligence = localStorage.getItem('CPUIntelligence');
 				NumberOfRounds = parseInt(localStorage.getItem('NumberOfRounds'));

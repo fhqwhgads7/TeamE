@@ -1,20 +1,36 @@
+<!-- Hey everyone, our credentials for our Parse.com account (our cloud service in which we store data for transferring) is as follows: username EntrepreneurshipCST316, password Reinforcements1! -->
+
 <!DOCTYPE html>
 <html>
 	<head>
-		<script src="jquery.js"></script>
-		<script src="Server.js"></script>
-		<script src="Client.js"></script>
+		<script src="js/Server.js"></script>
+		<script src="js/Client.js"></script>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+		<script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.2.16.min.js"></script>
 		<script type="text/javascript">
-			var TheServer;
+			Parse.initialize("xjUxyY8bghFGuSnM3ptEZkV3BiWOlD3VhkRLt4kz", "iZCS2S7ZuWn9keMoooLaHMlB7HMXpcqD1M60JVjp");
+			var Server;
 			var Self;
+			var SaveGameParseID;
 			function Initialize(){
-				TheServer=new Server();
-				Self=new Client("me");
-				Self.ConnectTo(TheServer);
-				alert(TheServer.Clients);
-				localStorage.RememberedServer=JSON.stringify(TheServer);
-				localStorage.RememberedClient=JSON.stringify(Self);
-				Self.SendToHost("INITIALIZATION_REQUEST",[]);
+				var SavedGame=Parse.Object.extend("SavedGame");
+				var savedGame=new SavedGame();
+				savedGame.save({
+					Name:"TheFirstGameOfYay"
+				});
+				SaveGameParseID=savedGame.id;
+				var Query=new Parse.Query(SavedGame);
+				Query.descending("time");
+				Query.first({
+					success:function(savedGame){
+						alert("yes");
+						alert(savedGame.get("Name"));
+					},
+					error:function(object,error){
+						alert("no");
+						alert(error.description);
+					}
+				});
 			}
 		</script>
 	</head>

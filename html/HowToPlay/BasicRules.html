@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script type="text/javascript" src="Shared.js"></script>
+		<link rel="stylesheet" type="text/css" href="Shared.css"></link>
+		<script>
+			function Initialize(){
+				// nothin right now
+			}
+			function GoToHow(){
+				window.location="HowToPlay.html";
+			}
+		</script>
+		<style>
+			div.HowToPlayBox{
+				position:absolute;
+				border-style:solid;
+				border-width:5px;
+				font-family:"Arial";
+				font-size:15px;
+				font-weight:900;
+				font-color:black;
+				width:60%;
+				height:50%;
+				box-shadow: 0px 0px 40px 5px #AAAAAA;
+			}
+			div.HTPText{
+				position:absolute;
+				font-family:"Arial";
+				font-size:20px;
+				font-weight:900;
+				text-align:center;
+
+			}
+            div.BigText{
+	        position:absolute;
+	        font-family:"Times New Roman";
+	        font-size:50px;
+	        font-weight:900;
+	        text-align:center;
+	        color:black;
+            }
+            button.Big{
+	        position:absolute;
+	        text-align:center;
+	        font-family:"Arial";
+	        font-weight:700;
+	        font-size:20px;
+	        color:rgb(0,0,0);
+	        background-image:-webkit-linear-gradient(top,rgba(170,170,170,1),rgba(70,70,70,1) 100%);
+	        background-image:-moz-linear-gradient(top,rgba(170,170,170,1),rgba(70,70,70,1) 100%);
+	        width:30%;
+	        height:7%;
+	        border-width:5px;
+	        border-style:solid;
+	        border-color:rgba(120,120,120,1);
+	        outline:none;
+	        -moz-border-radius:20px;
+	        -webkit-border-radius:20px;
+	        border-radius:20px;
+            }
+            .RoundEdge{
+	        -moz-border-radius:20px;
+	        -webkit-border-radius:20px;
+	        border-radius:20px;
+            }			
+		</style>
+	</head>
+	<body>
+		<div id="MainBackground">
+			<div class="BigText" id="MainTitle" style="left:34%;top:10%;">Basic Rules</div>
+			<div class="HowToPlayBox" id="HowToPlayBox" style="left:20%;top:25%;">
+			<!-- Codes by HTML.am -->
+			<div class="HTPText" style="text-wrap:normal;width:98%;height:96%;overflow-y:auto;overflow-x:hidden;padding:5px;">
+			
+			The main objective of this game is to obtain more money than all the
+			other players. Each player will start with an equal amount of money
+			to help them begin. The idea is to create products and take them thru 
+			the process an entrepreneur would go through.<br><br>
+			There are nine different phases a product will go through idea,
+            design, prototype, testing prototype, development, testing prerelease
+			product, deploy, testing postrelease product, and maintenance.
+			During a round a player will have a choice to do nothing, create a
+			product, add employees, or move to the next product phase.<br><br>
+			Once you end your turn you will either gain money or lose money.
+			Next the other player will have to do the same thing during their
+			turn and so on until the final round is over<br><br>
+
+			
+			</div>
+			</div>
+			<button class="Big RoundEdge" id="ToMenu" style="left:35%;top:80%;" onclick="GoToHow()">Back</button>
+		</div>
+	</body>
+</html>

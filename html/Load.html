@@ -85,18 +85,35 @@
 			}
 			ol {
 				color: white;
+				list-style: none;
+			}
+			li {
+				padding: 0.5em;
+			}
+			li:hover {
+				cursor: pointer;
+				background: grey;
 			}
 		</style>
 	</head>
 	<body onload="Initialize()">
 		<div id="MainBackground">
-			<h1 class="BigText" id="MainTitle">Save/Load</h1>
+			<h1 class="BigText" id="MainTitle">Load</h1>
 			<div class="OptionsBox" id="OptionsBox" style="left:20%;top:20%;">
-				<ol>
+				<ol id="game-list">
 					<li>Game 1 (2014-02-03 17:54)</li>
 					<li>Game 2 (2014-02-04 03:16)</li>
+					<li>Game 3(2014-02-04 03:16)</li>
 				</ol>
 			</div>
 		</div>
+
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$("#game-list").find("li").click(function(){
+					alert($(this).html());
+				});
+			});
+		</script>
 	</body>
 </html>

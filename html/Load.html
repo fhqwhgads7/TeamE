@@ -40,7 +40,6 @@
 				color:white;
 			}
 			button.Medium{
-				position:absolute;
 				text-align:center;
 				font-family:"Arial";
 				font-weight:700;
@@ -48,8 +47,7 @@
 				color:rgb(0,0,0);
 				background-image:-moz-linear-gradient(top,rgba(170,170,170,1),rgba(70,70,70,1) 100%);
 				background-image:-webkit-linear-gradient(top,rgba(170,170,170,1),rgba(70,70,70,1) 100%);
-				width:20%;
-				height:7%;
+				height: 2em:
 				border-width:5px;
 				border-style:solid;
 				border-color:rgba(120,120,120,1);
@@ -60,6 +58,7 @@
 			}
 			button.Medium:hover{
 				color:rgb(255,255,255);
+				cursor: pointer;
 			}
 			button.Medium:active{
 				background-image:-moz-linear-gradient(top,rgba(80,80,80,1),rgba(150,150,150,1) 100%);
@@ -94,6 +93,18 @@
 				cursor: pointer;
 				background: grey;
 			}
+			div.alert {
+				display: none;
+				position: absolute;
+				top: 30%;
+				left: 20%;
+				color: black;
+				height: 10em;
+				width: 20em;
+				border: 1px black solid;
+				background: white;
+				text-align: center;
+			}
 		</style>
 	</head>
 	<body onload="Initialize()">
@@ -101,17 +112,40 @@
 			<h1 class="BigText" id="MainTitle">Load</h1>
 			<div class="OptionsBox" id="OptionsBox" style="left:20%;top:20%;">
 				<ol id="game-list">
-					<li>Game 1 (2014-02-03 17:54)</li>
-					<li>Game 2 (2014-02-04 03:16)</li>
-					<li>Game 3(2014-02-04 03:16)</li>
+					<li><span class="game-title">Game 1</span> (2014-02-03 17:54)</li>
+					<li><span class="game-title">Game 2</span> (2014-02-04 03:16)</li>
+					<li><span class="game-title">Game 3</span> (2014-02-04 03:16)</li>
 				</ol>
+			</div>
+		</div>
+
+		<div class="alert" id="load-alert">
+			<p>
+				Load <span id="loaded-game-name">Game 1</span>?
+			</p>
+			<div>
+				<button class="Medium RoundEdge" id="yep-button">Yep</button>
+				<button class="Medium RoundEdge" id="nope-button">Nope</button>
 			</div>
 		</div>
 
 		<script type="text/javascript">
 			$(document).ready(function() {
+				function showLoadAlert(gameTitle) {
+					$("#load-alert").find("#loaded-game-name").text(gameTitle);
+					$("#load-alert").show();
+				}
+
 				$("#game-list").find("li").click(function(){
-					alert($(this).html());
+					var gameTitle = $(this).find(".game-title").text();
+					showLoadAlert(gameTitle);
+				});
+
+				$("#yep-button").click(function(){
+					$("#load-alert").hide();
+				});
+				$("#nope-button").click(function(){
+					$("#load-alert").hide();
 				});
 			});
 		</script>

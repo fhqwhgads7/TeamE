@@ -4,7 +4,7 @@
 		<script src="../js/Client.js"></script>
 		<script src="../js/jquery.js"></script>
 		<script src="../js/Server.js"></script>
-		<script type="text/javascript" src="../js/Shared.js"></script>
+		<script src="../js/Shared.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/Shared.css"></link>
 		<script>
 		
@@ -20,11 +20,12 @@
 			function Initialize()
 			{
 				LoadOptions();
+				checkOptions();
 				TheServer=new Server();
 				Self=new Client("me");
 				Self.ConnectTo(TheServer);
 				alert(TheServer.Clients);
-				alert(GameDifficulty + " " + CPUIntelligence + " " + NumberOfRounds + " " + PatentingEnabled + " " + RetirementMinimum);
+				//alert(GameDifficulty + " " + CPUIntelligence + " " + NumberOfRounds + " " + PatentingEnabled + " " + RetirementMinimum);
 				localStorage.RememberedServer=JSON.stringify(TheServer);
 				localStorage.RememberedClient=JSON.stringify(Self);
 				Self.SendToHost("INITIALIZATION_REQUEST",[]);

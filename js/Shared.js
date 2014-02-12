@@ -7,7 +7,7 @@ function checkOptions()
 	if (!((localStorage.getItem('CPUIntelligence') == 'BEGINNER') || (localStorage.getItem('CPUIntelligence') == 'STANDARD') || (localStorage.getItem('CPUIntelligence') == 'EXPERT')))
 		localStorage.setItem('CPUIntelligence','STANDARD');
 	//Checks if 'NumberOfRounds' is 40, 45, 50, 55, or 60. Sets to '40' if otherwise.
-	if (!((parsetInt(localStorage.getItem('NumberOfRounds'))/5 >= 8)&&(parsetInt(localStorage.getItem('NumberOfRounds'))/5 <= 12)))
+	if (!((parseInt(localStorage.getItem('NumberOfRounds'))/5 >= 8)&&(parseInt(localStorage.getItem('NumberOfRounds'))/5 <= 12)))
 		localStorage.setItem('NumberOfRounds','40');
 	//Checks if 'PatentingEnabled' is 'true' or 'false'. Sets to 'true' if otherwise.
 	if (!((localStorage.getItem('PatentingEnabled') == 'true') || (localStorage.getItem('PatentingEnabled') == 'false')))

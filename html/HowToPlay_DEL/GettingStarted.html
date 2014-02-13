@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script type="text/javascript" src="Shared.js"></script>
+		<link rel="stylesheet" type="text/css" href="Shared.css"></link>
+		<script>
+			function Initialize(){
+				// nothin right now
+			}
+			function GoToHow(){
+				window.location="HowToPlay.html";
+			}
+		</script>
+		<style>
+
+
+            div.BigText{
+	        position:absolute;
+	        font-family:"Times New Roman";
+	        font-size:50px;
+	        font-weight:900;
+	        text-align:center;
+	        color:black;
+            }
+            button.Big{
+	        position:absolute;
+	        text-align:center;
+	        font-family:"Arial";
+	        font-weight:700;
+	        font-size:20px;
+	        color:rgb(0,0,0);
+	        background-image:-webkit-linear-gradient(top,rgba(170,170,170,1),rgba(70,70,70,1) 100%);
+	        background-image:-moz-linear-gradient(top,rgba(170,170,170,1),rgba(70,70,70,1) 100%);
+	        width:30%;
+	        height:7%;
+	        border-width:5px;
+	        border-style:solid;
+	        border-color:rgba(120,120,120,1);
+	        outline:none;
+	        -moz-border-radius:20px;
+	        -webkit-border-radius:20px;
+	        border-radius:20px;
+            }
+            .RoundEdge{
+	        -moz-border-radius:20px;
+	        -webkit-border-radius:20px;
+	        border-radius:20px;
+            }			
+		</style>
+	</head>
+	<body>
+		<table border="1" width="1000" height="475" cellpadding="5" cellspacing="5" align="center">
+          <caption><h1>Getting Started</h1></caption>
+		  <tr>
+		      <td rowspan="2" width="25%" height="66%"><img src="FirstPlayer.png" /><br /></td>
+		      <td rowspan="2" width="25%" height="66%">In this game you have a choice of playing against other people or against the computer.
+			   You can play up to six players, so you first need to select your competition.
+			   When you select your competition you need to select a name and color of the
+			   business.Make sure you did the same for your own business and now you are ready to get started.<br><br><br /></td>	
+		      <td rowspan="2" width="25%" height="66%"><img src="Computer.png" /><br /></td>			  
+		  
+		  </tr>
+		</table>
+		<button class="Big RoundEdge" id="ToMenu" style="left:35%;top:80%;" onclick="GoToHow()">Back</button> 
+	</body>
+</html>

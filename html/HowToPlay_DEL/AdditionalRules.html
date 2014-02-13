@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script type="text/javascript" src="Shared.js"></script>
+		<link rel="stylesheet" type="text/css" href="Shared.css"></link>
+		<script>
+			function Initialize(){
+				// nothin right now
+			}
+			function GoToHow(){
+				window.location="HowToPlay.html";
+			}
+		</script>
+		<style>
+
+
+            div.BigText{
+	        position:absolute;
+	        font-family:"Times New Roman";
+	        font-size:50px;
+	        font-weight:900;
+	        text-align:center;
+	        color:black;
+            }
+            button.Big{
+	        position:absolute;
+	        text-align:center;
+	        font-family:"Arial";
+	        font-weight:700;
+	        font-size:20px;
+	        color:rgb(0,0,0);
+	        background-image:-webkit-linear-gradient(top,rgba(170,170,170,1),rgba(70,70,70,1) 100%);
+	        background-image:-moz-linear-gradient(top,rgba(170,170,170,1),rgba(70,70,70,1) 100%);
+	        width:30%;
+	        height:7%;
+	        border-width:5px;
+	        border-style:solid;
+	        border-color:rgba(120,120,120,1);
+	        outline:none;
+	        -moz-border-radius:20px;
+	        -webkit-border-radius:20px;
+	        border-radius:20px;
+            }
+            .RoundEdge{
+	        -moz-border-radius:20px;
+	        -webkit-border-radius:20px;
+	        border-radius:20px;
+            }			
+		</style>
+	</head>
+	<body>
+		<table border="1" width="1000" height="475" cellpadding="5" cellspacing="5" align="center">
+          <caption><h1>Additional Rules</h1></caption>
+		  <tr>
+		      <td rowspan="2" width="25%" height="66%"><img src="Employees.png" align="center" width="300" height="400" /><br /></td>
+		      <td rowspan="2" width="25%" height="66%">			
+			   At the beginning of the game you can choice to do nothing each round
+			   and you will gain a set amount of money each round. This can be
+			   very benefitial at first since you might not have enough money to
+			   create your first product.
+			   Once your product is created you can hire different people to help
+			   you at each phase. There is a cost for each person you hire, so might
+			   want to be careful not to hire to many people. The people you hire
+			   will help you during certain phases of your product.
+			   Throughout the game there will be random events that can either
+			   help you or make things more difficult. For example you can get
+			   a tax break and increase your fund. Or the power goes out in your
+			   building and you need to send workers home.<br><br>
+			
+			  <br /></td>	
+		      <td rowspan="2" width="25%" height="66%"><img src="Random.png" align="center" width="300" height="400" /><br /></td>			  
+		  
+		  </tr>
+		</table>
+		<button class="Big RoundEdge" id="ToMenu" style="left:35%;top:80%;" onclick="GoToHow()">Back</button> 
+	</body>
+</html>

@@ -1,1 +1,0 @@
-This was something I had found while looking for a way to make localStorage work for Internet Explorer. While I still wasn't able to get basic data storing working on that friggin' browser, I'm curious if this little variation might be of use to us regardless.

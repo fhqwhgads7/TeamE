@@ -16,3 +16,17 @@ function checkOptions()
 	if (!((localStorage.getItem('RetirementMinimum') == '401000') || ((parseInt(localStorage.getItem('RetirementMinimum'))/100000 >= 5) && (parseInt(localStorage.getItem('RetirementMinimum'))/100000 <= 10)) || (localStorage.getItem('RetirementMinimum') == '999999999')))
 		localStorage.setItem('RetirementMinimum','401000');
 }
+var PlayerColors={
+	Red:"rgb(255,30,30)",
+	Green:"rgb(0,170,0)",
+	Blue:"rgb(30,30,255)",
+	Yellow:"rgb(255,255,100)",
+	Cyan:"rgb(30,255,255)",
+	Magenta:"rgb(255,30,255)",
+	Pink:"rgb(255,200,210)",
+	Orange:"rgb(230,165,60)",
+	Purple:"rgb(130,20,140)",
+	Brown:"rgb(175,50,30)",
+	White:"rgb(255,255,255)",
+	Black:"rgb(50,50,50)"
+}

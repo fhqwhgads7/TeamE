@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+		<link rel="stylesheet" type="text/css" href="../css/temp_shared.css"></link>
+		<style>
+		#CurrentPlayerDisplay{
+				position:absolute;
+				top:4%;
+				left:3%;
+				width:200px;
+				height:100px;
+				border-style:solid;
+				border-width:8px;
+				box-shadow: 0px 0px 40px 5px #EEEEEE;
+			}
+			#ProductWindow{
+				position:absolute;
+				top:35%;
+				left:3%;
+				width:19%;
+				height:40%;
+				border-style:solid;
+				border-width:8px;
+				border-color:gray;
+				background-color:rgba(0,0,0,.8);
+			}
+			#CashAlert{
+				font-family:arial;
+				font-size:30px;
+				font-weight:400;
+				position:absolute;
+				top:9%;
+				left:20%;
+				color:red;
+				text-shadow:-1px -1px 1px #FFFFFF,1px 1px 1px #000000,3px 3px 5px #000000;
+				transition:top 2.2s ease-in,left 2.2s ease-in,opacity 2s ease-in;
+				visibility:hidden;
+			}
+			div.ProductDisplayItem{
+				background-repeat:no-repeat;
+				background-position:center;
+				background-size:35px 35px;
+				position:absolute;
+				width:50px;
+				height:50px;
+				background-color:red;
+				border-radius:20px;
+				border-width:5px;
+				border-color:red;
+				box-shadow:4px 4px 15px -2px #000000;
+				transition:top 1s ease-out,left 1s ease-out;
+				webkit-transform-origin:50% 50%;
+				moz-transform-origin:50% 50%;
+			}
+			div.PlayerBox{
+				position:absolute;
+				border-style:solid;
+				border-width:7px;
+				width:30%;
+				height:15%;
+				box-shadow: 0px 0px 40px 5px #AAAAAA;
+			}
+		</style>
+</head>
+
+<body>
+
+<div class="NewActionModal RoundEdge" id="Scoreboard" style="overflow:hidden;width:75%;left:11%">
+						<div class="BigText" id="ScoreboardTitle" style="left:27%;top:3%;">nil</div>
+						<div class="PlayerBox" id="PlyOneScbdBox" style="border-color:red;left:13%;top:19%;">
+							<div class="SmallText" id="PlyOneScbdName" style="left:14%;top:5%;">nil</div>
+							<div class="SmallText" style="left:14%;top:35%;color:rgb(120,120,120)">$<span id="PlyOneScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
+							<div class="TinyText" style="left:14%;top:70%;color:rgb(120,120,120);font-size:10px">Products <span id="PlyOneScbdProds" style="color:white">nil</span></div>
+							<div class="TinyText" style="left:55%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlyOneScbdEmps" style="color:white">nil</span></div>
+						</div>
+						<div class="PlayerBox" id="PlyTwoScbdBox" style="border-color:red;left:55%;top:19%;">
+							<div class="SmallText" id="PlyTwoScbdName" style="left:14%;top:5%;">nil</div>
+							<div class="SmallText" style="left:14%;top:35%;color:rgb(120,120,120)">$<span id="PlyTwoScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
+							<div class="TinyText" style="left:14%;top:70%;color:rgb(120,120,120);font-size:10px">Products <span id="PlyTwoScbdProds" style="color:white">nil</span></div>
+							<div class="TinyText" style="left:55%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlyTwoScbdEmps" style="color:white">nil</span></div>
+						</div>
+						<div class="PlayerBox" id="PlyThreeScbdBox" style="border-color:red;left:13%;top:41%;">
+							<div class="SmallText" id="PlyThreeScbdName" style="left:14%;top:5%;">nil</div>
+							<div class="SmallText" style="left:14%;top:35%;color:rgb(120,120,120)">$<span id="PlyThreeScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
+							<div class="TinyText" style="left:14%;top:70%;color:rgb(120,120,120);font-size:10px">Products <span id="PlyThreeScbdProds" style="color:white">nil</span></div>
+							<div class="TinyText" style="left:55%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlyThreeScbdEmps" style="color:white">nil</span></div>
+						</div>
+						<div class="PlayerBox" id="PlyFourScbdBox" style="border-color:red;left:55%;top:41%;">
+							<div class="SmallText" id="PlyFourScbdName" style="left:14%;top:5%;">nil</div>
+							<div class="SmallText" style="left:14%;top:35%;color:rgb(120,120,120)">$<span id="PlyFourScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
+							<div class="TinyText" style="left:14%;top:70%;color:rgb(120,120,120);font-size:10px">Products <span id="PlyFourScbdProds" style="color:white">nil</span></div>
+							<div class="TinyText" style="left:55%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlyFourScbdEmps" style="color:white">nil</span></div>
+						</div>
+						<div class="PlayerBox" id="PlyFiveScbdBox" style="border-color:red;left:13%;top:63%;">
+							<div class="SmallText" id="PlyFiveScbdName" style="left:14%;top:5%;">nil</div>
+							<div class="SmallText" style="left:14%;top:35%;color:rgb(120,120,120)">$<span id="PlyFiveScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
+							<div class="TinyText" style="left:14%;top:70%;color:rgb(120,120,120);font-size:10px">Products <span id="PlyFiveScbdProds" style="color:white">nil</span></div>
+							<div class="TinyText" style="left:55%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlyFiveScbdEmps" style="color:white">nil</span></div>
+						</div>
+						<div class="PlayerBox" id="PlySixScbdBox" style="border-color:red;left:55%;top:63%;">
+							<div class="SmallText" id="PlySixScbdName" style="left:14%;top:5%;">nil</div>
+							<div class="SmallText" style="left:14%;top:35%;color:rgb(120,120,120)">$<span id="PlySixScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
+							<div class="TinyText" style="left:14%;top:70%;color:rgb(120,120,120);font-size:10px">Products <span id="PlySixScbdProds" style="color:white">nil</span></div>
+							<div class="TinyText" style="left:55%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlySixScbdEmps" style="color:white">nil</span></div>
+						</div>
+						<button class="Big" id="ScoreboardClose" onclick="CloseScoreboard()" style="top:87%;left:10%;width:80%;height:10%">Done</button>
+					</div>
+</body>
+</html>

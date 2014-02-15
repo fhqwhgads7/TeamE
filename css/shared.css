@@ -1,3 +1,11 @@
+#ContentContainer{
+	position:fixed;
+	top:2px;
+	left:3px;
+	width:800px;
+	height:600px;
+	overflow:hidden;
+}
 button.Standard{
 	outline:none;
 	position:absolute;

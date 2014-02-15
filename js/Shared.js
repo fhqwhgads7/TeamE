@@ -1,5 +1,12 @@
-function checkOptions()
-{
+function GlobalInitialize(){
+	$(document).on('mousemove',function(e){
+		$("#ContentContainer").css({
+		   left:-e.pageX/100+3,
+		   top:-e.pageY/100+2
+		});
+	});
+}
+function checkOptions(){
 	//Checks if 'GameDifficulty' is 'EASY', 'NORMAL', 'HARD', or 'LUNATIC'. Sets to 'NORMAL' if otherwise.
 	if (!((localStorage.getItem('GameDifficulty') == 'EASY') || (localStorage.getItem('GameDifficulty') == 'NORMAL') || (localStorage.getItem('GameDifficulty') == 'HARD') || (localStorage.getItem('GameDifficulty') == 'LUNATIC')))
 		localStorage.setItem('GameDifficulty','NORMAL');

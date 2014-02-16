@@ -47,9 +47,15 @@ function Product(player,name,category,sub,color){
 	this.DesignStrength=0;
 	this.BuildStrength=0;
 	this.Phase="nil";
-	player.Products.push(this);
-	this.Number=player.Products.length-1;
-	this.OwnerNumber=player.Number;
-	player.NumProducts=player.Products.length;
+	if(player != null){
+		player.Products.push(this);
+		this.Number=player.Products.length-1;
+		this.OwnerNumber=player.Number;
+		player.NumProducts=player.Products.length;
+	}
 	this.DisplayItemID="nil";
+	this.toString = function () {
+		return this.Name + ', ' + this.Category + ', ' + this.SubCategory + ', ' + this.Color;
+	}
+	return this;
 }

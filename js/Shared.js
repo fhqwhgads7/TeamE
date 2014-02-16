@@ -37,3 +37,19 @@ var PlayerColors={
 	White:"rgb(255,255,255)",
 	Black:"rgb(50,50,50)"
 }
+
+function Product(player,name,category,sub,color){
+	this.Name=name;
+	this.Category=category;
+	this.SubCategory=sub;
+	this.Color=color;
+	this.IdeaStrength=0;
+	this.DesignStrength=0;
+	this.BuildStrength=0;
+	this.Phase="nil";
+	player.Products.push(this);
+	this.Number=player.Products.length-1;
+	this.OwnerNumber=player.Number;
+	player.NumProducts=player.Products.length;
+	this.DisplayItemID="nil";
+}

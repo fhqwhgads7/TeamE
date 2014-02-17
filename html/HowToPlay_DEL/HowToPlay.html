@@ -1,75 +1,98 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<script type="text/javascript" src="../../js/Shared.js"></script>
-		<link rel="stylesheet" type="text/css" href="../../Shared.css"></link>
-		<script>
-			function Initialize(){
-				// nothin right now
-			}
-			function AboutGame(){
-				window.location="AboutGame.html";
-			}
-			function GettingStarted(){
-				window.location="GettingStarted.html";
-			}
-			function BasicRules(){
-				window.location="BasicRules.html";
-			}
-			function AdditionalRules(){
-				window.location="AdditionalRules.html";
-			}
-			function MainMenu(){
-				window.location="../../Title.html";
-			}
-		</script>
-		<style>
-            div.BigText{
-	        position:absolute;
-	        font-family:"Times New Roman";
-	        font-size:50px;
-	        font-weight:900;
-	        text-align:center;
-	        color:black;
-            }
-            button.Big{
-	        position:absolute;
-	        text-align:center;
-	        font-family:"Arial";
-	        font-weight:700;
-	        font-size:20px;
-	        color:rgb(0,0,0);
-	        background-image:-webkit-linear-gradient(top,rgba(170,170,170,1),rgba(70,70,70,1) 100%);
-	        background-image:-moz-linear-gradient(top,rgba(170,170,170,1),rgba(70,70,70,1) 100%);
-	        width:30%;
-	        height:7%;
-	        border-width:5px;
-	        border-style:solid;
-	        border-color:rgba(120,120,120,1);
-	        outline:none;
-	        -moz-border-radius:20px;
-	        -webkit-border-radius:20px;
-	        border-radius:20px;
-            }
-            .RoundEdge{
-	        -moz-border-radius:20px;
-	        -webkit-border-radius:20px;
-	        border-radius:20px;
-            }			
-		</style>		
-	</head>
-	<body onload="Initialize()">
-		<div id="MainBackground">
-		
-		
-		
-			<div class="BigText" id="TitleHow" style="font-size:70px;top:20%;width:100%">How to Play</div>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>How to Play</title>
 
-			<button class="Big RoundEdge" id="About" style="left:35%;top:45%;" onclick="AboutGame()">About The Game</button>
-			<button class="Big RoundEdge" id="Getting" style="left:35%;top:53%;" onclick="GettingStarted()">Getting Started</button>
-			<button class="Big RoundEdge" id="Basic" style="left:35%;top:61%;" onclick="BasicRules()">Basic Rules</button>
-			<button class="Big RoundEdge" id="Additional" style="left:35%;top:69%;" onclick="AdditionalRules()">Additional Rules</button>
-			<button class="Big RoundEdge" id="Menu" style="left:35%;top:77%;" onclick="MainMenu()">Main Menu</button>
-		</div>
-	</body>
+<script type="text/javascript" src="tabber.js"></script>
+<link rel="stylesheet" href="example.css" TYPE="text/css" MEDIA="screen">
+<link rel="stylesheet" href="example-print.css" TYPE="text/css" MEDIA="print">
+
+<script type="text/javascript">
+
+
+
+document.write('<style type="text/css">.tabber{display:none;}<\/style>');
+</script>
+
+</head>
+<body>
+
+<h1>How To Play</h1>
+
+
+
+<div class="tabber">
+
+     <div class="tabbertab">
+	  <h2>About the Game</h2>
+	  <p>
+			The world of entrepreneurship is large, full of possibility,
+			and--most of all-- random. The best method to teach you of the
+			process behind and entrepreneurial venture is, and always will be,
+			experience.<br><br>
+			In this simulation, you take the role of an entrepreneur who is in
+			the process of starting their own business. In order to begin your
+			process, though, you must have the courage to pursue
+			and market a new idea or invention to the public.<br><br>
+			You will also need money. Fortunately, you start with enough to
+			begin the pursuit of one venture, but you can stay at your day job for
+			longer in order to acquire more starting funds.<br><br>
+			As you go through your venture, you will
+			fail. A lot. But after failure comes success.	  
+	  
+	  
+	  </p>
+     </div>
+
+
+     <div class="tabbertab">
+	  <h2>Getting Started</h2>
+	  <p>
+         In this game you have a choice of playing against other people or against the computer.
+	     You can play up to six players, so you first need to select your competition.
+		 When you select your competition you need to select a name and color of the
+		 business.Make sure you did the same for your own business and now you are ready to get started.	  
+	  </p>
+     </div>
+
+
+     <div class="tabbertab">
+	  <h2>Basic Rules</h2>
+	  <p>
+			   The main objective of this game is to obtain more money than all the
+			   other players. Each player will start with an equal amount of money
+			   to help them begin. The idea is to create products and take them thru 
+			   the process an entrepreneur would go through.
+			   There are nine different phases a product will go through idea,
+               design, prototype, testing prototype, development, testing prerelease
+			   product, deploy, testing postrelease product, and maintenance.
+			   During a round a player will have a choice to do nothing, create a
+			   product, add employees, or move to the next product phase.
+			   Once you end your turn you will either gain money or lose money.
+			   Next the other player will have to do the same thing during their
+			   turn and so on until the final round is over	  
+	  </p>
+     </div>
+	 
+     <div class="tabbertab">
+	  <h2>Additional Rules</h2>
+	  <p>
+			   At the beginning of the game you can choice to do nothing each round
+			   and you will gain a set amount of money each round. This can be
+			   very benefitial at first since you might not have enough money to
+			   create your first product.
+			   Once your product is created you can hire different people to help
+			   you at each phase. There is a cost for each person you hire, so might
+			   want to be careful not to hire to many people. The people you hire
+			   will help you during certain phases of your product.
+			   Throughout the game there will be random events that can either
+			   help you or make things more difficult. For example you can get
+			   a tax break and increase your fund. Or the power goes out in your
+			   building and you need to send workers home.<br><br>
+	  </p>
+     </div>
+</div>
+
+</body>
 </html>

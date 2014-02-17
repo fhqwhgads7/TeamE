@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-		<link rel="stylesheet" type="text/css" href="../css/temp_shared.css"></link>
+		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
 		<style>
+		
 		#CurrentPlayerDisplay{
 				position:absolute;
 				top:4%;
@@ -64,9 +65,10 @@
 </head>
 
 <body>
-
-<div class="NewActionModal RoundEdge" id="Scoreboard" style="overflow:hidden;width:75%;left:11%">
-						<div class="BigText" id="ScoreboardTitle" style="left:27%;top:3%;">nil</div>
+		<div id="MainBackground">
+			<div id="MainBoard">
+				<div class="NewActionModal RoundEdge" id="Scoreboard" style="overflow:hidden;width:75%;left:11%">
+						<div class="BigText" id="ScoreboardTitle" style="left:30%;top:3%;">Game Over</div>
 						<div class="PlayerBox" id="PlyOneScbdBox" style="border-color:red;left:13%;top:19%;">
 							<div class="SmallText" id="PlyOneScbdName" style="left:14%;top:5%;">nil</div>
 							<div class="SmallText" style="left:14%;top:35%;color:rgb(120,120,120)">$<span id="PlyOneScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
@@ -103,7 +105,10 @@
 							<div class="TinyText" style="left:14%;top:70%;color:rgb(120,120,120);font-size:10px">Products <span id="PlySixScbdProds" style="color:white">nil</span></div>
 							<div class="TinyText" style="left:55%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlySixScbdEmps" style="color:white">nil</span></div>
 						</div>
-						<button class="Big" id="ScoreboardClose" onclick="CloseScoreboard()" style="top:87%;left:10%;width:80%;height:10%">Done</button>
+						<button class="Big" id="ScoreboardClose" onclick="GoToMenu()" style="top:87%;left:15%;width:30%;height:10%">Main Menu</button>
+						<button class="Big" id="ScoreboardClose" onclick="GoToNewGame()" style="top:87%;right:15%;width:30%;height:10%">New Game</button>
 					</div>
+				</div>
+			</div>
 </body>
 </html>

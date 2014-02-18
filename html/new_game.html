@@ -13,33 +13,39 @@
 				PopulatePlayerColorFields();
 			}
 			function PopulatePlayerColorFields(){
+				var BigNum=1;
 				$("select").each(function(){
 					var Sel=$(this);
-					if(Sel.getAttribute){
-						alert(Sel.getAttribute("id"));
-						var Id=Sel.getAttribute("id");
+					var Id=Sel.attr("id");
+					if(Id){;
 						if((Id.indexOf("Player")!=-1)&&(Id.indexOf("Color")!=-1)){
+							var Num=1;
 							for(Color in PlayerColors){
-								var Opt=document.createElement("option");
-								Opt.value=Color;
-								Opt.innerHTML=Color;
-								Sel.appendChild(Opt);
+								var Select="";
+								if(BigNum==Num){Select=" selected='selected'";}
+								Sel.append("<option value="+Color+Select+">"+Color+"</option>")
+								Num=Num+1;
 							}
-							Sel.options[Select].selected="true";
-							SetBoxColor(Sel.id);
+							BigNum=BigNum+1;
+							SetBoxColor(Id);
 						}
 					}
 				})
 			}
 			function SetBoxColor(id){
-				var SelBox=$("#"+id);
-				var Col=SelBox.options[SelBox.selectedIndex].value;
-				SelBox.parentNode.style.borderColor=Col;
+				var Box=$("#"+id);
+				var Col=$("#"+id+" option:selected").val();
+				Box.parent().css("border-color",Col);
+			}
+			function LoadOptionsPage(){
+				window.location="options.html";
+			}
+			function GoBackToMainMenu(){
+				window.location="title.html";
 			}
 		</script>
 		<style>
-			#MainBackground
-			{
+			#MainBackground{
 				background-image:url('../images/background_morning_1.jpg');
 				position:fixed;
 				top:10px;

@@ -56,10 +56,19 @@
 				window.product = Product(null, 'Product Name', 'Product Category', 'Product Sub-Category', 'Player Color');
 				alert("New Product: " + window.product.toString());
 			}
+			function displayNewProductDialog() {
+				$("#new-product-dialog").show();		
+			}
+
 			$(document).ready(function() {
+
+				// Event assignments
+
 				$("#new-product-button").click(function() {
-					createNewProduct();	
+					displayNewProductDialog();
+					// createNewProduct();	
 				})
+
 			});
 			
 		</script>
@@ -102,7 +111,7 @@
 			</div>
 		</div>
 <!-- hidden dom elements -->		
-		<div class="popup" id="load-alert">
+		<div class="popup" id="new-product-dialog">
 			<h1>New Product</h1>
 			<p>
 			</p>

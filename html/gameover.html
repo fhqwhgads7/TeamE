@@ -1,7 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
+		<script src="../js/jquery.js"></script>
+		<script src="../js/Server.js"></script>
+		<script src="../js/Client.js"></script>
+		<script src="../js/Shared.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
+		<script>
+		function Initialize()
+		{
+			GlobalInitialize();
+		}
+		
+		</script>
+		
 		<style>
 		
 		#CurrentPlayerDisplay{
@@ -64,11 +76,12 @@
 		</style>
 </head>
 
-<body>
-		<div id="MainBackground">
-			<div id="MainBoard">
+<body onload="Initialize()">
+	<div id="MainBackground">
+		<div id="MainBoard">
+			<div id="ContentContainer">
 				<div class="NewActionModal RoundEdge" id="Scoreboard" style="overflow:hidden;width:75%;left:11%">
-						<div class="BigText" id="ScoreboardTitle" style="left:30%;top:3%;">Game Over</div>
+						<div class="StandardText" id="ScoreboardTitle" style="left:30%;top:3%;">Game Over</div>
 						<div class="PlayerBox" id="PlyOneScbdBox" style="border-color:red;left:13%;top:19%;">
 							<div class="SmallText" id="PlyOneScbdName" style="left:14%;top:5%;">nil</div>
 							<div class="SmallText" style="left:14%;top:35%;color:rgb(120,120,120)">$<span id="PlyOneScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
@@ -110,5 +123,6 @@
 					</div>
 				</div>
 			</div>
+		</div>
 </body>
 </html>

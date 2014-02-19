@@ -63,26 +63,8 @@
 			});
 			
 		</script>
+		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
 		<style>
-			#MainBackground
-			{
-				background-image:url('../images/background_night_2.jpg');
-				position:fixed;
-				top:10px;
-				left:10px;
-				width:800px;
-				height:600px;
-				overflow:hidden;
-			}
-			#MainBoard
-			{
-				position:absolute;
-				top:0px;
-				left:0px;
-				width:800px;
-				height:600px;
-				overflow:hidden;
-			}
 			#GameBoardCircle
 			{
 				background-image:url('../images/gameboard_circle.png');
@@ -103,43 +85,6 @@
 				width:800px;
 				height:600px;
 			}
-			button.Small
-			{
-				position:absolute;
-				text-align:center;
-				font-family:"Arial";
-				font-weight:600;
-				font-size:15px;
-				color:rgb(0,0,0);
-				background-image:-webkit-linear-gradient(top,rgba(170,170,170,1),rgba(70,70,70,1) 100%);
-				background-image:-moz-linear-gradient(top,rgba(170,170,170,1),rgba(70,70,70,1) 100%);
-				width:15%;
-				height:6%;
-				border-width:5px;
-				border-style:solid;
-				border-color:rgba(120,120,120,1);
-				outline:none;
-				-moz-border-radius:10px;
-				-webkit-border-radius:10px;
-				border-radius:10px;
-			}
-			button.Small:hover
-			{
-				color:rgb(255,255,255);
-				cursor: pointer;
-			}
-			button.Small:active
-			{
-				background-image:-webkit-linear-gradient(top,rgba(80,80,80,1),rgba(150,150,150,1) 100%);
-				background-image:-moz-linear-gradient(top,rgba(80,80,80,1),rgba(150,150,150,1) 100%);
-				color:rgb(180,180,180);
-			}
-			button.Small:disabled
-			{
-				background-color:rgb(140,140,140);
-				color:rgb(110,110,110);
-				background-image:none;
-			}
 		</style>
 	</head>
 	
@@ -154,6 +99,17 @@
 					<button class="Small" id="TurnBoardCWButton" style="top:26%;left:19%;width:5%" onmousedown="RotateBegin(1)" onmouseup="RotateEnd()"><b>></b></button>
 				</div>
 				<button id="new-product-button" class="Small" style="top:80%;left:3%;width:10%;height:8%;">New<br>Product</button>		
+			</div>
+		</div>
+<!-- hidden dom elements -->		
+		<div class="popup" id="load-alert">
+			<h1>New Product</h1>
+			<p>
+			</p>
+			<div>
+				<button class="Medium RoundEdge" id="new-product-make-button">Make</button>
+				<button class="Medium RoundEdge" id="new-product-cancel-button">Cancel</button>
+			</div>
 			</div>
 		</div>
 	</body>

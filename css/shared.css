@@ -235,11 +235,15 @@ button.Small:disabled{
 }
 
 div.popup {
+	position: absolute;
 	display: none;
+	
+	z-index: 10;
+	top: 30%;
+	left: 30%;
 	color: black;
 	height: 10em;
 	width: 20em;
-	margin: auto;
 	border: 1px black solid;
 	background: white;
 	text-align: center;

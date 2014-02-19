@@ -232,3 +232,14 @@ button.Small:disabled{
 	-webkit-border-radius:20px;
 	border-radius:20px;
 }
+
+div.popup {
+	display: none;
+	color: black;
+	height: 10em;
+	width: 20em;
+	margin: auto;
+	border: 1px black solid;
+	background: white;
+	text-align: center;
+}

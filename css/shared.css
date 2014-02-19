@@ -216,6 +216,7 @@ button.Small{
 }
 button.Small:hover{
 	color:rgb(255,255,255);
+	cursor: pointer;
 }
 button.Small:active{
 	background-image:-webkit-linear-gradient(top,rgba(80,80,80,1),rgba(150,150,150,1) 100%);

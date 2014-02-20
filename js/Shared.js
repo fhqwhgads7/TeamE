@@ -13,6 +13,12 @@ function GlobalInitialize(){
 		$("#PageFadeIn").remove();
 	},174);
 }
+function GameObject(name){
+	this.Name=name;
+	this.LoadGame=function(id){
+		alert("you selected to load "+id+" game!");
+	}
+}
 function SwitchToPage(page){
 	$(document.body).append('<div id="PageFadeOut"></div>')
 	setTimeout(function(){

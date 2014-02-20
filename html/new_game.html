@@ -38,22 +38,13 @@
 				Box.parent().css("border-color",Col);
 			}
 			function LoadOptionsPage(){
-				window.location="options.html";
+				SwitchToPage("options.html");
 			}
 			function GoBackToMainMenu(){
 				window.location="title.html";
 			}
 		</script>
 		<style>
-			#MainBackground{
-				background-image:url('../images/background_morning_1.jpg');
-				position:fixed;
-				top:10px;
-				left:10px;
-				width:800px;
-				height:600px;
-				overflow:hidden;
-			}
 			div.PlayerBox{
 				position:absolute;
 				border-style:solid;
@@ -74,7 +65,7 @@
 	<body onload="Initialize()">
 		<div id="MainBackground">
 			<div id="ContentContainer">
-				<div class="StandardText" id="StartNewGameTitle" style="left:28%;top:10%;">Create New Game</div> 
+				<div class="StandardText" id="StartNewGameTitle" style="left:28%;top:10%;">New Game Players</div> 
 				<div class="PlayerBox" id="PlayerOneBox" style="border-color:red;left:13%;top:22%;">
 					<div class="StandardText" style="left:14%;top:5%;font-size:20px">Business One</div>
 					<textarea id="PlayerOneName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>

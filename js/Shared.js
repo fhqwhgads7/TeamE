@@ -5,6 +5,22 @@ function GlobalInitialize(){
 		   top:-e.pageY/100+2
 		});
 	});
+	$(document.body).append('<div id="PageFadeIn"></div>')
+	setTimeout(function(){
+		$("#PageFadeIn").css("background-color","rgba(128,128,128,0)");
+	},1);
+	setTimeout(function(){
+		$("#PageFadeIn").remove();
+	},174);
+}
+function SwitchToPage(page){
+	$(document.body).append('<div id="PageFadeOut"></div>')
+	setTimeout(function(){
+		$("#PageFadeOut").css("background-color","rgba(128,128,128,1)");
+	},1);
+	setTimeout(function(){
+		window.location=page;
+	},149);
 }
 function checkOptions(){
 	//Checks if 'GameDifficulty' is 'EASY', 'NORMAL', 'HARD', or 'LUNATIC'. Sets to 'NORMAL' if otherwise.

@@ -1,18 +1,16 @@
 <html>
 <head>
-	<title>Background Music </title>
+<title>Background Music </title>
 	
-	<script src = "http://code.jquery.com/jquery-2.1.0.min.js"></script>
+<script src = "http://code.jquery.com/jquery-2.1.0.min.js"></script>
+
+<script>
 	
-	<script>
+jQuery(document).ready(function (){
 	
-	jQuery(document).ready(function (){
-	
-		var audioArray = document.getElementsByClassName('playsong');
+var audioArray = document.getElementsByClassName('playsong');
 		
-		
-		//document.write(audioArray.length);
-		
+//document.write(audioArray.length);
 		var i = 0;
 		var nowPlaying = audioArray[i];
 		nowPlaying.load();
@@ -60,12 +58,14 @@
 	
 	});
 	
-	</script>
+</script>
 
 
 </head>
-
+ 
 <body>
+<audio controls autoPlay loop> //get rid of controls
+<source src="The Man.mp3" /> 
 <audio id="player" class = "playsong">
 <source src="For The Win.mp3" /> 
 </audio>

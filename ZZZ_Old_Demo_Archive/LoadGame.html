@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script type="text/javascript" src="Shared.js"></script>
+		<link rel="stylesheet" type="text/css" href="Shared.css"></link>
+		<script>
+			function Initialize(){
+				// nothin right now
+			}
+			function GetSavedGame(theGame){
+				// nothin right now
+			}
+			function GoToMenu(){
+				window.location="MainMenu.html";
+			}
+			function LoadThisGame(theGame){
+				//nothin right now
+			}
+		</script>
+		<style>
+			div.LoadGameBox{
+				position:absolute;
+				border-style:solid;
+				border-width:5px;
+				font-family:"Arial";
+				font-size:15px;
+				font-weight:900;
+				font-color:white;
+				width:70%;
+				height:15%;
+				box-shadow: 0px 0px 20px 5px #AAAAAA;
+			}
+			div.HTPText{
+				position:absolute;
+				font-family:"Arial";
+				font-size:20px;
+				font-weight:900;
+				text-align:center;
+				color:rgba(255,255,255,1);
+			}
+		</style>
+	</head>
+	<body>
+		<div id="MainBackground">
+			<div class="BigText" id="MainTitle" style="left:35%;top:8%;">Load Game</div>
+			<div class="LoadGameBox" id="SavedGameOne" style="left:15%;top:20%;">
+				<div class="SmallText" id="Details1" style="left:5%;top:40%">Game One Details</div>
+				<button class="Small RoundEdge" id="ToMenu" style="right:5%;top:30%;height:40%" onclick="GoToMenu()">Load</button>
+			</div>
+			<div class="LoadGameBox" id="SavedGameTwo" style="left:15%;top:40%;">
+				<div class="SmallText" id="Details2" style="left:5%;top:40%">Game Two Details</div>
+				<button class="Small RoundEdge" id="ToMenu" style="right:5%;top:30%;height:40%" onclick="GoToMenu()">Load</button>
+			</div>
+			<div class="LoadGameBox" id="SavedGameTwo" style="left:15%;top:60%;">
+				<div class="SmallText" id="Details3" style="left:5%;top:40%">Game Three Details</div>
+				<button class="Small RoundEdge" id="ToMenu" style="right:5%;top:30%;height:40%" onclick="GoToMenu()">Load</button>
+			</div>
+			<button class="Big RoundEdge" id="ToMenu" style="left:35%;top:80%;" onclick="GoToMenu()">Return to Menu</button>
+		</div>
+	</body>
+</html>

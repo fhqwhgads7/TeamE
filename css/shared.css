@@ -1,0 +1,285 @@
+#ContentContainer{
+	position:fixed;
+	top:2px;
+	left:3px;
+	width:800px;
+	height:600px;
+	overflow:hidden;
+}
+#PageFadeOut{
+	position:fixed;
+	top:2px;
+	left:3px;
+	width:810px;
+	height:610px;
+	background-color:rgba(128,128,128,0);
+	transition: background-color 149ms linear;
+	-webkit-transition: background-color 149ms linear;
+    -moz-transition: background-color 149ms linear;
+}
+#PageFadeIn{
+	position:fixed;
+	top:2px;
+	left:3px;
+	width:810px;
+	height:610px;
+	background-color:rgba(128,128,128,1);
+	transition: background-color 174ms linear;
+	-webkit-transition: background-color 174ms linear;
+    -moz-transition: background-color 174ms linear;
+}
+button.Standard{
+	outline:none;
+	position:absolute;
+	padding:0.4em 2em;
+	font-size:1.6em;
+	font-family:Arial;
+	background:rgba(255,255,255,0.75);
+	color:rgba(0,0,0,0.7);
+	text-shadow:1px 1px 0 rgba(255,255,255,0.1);
+	text-decoration:none;
+	border:solid 1px rgba(20,20,20,1);
+	border-radius:10px;
+	box-shadow:inset 1px 1px 1px rgba(255,255,255,0.05),inset 0 0 35px rgba(0,0,0,0.6),0 10px 10px -6px rgba(0,0,0,0.75);
+}
+button.Standard:hover {
+	background:rgba(255,255,255,1);
+	box-shadow:inset 1px 1px 1px rgba(255,255,255,0.05),inset 0 0 35px rgba(0,0,0,0.6),0 10px 10px -6px rgba(0,0,0,1);
+}
+button.Standard:active {
+	top:5px;
+	box-shadow:inset 0 1px 1px rgba(0,0,0,0.4),inset 0 0 35px rgba(0,0,0,0.6),0 1px 1px rgba(255,255,255,0.1),inset 0 6px 4px rgba(0,0,0,0.4);
+}
+div.StandardText{
+	position:absolute;
+	font-family:"Arial";
+	font-size:40px;
+	font-weight:900;
+	text-align:center;
+	color:white;
+}
+.OneColumn{
+	position:absolute;
+	left:10%;
+	width:80%;
+}
+.TwoColumnFirst{
+	position:absolute;
+	left:10%;
+	width:36%:
+}
+.TwoColumnSecond{
+	position:absolute;
+	left:53%;
+	width:36%;
+}
+.ThreeColumnFirst{
+	position:absolute;
+	left:10%;
+	width:25%
+}
+.ThreeColumnSecond{
+	position:absolute;
+	left:40%;
+	width:25%;
+}
+.ThreeColumnThird{
+	position:absolute;
+	left:70%;
+	width:25%;
+}
+#MainBackground{
+	background-image:url('../images/background_night_2.jpg');
+	position:fixed;
+	top:10px;
+	left:10px;
+	width:800px;
+	height:600px;
+	overflow:hidden;
+}
+#MainBoard{
+	position:absolute;
+	top:0px;
+	left:0px;
+	width:800px;
+	height:600px;
+	overflow:hidden;
+}
+#RoundAnnouncer{
+	position:absolute;
+	top:-600px;
+	left:0px;
+	width:800px;
+	height:600px;
+	overflow:hidden;
+	font-family:"Arial";
+	font-size:180px;
+	font-weight:900;
+	text-align:center;
+	color:gray;
+	text-shadow:-5px -5px 5px #FFFFFF,10px 10px 10px #000000;
+}
+div.NewActionModal{
+	position:absolute;
+	font-align:center;
+	font-family:"Arial";
+	font-size:90px;
+	font-color:white;
+	width:40%;
+	height:80%;
+	left:30%;
+	top:10%;
+	border-style:solid;
+	border-width:15px;
+	border-color:rgba(128,128,128,1);
+	background-color:rgba(0,0,0,1);
+}
+div.BigText{
+	position:absolute;
+	font-family:"Times New Roman";
+	font-size:50px;
+	font-weight:900;
+	text-align:center;
+	color:white;
+}
+div.MediumText{
+	position:absolute;
+	font-family:"Arial";
+	font-size:40px;
+	font-weight:900;
+	text-align:center;
+	color:white;
+}
+div.SmallText{
+	position:absolute;
+	font-family:"Arial";
+	font-size:20px;
+	font-weight:900;
+	text-align:center;
+	color:white;
+}
+div.TinyText{
+	position:absolute;
+	font-family:"Arial";
+	font-size:15px;
+	font-weight:900;
+	text-align:center;
+	color:rgba(200,200,200,1);
+}
+button.Big{
+	position:absolute;
+	text-align:center;
+	font-family:"Arial";
+	font-weight:700;
+	font-size:20px;
+	color:rgb(0,0,0);
+	background-image:-webkit-linear-gradient(top,rgba(170,170,170,1),rgba(70,70,70,1) 100%);
+	background-image:-moz-linear-gradient(top,rgba(170,170,170,1),rgba(70,70,70,1) 100%);
+	width:30%;
+	height:7%;
+	border-width:5px;
+	border-style:solid;
+	border-color:rgba(120,120,120,1);
+	outline:none;
+	-moz-border-radius:20px;
+	-webkit-border-radius:20px;
+	border-radius:20px;
+}
+button.Big:hover{
+	color:rgb(255,255,255);
+}
+button.Big:active{
+	background-image:-webkit-linear-gradient(top,rgba(80,80,80,1),rgba(150,150,150,1) 100%);
+	background-image:-moz-linear-gradient(top,rgba(80,80,80,1),rgba(150,150,150,1) 100%);
+	color:rgb(180,180,180);
+}
+button.Big:disabled{
+	background-color:rgb(140,140,140);
+	color:rgb(110,110,110);
+	background-image:none;
+}
+button.Medium{
+	position:absolute;
+	text-align:center;
+	font-family:"Arial";
+	font-weight:700;
+	font-size:15px;
+	color:rgb(0,0,0);
+	background-image:-moz-linear-gradient(top,rgba(170,170,170,1),rgba(70,70,70,1) 100%);
+	background-image:-webkit-linear-gradient(top,rgba(170,170,170,1),rgba(70,70,70,1) 100%);
+	width:20%;
+	height:7%;
+	border-width:5px;
+	border-style:solid;
+	border-color:rgba(120,120,120,1);
+	outline:none;
+	-moz-border-radius:20px;
+	-webkit-border-radius:20px;
+	border-radius:20px;
+}
+button.Medium:hover{
+	color:rgb(255,255,255);
+}
+button.Medium:active{
+	background-image:-moz-linear-gradient(top,rgba(80,80,80,1),rgba(150,150,150,1) 100%);
+	background-image:-webkit-linear-gradient(top,rgba(80,80,80,1),rgba(150,150,150,1) 100%);
+	color:rgb(180,180,180);
+}
+button.Medium:disabled{
+	background-color:rgb(140,140,140);
+	color:rgb(110,110,110);
+	background-image:none;
+}
+button.Small{
+	position:absolute;
+	text-align:center;
+	font-family:"Arial";
+	font-weight:600;
+	font-size:15px;
+	color:rgb(0,0,0);
+	background-image:-webkit-linear-gradient(top,rgba(170,170,170,1),rgba(70,70,70,1) 100%);
+	background-image:-moz-linear-gradient(top,rgba(170,170,170,1),rgba(70,70,70,1) 100%);
+	width:15%;
+	height:6%;
+	border-width:5px;
+	border-style:solid;
+	border-color:rgba(120,120,120,1);
+	outline:none;
+	-moz-border-radius:10px;
+	-webkit-border-radius:10px;
+	border-radius:10px;
+}
+button.Small:hover{
+	color:rgb(255,255,255);
+	cursor: pointer;
+}
+button.Small:active{
+	background-image:-webkit-linear-gradient(top,rgba(80,80,80,1),rgba(150,150,150,1) 100%);
+	background-image:-moz-linear-gradient(top,rgba(80,80,80,1),rgba(150,150,150,1) 100%);
+	color:rgb(180,180,180);
+}
+button.Small:disabled{
+	background-color:rgb(140,140,140);
+	color:rgb(110,110,110);
+	background-image:none;
+}
+.RoundEdge{
+	-moz-border-radius:20px;
+	-webkit-border-radius:20px;
+	border-radius:20px;
+}
+
+div.popup {
+	position: absolute;
+	display: none;
+	
+	z-index: 10;
+	top: 30%;
+	left: 30%;
+	color: black;
+	height: 10em;
+	width: 20em;
+	border: 1px black solid;
+	background: white;
+	text-align: center;
+}

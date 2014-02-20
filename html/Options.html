@@ -21,18 +21,13 @@
 			{
 				LoadOptions();
 				checkOptions();
-				TheServer=new Server();
-				Self=new Client("me");
-				Self.ConnectTo(TheServer);
-				alert(TheServer.Clients);
 				//alert(GameDifficulty + " " + CPUIntelligence + " " + NumberOfRounds + " " + PatentingEnabled + " " + RetirementMinimum);
-				localStorage.RememberedServer=JSON.stringify(TheServer);
-				localStorage.RememberedClient=JSON.stringify(Self);
-				Self.SendToHost("INITIALIZATION_REQUEST",[]);
+				GlobalInitialize();
 			}
 			
-			function GoToMenu(){
-				window.location="TitlePage.html";
+			function GoBack(){
+				SaveOptions();
+				SwitchToPage("new_game.html");
 			}
 			
 			function LoadOptions()
@@ -51,6 +46,10 @@
 				else
 					$( "#Patenting").val("Off");
 				$( "#RetirementMinimum").val(RetirementMinimum);
+			}
+			function CreateGame(){
+				SaveOptions();
+				SwitchToPage("game_board.html");
 			}
 			function SaveOptions()
 			{
@@ -85,15 +84,6 @@
 			
 		</script>
 		<style>
-			#MainBackground{
-				background-image:url('../images/game_background.png');
-				position:fixed;
-				top:10px;
-				left:10px;
-				width:800px;
-				height:600px;
-				overflow:hidden;
-			}
 			div.OptionsBox{
 				position:absolute;
 				border-style:solid;
@@ -101,54 +91,10 @@
 				width:60%;
 				height:60%;
 				box-shadow: 0px 0px 40px 5px #AAAAAA;
+				background-color:rgba(0,0,0,.1);
 			}
-			div.BigText{
-				position:absolute;
-				font-family:"Times New Roman";
-				font-size:50px;
-				font-weight:900;
-				text-align:center;
-				color:white;
-			}
-			div.SmallText{
-				position:absolute;
-				font-family:"Arial";
-				font-size:20px;
-				font-weight:900;
-				text-align:center;
-				color:white;
-			}
-			button.Medium{
-				position:absolute;
-				text-align:center;
-				font-family:"Arial";
-				font-weight:700;
-				font-size:15px;
-				color:rgb(0,0,0);
-				background-image:-moz-linear-gradient(top,rgba(170,170,170,1),rgba(70,70,70,1) 100%);
-				background-image:-webkit-linear-gradient(top,rgba(170,170,170,1),rgba(70,70,70,1) 100%);
-				width:20%;
-				height:7%;
-				border-width:5px;
-				border-style:solid;
-				border-color:rgba(120,120,120,1);
-				outline:none;
-				-moz-border-radius:20px;
-				-webkit-border-radius:20px;
-				border-radius:20px;
-			}
-			button.Medium:hover{
-				color:rgb(255,255,255);
-			}
-			button.Medium:active{
-				background-image:-moz-linear-gradient(top,rgba(80,80,80,1),rgba(150,150,150,1) 100%);
-				background-image:-webkit-linear-gradient(top,rgba(80,80,80,1),rgba(150,150,150,1) 100%);
-				color:rgb(180,180,180);
-			}
-			button.Medium:disabled{
-				background-color:rgb(140,140,140);
-				color:rgb(110,110,110);
-				background-image:none;
+			div.OptionsBox:hover{
+				background-color:rgba(255,255,255,.1);
 			}
 			.Options{
 				position:absolute;
@@ -166,80 +112,81 @@
 	</head>
 	<body onload="Initialize()">
 		<div id="MainBackground">
-			<div class="OptionsBox" id="OptionsBox" style="left:20%;top:20%;">
-			
-				<div class="SmallText" style="left:3%;top:5%;">Game Difficulty</div>
-				<div class="SmallText" style="left:3%;top:14%;">CPU Intelligence</div>
-				<div class="SmallText" style="left:3%;top:23%;">Product Patenting</div>
-				<div class="SmallText" style="left:3%;top:32%;">Number of Rounds</div>
-				<div class="SmallText" style="left:3%;top:41%;">Retirement Minimum</div>
+			<div id="ContentContainer">
+				<div class="OptionsBox" id="OptionsBox" style="left:20%;top:20%;">
 				
-				<select class="Options" id="GameDifficulty" style="top:5%;" onchange="STV_GameDifficulty()">
-						<option value="EASY">Easy</option>
-						<option value="NORMAL" selected="selected">Normal</option>
-						<option value="HARD">Hard</option>
-						<option value="LUNATIC">Lunatic</option>
-					</select>
-					<select class="Options" id="CPUIntelligence" style="top:14%;" onchange="STV_CPUIntelligence()">
-						<option value="BEGINNER">Beginner</option>
-						<option value="STANDARD" selected="selected">Standard</option>
-						<option value="EXPERT">Expert</option>
-					</select>
-					<select class="Options" id="Patenting" style="top:23%;" onchange="STV_PatentingEnabled()">
-						<option value="On" selected="selected">On</option>
-						<option value="Off">Off</option>
-					</select>
-					<select class="Options" id="NumberOfRounds" style="top:32%;" onchange="STV_NumberOfRounds()">
-						<option value=40 selected="selected">40</option>
-						<option value=45>45</option>
-						<option value=50>50</option>
-						<option value=55>55</option>
-						<option value=60>60</option>
-					</select>
-					<select class="Options" id="RetirementMinimum" style="top:41%;" onchange="STV_RetirementMinimum()">
-						<option value=401000 selected="selected">$401,000</option>
-						<option value=500000>$500,000</option>
-						<option value=600000>$600,000</option>
-						<option value=700000>$700,000</option>
-						<option value=800000>$800,000</option>
-						<option value=900000>$900,000</option>
-						<option value=1000000>$1,000,000</option>
-						<option value=999999999>$999,999,999</option>
-					</select>
-				
-				<form>
-
-					<TABLE bgcolor="FFFFFF" border="5" style="position:absolute;top:53%;left:2%;width:96%">
-						<TR>
-					  <TH COLSPAN="2">Background Music
-					  </TH>
-					   <TR>
-						  <TD>Main Menu</TD>
-						  <TD><input type="file" name="Music_Menu"></TD>
-					   </TR>
-					   <TR>
-						  <TD>In Game</TD>
-						  <TD><input type="file" name="Music_Game"></TD>
-					   </TR>
-					   <TR>
-						  <TD>Time's running out!</TD>
-						  <TD><input type="file" name="Music_Time"></TD>
-					   </TR>
-					   <TR>
-						  <TD>Final Scores</TD>
-						  <TD><input type="file" name="Music_Scores"></TD>
-					   </TR>
-					</TABLE>
+					<div class="StandardText" style="font-size:23px;left:3%;top:5%;">Game Difficulty</div>
+					<div class="StandardText" style="font-size:23px;left:3%;top:14%;">CPU Intelligence</div>
+					<div class="StandardText" style="font-size:23px;left:3%;top:23%;">Product Patenting</div>
+					<div class="StandardText" style="font-size:23px;left:3%;top:32%;">Number of Rounds</div>
+					<div class="StandardText" style="font-size:23px;left:3%;top:41%;">Retirement Minimum</div>
 					
-				</form>
-				
-				
-				
+					<select class="Options" id="GameDifficulty" style="top:5%;" onchange="STV_GameDifficulty()">
+							<option value="EASY">Easy</option>
+							<option value="NORMAL" selected="selected">Normal</option>
+							<option value="HARD">Hard</option>
+							<option value="LUNATIC">Lunatic</option>
+						</select>
+						<select class="Options" id="CPUIntelligence" style="top:14%;" onchange="STV_CPUIntelligence()">
+							<option value="BEGINNER">Beginner</option>
+							<option value="STANDARD" selected="selected">Standard</option>
+							<option value="EXPERT">Expert</option>
+						</select>
+						<select class="Options" id="Patenting" style="top:23%;" onchange="STV_PatentingEnabled()">
+							<option value="On" selected="selected">On</option>
+							<option value="Off">Off</option>
+						</select>
+						<select class="Options" id="NumberOfRounds" style="top:32%;" onchange="STV_NumberOfRounds()">
+							<option value=40 selected="selected">40</option>
+							<option value=45>45</option>
+							<option value=50>50</option>
+							<option value=55>55</option>
+							<option value=60>60</option>
+						</select>
+						<select class="Options" id="RetirementMinimum" style="top:41%;" onchange="STV_RetirementMinimum()">
+							<option value=401000 selected="selected">$401,000</option>
+							<option value=500000>$500,000</option>
+							<option value=600000>$600,000</option>
+							<option value=700000>$700,000</option>
+							<option value=800000>$800,000</option>
+							<option value=900000>$900,000</option>
+							<option value=1000000>$1,000,000</option>
+							<option value=999999999>$999,999,999</option>
+						</select>
+					
+					<form>
+
+						<TABLE bgcolor="FFFFFF" border="5" style="position:absolute;top:53%;left:2%;width:96%">
+							<TR>
+						  <TH COLSPAN="2">Background Music
+						  </TH>
+						   <TR>
+							  <TD>Menus</TD>
+							  <TD><input type="file" name="Music_Menu"></TD>
+						   </TR>
+						   <TR>
+							  <TD>In Game</TD>
+							  <TD><input type="file" name="Music_Game"></TD>
+						   </TR>
+						   <TR>
+							  <TD>Time's running out!</TD>
+							  <TD><input type="file" name="Music_Time"></TD>
+						   </TR>
+						   <TR>
+							  <TD>Final Scores</TD>
+							  <TD><input type="file" name="Music_Scores"></TD>
+						   </TR>
+						</TABLE>
+						
+					</form>
+					
+					
+					
+				</div>
+				<div class="StandardText" id="MainTitle" style="left:30%;top:8%;">New Game Options</div>
+				<button class="Standard" onclick="CreateGame()" style="left:54%;width:36%;top:85%;font-size:20px">Create Game</button>
+				<button class="Standard" onclick="GoBack()" style="left:11%;width:36%;top:85%;font-size:20px">Back</button>
 			</div>
-			<div class="BigText" id="MainTitle" style="left:40%;top:10%;">Options</div>
-			<button class="Medium RoundEdge" onclick="SaveOptions()" style="left:20%;top:84%;">Save Changes</button>
-			<button class="Medium RoundEdge" onclick="RestorePrevious()" style="left:40.5%;top:84%;">Restore Previous</button>
-			<button class="Medium RoundEdge" onclick="GoToMenu()" style="left:61%;top:84%;">Return to Menu</button>
 		</div>
 	</body>
 </html>

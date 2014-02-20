@@ -2,10 +2,7 @@
 <html>
 	<head>
 		<script src="../js/jquery.js"></script>
-		<script src="../js/Server.js"></script>
-		<script src="../js/Client.js"></script>
-		<script src="../js/Shared.js"></script>
-		<script src="../js/single_player.js"></script>
+		<script src="../js/shared.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
 		<script type="text/javascript">
 			function Initialize(){
@@ -38,10 +35,10 @@
 				Box.parent().css("border-color",Col);
 			}
 			function LoadOptionsPage(){
-				SwitchToPage("options.html");
+				SwitchToPage("new_game_options.html");
 			}
 			function GoBackToMainMenu(){
-				window.location="title.html";
+				SwitchToPage("title.html");
 			}
 		</script>
 		<style>

@@ -1,65 +1,83 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta charset="utf-8">
-	<title>Entrepreneurship Game</title>
-	<link type="text/css" rel="stylesheet" href="css/main.css" />
-	
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/jquery-ui.min.js"></script>
-	<script>
-	//main jquery
-	function selectStep(n) {
-		if(n ==1) {
-			$(".progress-selected").animate({marginLeft: '2px'}, 300);
-		} else if(n ==2) {
-			$(".progress-selected").animate({marginLeft: '121px'}, 300);
-		} else if(n ==3) {
-			$(".progress-selected").animate({marginLeft: '208px'}, 300);
-		}
-		$(".content-switcher").hide();
-		$("#content"+n).show();
-	}
-	</script>
+		<script src="../js/jquery.js"></script>
+		<script src="../js/shared.js"></script>
+		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
+		<script>
+			function Initialize(){
+				GlobalInitialize();
+				$("#ButtonSheetOne").css("left","0%");
+				$("#ButtonSheetTwo").css("left","-100%");
+				$("#ButtonSheetThree").css("left","100%");
+			}
+			function LocalGame(){
+				setTimeout(function(){
+					$("#ButtonSheetOne").css("left","-100%");
+				},150);
+				$("#ButtonSheetThree").css("left","0%");
+			}
+			function NetworkedGame(){
+				setTimeout(function(){
+					$("#ButtonSheetOne").css("left","100%");
+				},150);
+				$("#ButtonSheetTwo").css("left","0%");
+			}
+			function CreateMPGame(){
+				alert("match hosting not implemented yet");
+			}
+			function FindGame(){
+				alert("matchmaking not implemented yet");
+			}
+			function CreateSPGame(){
+				SwitchToPage("new_game_players.html");
+			}
+			function LoadGame(){
+				SwitchToPage("load.html");
+			}
+			function BackFromSP(){
+				$("#ButtonSheetOne").css("left","0%");
+				setTimeout(function(){
+					$("#ButtonSheetThree").css("left","100%");
+				},150);
+			}
+			function BackFromMP(){
+				$("#ButtonSheetOne").css("left","0%");
+				setTimeout(function(){
+					$("#ButtonSheetTwo").css("left","-100%");
+				},150);
+			}
+		</script>
+		<style type="text/css">
+			div.ButtonSheet{
+				transition:left 500ms ease-in-out;
+				-webkit-transition:left 500ms ease-in-out;
+				-moz-transition:left 500ms ease-in-out;
+				position:absolute;
+				width:100%;
+				height:100%;
+			}
+		</style>
 	</head>
-	<body>
-		
-		<!-- start container -->
-		<div class="container">
-			<!-- main content -->
-			<div class="main-content">
-			<div class="content-switcher" id="content1"> 
-				<h1>The Entrepreneurship Game</h1>
-				<p>Welcome to the game of entrepreneurs, please select from the options below. Please Login to play.</p>
-				<p>
-					1)<input type="button" value="PLAY NOW">
-				</p>
-				<p>
-					2) How to Play? 
-				</p>
-				<p>
-					3) Options
-				</p>
-			</div>
-			<div class="content-switcher" id="content2">
-				<h1>How to play</h1>
-			</div>
-			<div class="content-switcher" id="content3">
-				<h1>Options</h1>
+	<body onload="Initialize()">
+		<div id="MainBackground">
+			<div id="ContentContainer">
+				<div class="FancyText" id="StartNewGameTitle" style="left:27%;top:20%;">Entreprenership</div> 
+				<div id="ButtonSheetOne" class="ButtonSheet" style="height:100%">
+					<button class="Standard" style="left:34%;top:55%;width:38%" onclick="LocalGame()">Local Game</button>
+					<button class="Standard" style="left:33.75%;top:65%" onclick="NetworkedGame()">Networked Game</button>
+				</div>
+				<div id="ButtonSheetTwo" class="ButtonSheet" style="left:-100%">
+					<button class="Standard" style="left:27%;top:55%;width:25%" onclick="CreateMPGame()">Create</button>
+					<button class="Standard" style="left:55%;top:55%;width:25%" onclick="FindGame()">Find</button>
+					<button class="Standard" style="left:43%;top:66%" onclick="BackFromMP()">Back</button>
+				</div>
+				<div id="ButtonSheetThree" class="ButtonSheet" style="left:100%">
+					<button class="Standard" style="left:27%;top:55%;width:25%" onclick="CreateSPGame()">Create</button>
+					<button class="Standard" style="left:55%;top:55%;width:25%" onclick="LoadGame()">Load</button>
+					<button class="Standard" style="left:43%;top:66%" onclick="BackFromSP()">Back</button>
+				</div>
 			</div>
 		</div>
-			
-			<!-- progress steps -->
-			<div class="progress-container">
-				<a href="#" class="item-number" onclick="selectStep(1); return false;">1</a>
-				<a href="#" class="item-number" onclick="selectStep(2); return false;">2</a>
-				<a href="#" class="item-number" onclick="selectStep(3); return false;">3</a>
-				
-				<div class="progress-selected"></div>
-			</div>	
-			
-		</div>	
-		
-		
 	</body>
 </html>		

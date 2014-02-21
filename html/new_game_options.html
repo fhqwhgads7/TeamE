@@ -13,7 +13,7 @@
 			var CPUIntelligence;		//BEGINNER, STANDARD, EXPERT
 			var NumberOfRounds;			//Between 40 and 60
 			var PatentingEnabled;		//true/false
-			var RetirementMinimum;		//401k, 500k, 600k, 700k, 800k, 900k, 1m, 999999999
+			//var RetirementMinimum;		//401k, 500k, 600k, 700k, 800k, 900k, 1m, 999999999
 			
 			function Initialize()
 			{
@@ -34,7 +34,7 @@
 				CPUIntelligence = localStorage.getItem('CPUIntelligence');
 				NumberOfRounds = parseInt(localStorage.getItem('NumberOfRounds'));
 				PatentingEnabled = (localStorage.getItem('PatentingEnabled') == 'true');
-				RetirementMinimum = parseInt(localStorage.getItem('RetirementMinimum'));
+				//RetirementMinimum = parseInt(localStorage.getItem('RetirementMinimum'));
 				
 				$( "#GameDifficulty").val(GameDifficulty);
 				$( "#CPUIntelligence").val(CPUIntelligence);
@@ -43,7 +43,7 @@
 					$( "#Patenting").val("On");
 				else
 					$( "#Patenting").val("Off");
-				$( "#RetirementMinimum").val(RetirementMinimum);
+				//$( "#RetirementMinimum").val(RetirementMinimum);
 			}
 			function CreateGame(){
 				SaveOptions();
@@ -55,9 +55,7 @@
 				localStorage.setItem('CPUIntelligence',CPUIntelligence);
 				localStorage.setItem('NumberOfRounds',NumberOfRounds.toString());
 				localStorage.setItem('PatentingEnabled',PatentingEnabled.toString());
-				localStorage.setItem('RetirementMinimum',RetirementMinimum.toString());
-				
-				alert("Your preferences have been saved.");
+				//localStorage.setItem('RetirementMinimum',RetirementMinimum.toString());
 			}
 			function RestorePrevious()
 			{
@@ -78,7 +76,7 @@
 			function STV_CPUIntelligence() { CPUIntelligence = $( "#CPUIntelligence").val(); }
 			function STV_NumberOfRounds() { NumberOfRounds = parseInt($( "#NumberOfRounds").val()); }
 			function STV_PatentingEnabled() { PatentingEnabled = ($( "#Patenting").val() == 'On'); }
-			function STV_RetirementMinimum() { RetirementMinimum = parseInt($( "#RetirementMinimum").val()); }
+			//function STV_RetirementMinimum() { RetirementMinimum = parseInt($( "#RetirementMinimum").val()); }
 			
 		</script>
 		<style>
@@ -114,10 +112,10 @@
 				<div class="OptionsBox" id="OptionsBox" style="left:20%;top:20%;">
 				
 					<div class="StandardText" style="font-size:23px;left:3%;top:5%;">Game Difficulty</div>
-					<div class="StandardText" style="font-size:23px;left:3%;top:14%;">CPU Intelligence</div>
-					<div class="StandardText" style="font-size:23px;left:3%;top:23%;">Product Patenting</div>
-					<div class="StandardText" style="font-size:23px;left:3%;top:32%;">Number of Rounds</div>
-					<div class="StandardText" style="font-size:23px;left:3%;top:41%;">Retirement Minimum</div>
+					<div class="StandardText" style="font-size:23px;left:3%;top:17%;">CPU Intelligence</div>
+					<div class="StandardText" style="font-size:23px;left:3%;top:29%;">Product Patenting</div>
+					<div class="StandardText" style="font-size:23px;left:3%;top:41%;">Number of Rounds</div>
+					<!--<div class="StandardText" style="font-size:23px;left:3%;top:41%;">Retirement Minimum</div>-->
 					
 					<select class="Options" id="GameDifficulty" style="top:5%;" onchange="STV_GameDifficulty()">
 							<option value="EASY">Easy</option>
@@ -125,22 +123,23 @@
 							<option value="HARD">Hard</option>
 							<option value="LUNATIC">Lunatic</option>
 						</select>
-						<select class="Options" id="CPUIntelligence" style="top:14%;" onchange="STV_CPUIntelligence()">
+						<select class="Options" id="CPUIntelligence" style="top:17%;" onchange="STV_CPUIntelligence()">
 							<option value="BEGINNER">Beginner</option>
 							<option value="STANDARD" selected="selected">Standard</option>
 							<option value="EXPERT">Expert</option>
 						</select>
-						<select class="Options" id="Patenting" style="top:23%;" onchange="STV_PatentingEnabled()">
+						<select class="Options" id="Patenting" style="top:29%;" onchange="STV_PatentingEnabled()">
 							<option value="On" selected="selected">On</option>
 							<option value="Off">Off</option>
 						</select>
-						<select class="Options" id="NumberOfRounds" style="top:32%;" onchange="STV_NumberOfRounds()">
+						<select class="Options" id="NumberOfRounds" style="top:41%;" onchange="STV_NumberOfRounds()">
 							<option value=40 selected="selected">40</option>
 							<option value=45>45</option>
 							<option value=50>50</option>
 							<option value=55>55</option>
 							<option value=60>60</option>
 						</select>
+						<!--
 						<select class="Options" id="RetirementMinimum" style="top:41%;" onchange="STV_RetirementMinimum()">
 							<option value=401000 selected="selected">$401,000</option>
 							<option value=500000>$500,000</option>
@@ -151,6 +150,7 @@
 							<option value=1000000>$1,000,000</option>
 							<option value=999999999>$999,999,999</option>
 						</select>
+						-->
 					
 					<form>
 
@@ -181,9 +181,9 @@
 					
 					
 				</div>
-				<div class="StandardText" id="MainTitle" style="left:30%;top:8%;">New Game Options</div>
-				<button class="Standard" onclick="CreateGame()" style="left:54%;width:36%;top:85%;font-size:20px">Create Game</button>
-				<button class="Standard" onclick="GoBack()" style="left:11%;width:36%;top:85%;font-size:20px">Back</button>
+				<div class="StandardText" id="OptionsTitle" style="font-size:40px;margin:10px;width:800px;top:7%;">New Game: Options</div> 
+				<button class="Standard" onclick="CreateGame()" style="right:19%;width:28%;top:85%;font-size:20px">Create Game</button>
+				<button class="Standard" onclick="GoBack()" style="left:20%;width:28%;top:85%;font-size:20px">Back</button>
 			</div>
 		</div>
 	</body>

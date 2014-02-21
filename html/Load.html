@@ -1,21 +1,38 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<script src="../js/Client.js"></script>
 		<script src="../js/jquery.js"></script>
-		<script src="../js/Server.js"></script>
-		<script type="text/javascript" src="../js/Shared.js"></script>
+		<script src="../js/shared.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/Shared.css"></link>
-		<style>
-			#MainBackground{
-				background-image:url('../images/game_background.png');
-				position:fixed;
-				top:10px;
-				left:10px;
-				width:800px;
-				height:600px;
-				overflow:hidden;
+
+		<script>
+			function Initialize()
+			{
+				GlobalInitialize();
 			}
+			$(document).ready(function() {
+				function showLoadAlert(gameTitle) {
+					$("#load-alert").find("#loaded-game-name").text(gameTitle);
+					$("#load-alert").show();
+				}
+
+				$("#game-list").find("li").click(function(){
+					var gameTitle = $(this).find(".game-title").text();
+					showLoadAlert(gameTitle);
+				});
+
+				$("#yep-button").click(function(){
+					$("#load-alert").hide();
+				});
+				$("#nope-button").click(function(){
+					$("#load-alert").hide();
+				});
+			});
+			
+		
+		</script>
+		
+		<style>
 			div.OptionsBox{
 				position:absolute;
 				border-style:solid;
@@ -109,7 +126,8 @@
 	</head>
 	<body onload="Initialize()">
 		<div id="MainBackground">
-			<h1 class="BigText" id="MainTitle">Load</h1>
+		<div id="ContentContainer">
+			<div class="StandardText" id="MainTitle" style="margin:0;width:800px;top:7%">Load Game</div>
 			<div class="OptionsBox" id="OptionsBox" style="left:20%;top:20%;">
 				<ol id="game-list">
 					<li><span class="game-title">Game 1</span> (2014-02-03 17:54)</li>
@@ -117,7 +135,6 @@
 					<li><span class="game-title">Game 3</span> (2014-02-04 03:16)</li>
 				</ol>
 			</div>
-		</div>
 
 		<div class="alert" id="load-alert">
 			<p>
@@ -128,26 +145,7 @@
 				<button class="Medium RoundEdge" id="nope-button">Nope</button>
 			</div>
 		</div>
-
-		<script type="text/javascript">
-			$(document).ready(function() {
-				function showLoadAlert(gameTitle) {
-					$("#load-alert").find("#loaded-game-name").text(gameTitle);
-					$("#load-alert").show();
-				}
-
-				$("#game-list").find("li").click(function(){
-					var gameTitle = $(this).find(".game-title").text();
-					showLoadAlert(gameTitle);
-				});
-
-				$("#yep-button").click(function(){
-					$("#load-alert").hide();
-				});
-				$("#nope-button").click(function(){
-					$("#load-alert").hide();
-				});
-			});
-		</script>
+		</div>
+		</div>
 	</body>
 </html>

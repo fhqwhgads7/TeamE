@@ -2,8 +2,6 @@
 <html>
 <head>
 		<script src="../js/jquery.js"></script>
-		<script src="../js/Server.js"></script>
-		<script src="../js/Client.js"></script>
 		<script src="../js/Shared.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
 		<script>
@@ -73,6 +71,21 @@
 				height:15%;
 				box-shadow: 0px 0px 40px 5px #AAAAAA;
 			}
+			div.PlayerBox{
+				position:absolute;
+				border-style:solid;
+				border-width:7px;
+				width:30%;
+				height:15%;
+				box-shadow: 0px 0px 40px 5px #AAAAAA;
+				background:rgba(0,0,0,.1);
+				-moz-border-radius:10px;
+				-webkit-border-radius:10px;
+				border-radius:10px;
+			}
+			div.PlayerBox:hover{
+				background:rgba(255,255,255,.1);
+			}
 		</style>
 </head>
 
@@ -80,47 +93,45 @@
 	<div id="MainBackground">
 		<div id="MainBoard">
 			<div id="ContentContainer">
-				<div class="NewActionModal RoundEdge" id="Scoreboard" style="overflow:hidden;width:75%;left:11%">
-						<div class="StandardText" id="ScoreboardTitle" style="left:30%;top:3%;">Game Over</div>
+						<div class="StandardText" id="ScoreboardTitle" style="font-size:60px;margin:0;width:100%;top:5%">Game Over</div>
 						<div class="PlayerBox" id="PlyOneScbdBox" style="border-color:red;left:13%;top:19%;">
-							<div class="SmallText" id="PlyOneScbdName" style="left:14%;top:5%;">nil</div>
-							<div class="SmallText" style="left:14%;top:35%;color:rgb(120,120,120)">$<span id="PlyOneScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
-							<div class="TinyText" style="left:14%;top:70%;color:rgb(120,120,120);font-size:10px">Products <span id="PlyOneScbdProds" style="color:white">nil</span></div>
-							<div class="TinyText" style="left:55%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlyOneScbdEmps" style="color:white">nil</span></div>
+							<div class="StandardText" id="PlyOneScbdName" style="font-size:25px;left:14%;top:5%;">nil</div>
+							<div class="StandardText" style="font-size:18px;left:14%;top:35%;color:rgb(120,120,120)">$<span id="PlyOneScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
+							<div class="StandardText" style="font-size:10px;left:14%;top:70%;color:rgb(120,120,120);font-size:10px">Products <span id="PlyOneScbdProds" style="color:white">nil</span></div>
+							<div class="StandardText" style="font-size:10px;left:52%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlyOneScbdEmps" style="color:white">nil</span></div>
 						</div>
 						<div class="PlayerBox" id="PlyTwoScbdBox" style="border-color:red;left:55%;top:19%;">
-							<div class="SmallText" id="PlyTwoScbdName" style="left:14%;top:5%;">nil</div>
-							<div class="SmallText" style="left:14%;top:35%;color:rgb(120,120,120)">$<span id="PlyTwoScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
-							<div class="TinyText" style="left:14%;top:70%;color:rgb(120,120,120);font-size:10px">Products <span id="PlyTwoScbdProds" style="color:white">nil</span></div>
-							<div class="TinyText" style="left:55%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlyTwoScbdEmps" style="color:white">nil</span></div>
+							<div class="StandardText" id="PlyTwoScbdName" style="font-size:25px;left:14%;top:5%;">nil</div>
+							<div class="StandardText" style="font-size:18px;left:14%;top:35%;color:rgb(120,120,120)">$<span id="PlyTwoScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
+							<div class="StandardText" style="font-size:10px;left:14%;top:70%;color:rgb(120,120,120);font-size:10px">Products <span id="PlyTwoScbdProds" style="color:white">nil</span></div>
+							<div class="StandardText" style="font-size:10px;left:52%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlyTwoScbdEmps" style="color:white">nil</span></div>
 						</div>
 						<div class="PlayerBox" id="PlyThreeScbdBox" style="border-color:red;left:13%;top:41%;">
-							<div class="SmallText" id="PlyThreeScbdName" style="left:14%;top:5%;">nil</div>
-							<div class="SmallText" style="left:14%;top:35%;color:rgb(120,120,120)">$<span id="PlyThreeScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
-							<div class="TinyText" style="left:14%;top:70%;color:rgb(120,120,120);font-size:10px">Products <span id="PlyThreeScbdProds" style="color:white">nil</span></div>
-							<div class="TinyText" style="left:55%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlyThreeScbdEmps" style="color:white">nil</span></div>
+							<div class="StandardText" id="PlyThreeScbdName" style="font-size:25px;left:14%;top:5%;">nil</div>
+							<div class="StandardText" style="font-size:18px;left:14%;top:35%;color:rgb(120,120,120)">$<span id="PlyThreeScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
+							<div class="StandardText" style="font-size:10px;left:14%;top:70%;color:rgb(120,120,120);font-size:10px">Products <span id="PlyThreeScbdProds" style="color:white">nil</span></div>
+							<div class="StandardText" style="font-size:10px;left:52%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlyThreeScbdEmps" style="color:white">nil</span></div>
 						</div>
 						<div class="PlayerBox" id="PlyFourScbdBox" style="border-color:red;left:55%;top:41%;">
-							<div class="SmallText" id="PlyFourScbdName" style="left:14%;top:5%;">nil</div>
-							<div class="SmallText" style="left:14%;top:35%;color:rgb(120,120,120)">$<span id="PlyFourScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
-							<div class="TinyText" style="left:14%;top:70%;color:rgb(120,120,120);font-size:10px">Products <span id="PlyFourScbdProds" style="color:white">nil</span></div>
-							<div class="TinyText" style="left:55%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlyFourScbdEmps" style="color:white">nil</span></div>
+							<div class="StandardText" id="PlyFourScbdName" style="font-size:25px;left:14%;top:5%;">nil</div>
+							<div class="StandardText" style="font-size:18px;left:14%;top:35%;color:rgb(120,120,120)">$<span id="PlyFourScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
+							<div class="StandardText" style="font-size:10px;left:14%;top:70%;color:rgb(120,120,120);font-size:10px">Products <span id="PlyFourScbdProds" style="color:white">nil</span></div>
+							<div class="StandardText" style="font-size:10px;left:52%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlyFourScbdEmps" style="color:white">nil</span></div>
 						</div>
 						<div class="PlayerBox" id="PlyFiveScbdBox" style="border-color:red;left:13%;top:63%;">
-							<div class="SmallText" id="PlyFiveScbdName" style="left:14%;top:5%;">nil</div>
-							<div class="SmallText" style="left:14%;top:35%;color:rgb(120,120,120)">$<span id="PlyFiveScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
-							<div class="TinyText" style="left:14%;top:70%;color:rgb(120,120,120);font-size:10px">Products <span id="PlyFiveScbdProds" style="color:white">nil</span></div>
-							<div class="TinyText" style="left:55%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlyFiveScbdEmps" style="color:white">nil</span></div>
+							<div class="StandardText" id="PlyFiveScbdName" style="font-size:25px;left:14%;top:5%;">nil</div>
+							<div class="StandardText" style="font-size:18px;left:14%;top:35%;color:rgb(120,120,120)">$<span id="PlyFiveScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
+							<div class="StandardText" style="font-size:10px;left:14%;top:70%;color:rgb(120,120,120);font-size:10px">Products <span id="PlyFiveScbdProds" style="color:white">nil</span></div>
+							<div class="StandardText" style="font-size:10px;left:52%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlyFiveScbdEmps" style="color:white">nil</span></div>
 						</div>
 						<div class="PlayerBox" id="PlySixScbdBox" style="border-color:red;left:55%;top:63%;">
-							<div class="SmallText" id="PlySixScbdName" style="left:14%;top:5%;">nil</div>
-							<div class="SmallText" style="left:14%;top:35%;color:rgb(120,120,120)">$<span id="PlySixScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
-							<div class="TinyText" style="left:14%;top:70%;color:rgb(120,120,120);font-size:10px">Products <span id="PlySixScbdProds" style="color:white">nil</span></div>
-							<div class="TinyText" style="left:55%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlySixScbdEmps" style="color:white">nil</span></div>
+							<div class="StandardText" id="PlySixScbdName" style="font-size:25px;left:14%;top:5%;">nil</div>
+							<div class="StandardText" style="font-size:18px;left:14%;top:35%;color:rgb(120,120,120)">$<span id="PlySixScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
+							<div class="StandardText" style="font-size:10px;left:14%;top:70%;color:rgb(120,120,120);font-size:10px">Products <span id="PlySixScbdProds" style="color:white">nil</span></div>
+							<div class="StandardText" style="font-size:10px;left:52%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlySixScbdEmps" style="color:white">nil</span></div>
 						</div>
-						<button class="Big" id="ScoreboardClose" onclick="GoToMenu()" style="top:87%;left:15%;width:30%;height:10%">Main Menu</button>
-						<button class="Big" id="ScoreboardClose" onclick="GoToNewGame()" style="top:87%;right:15%;width:30%;height:10%">New Game</button>
-					</div>
+						<button class="Standard" id="ToMenu" onclick="GoToMenu()" style="top:87%;left:15%">Main Menu</button>
+						<button class="Standard" id="ToNewGame" onclick="GoToNewGame()" style="top:87%;right:15%">New Game</button>
 				</div>
 			</div>
 		</div>

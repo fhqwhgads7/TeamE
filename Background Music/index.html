@@ -1,0 +1,86 @@
+<html>
+<head>
+<title>Background Music </title>
+	
+<script src = "http://code.jquery.com/jquery-2.1.0.min.js"></script>
+
+<script>
+	
+jQuery(document).ready(function (){
+	
+var audioArray = document.getElementsByClassName('playsong');
+		
+//document.write(audioArray.length);
+		var i = 0;
+		var nowPlaying = audioArray[i];
+		nowPlaying.load();
+		nowPlaying.play();
+		//alert("hi");
+		/*$('.play').on('click', function() {
+			nowPlaying.play();
+		});
+		
+		$('.stop').on('click', function() {
+			nowPlaying.pause();
+		});
+		
+		$('.next').on('click', function() {*/
+		//alert(audioArray.length);
+		$('#player').on('ended', function(){
+    // done playing
+			//alert("Player stopped");
+			//alert(i);
+			/*$.each($('audio.playsong'), function(){
+				this.pause();
+			});
+			
+			if(i>=audioArray.length-1){
+				i=0;
+			}
+			else{
+				i++;
+			}*/
+			
+			//document.write(audioArray.length);
+			nowPlaying = audioArray[1];
+			nowPlaying.load();
+			nowPlaying.play();
+			
+			$('#player2').on('ended', function(){
+			
+				nowPlaying = audioArray[2];
+				nowPlaying.load();
+				nowPlaying.play();
+			});
+			//nowPlaying.pause();
+		});
+		//})
+	
+	});
+	
+</script>
+
+
+</head>
+ 
+<body>
+<audio controls autoPlay loop> //get rid of controls
+<source src="The Man.mp3" /> 
+<audio id="player" class = "playsong">
+<source src="For The Win.mp3" /> 
+</audio>
+
+<audio id="player2" class = "playsong">
+<source src="Super Mario Medley.mp3" /> 
+</audio>
+
+<audio id="player3" class = "playsong">
+<source src="Wake Me Up.mp3" /> 
+</audio>
+
+<!--<div class = "play">PLAY</div>-->
+<!--<div class = "stop">STOP</div>-->
+<!--<div class = "next">NEXT</div>-->
+
+</body>
+</html>

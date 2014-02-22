@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!--
+		You have to go up one level in order to access files from other folders.
+		.. = One folder up from the current folder.
+		-->
+		<script src="../js/jquery.js"></script>
+		<script src="../js/shared.js"></script>
+		<script src="../js/SinglePlayer.js"></script>
+		<script type="text/javascript">
+
+			var RotateDir=0;
+			var Rotation=0;
+			
+			function Initialize()
+			{
+				//The commented code does not function properly yet.
+				//When something screws up during runtime, other functions just stop.
+				//So I had to comment them out to allow the game board to rotate, which it does.
+				checkOptions();
+				//var Game=JSON.parse(localStorage.MainGame);
+				//alert(Game.Name);
+				setInterval("RotateThink();",50);
+			}
+			function RotateBegin(dir){
+				RotateDir=dir*5;
+			}
+			function RotateEnd(){
+				RotateDir=0;
+			}
+			function RotateThink(){
+				if(RotateDir!=0){
+					Rotation+=RotateDir;
+					RotateDir%=360;
+					//if((RotateDir>=360)||(RotateDir<=-360)){RotateDir=0;}
+					document.getElementById("GameBoardCircle").style.webkitTransform="rotate("+Rotation.toString()+"deg)";
+					document.getElementById("GameBoardCircle").style.MozTransform="rotate("+Rotation.toString()+"deg)";
+					/*
+					var Prods=document.getElementsByClassName("ProductDisplayItem");
+					if(Prods.length>0){
+						for(Key in Prods){
+							if(Prods[Key].style){
+								Prods[Key].style.webkitTransform="rotate("+(-Rotation).toString()+"deg)";
+								Prods[Key].style.MozTransform="rotate("+(-Rotation).toString()+"deg)";
+							}
+						}
+					}
+					*/
+				}
+			}
+
+			function createNewProduct() {
+				window.product = Product(null, 'Product Name', 'Product Category', 'Product Sub-Category', 'Player Color');
+				alert("New Product: " + window.product.toString());
+			}
+			function displayNewProductDialog() {
+				$("#new-product-dialog").show();		
+			}
+
+			$(document).ready(function() {
+
+				// Event assignments
+
+				$("#new-product-button").click(function() {
+					displayNewProductDialog();
+					// createNewProduct();	
+				})
+
+			});
+			
+		</script>
+		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
+		<style>
+			#GameBoardCircle
+			{
+				background-image:url('../images/gameboard_circle.png');
+				position:absolute;
+				top:0%;
+				left:24%;
+				width:600px;
+				height:600px;
+				webkit-transform-origin:50% 50%;
+				moz-transform-origin:50% 50%;
+			}
+			#GameBoardCenter
+			{
+				background-image:url('../images/gameboard_center.png');
+				position:absolute;
+				top:0%;
+				left:24%;
+				width:800px;
+				height:600px;
+			}
+		</style>
+	</head>
+	
+	
+	<body onload="Initialize()">
+		<div id="MainBackground">
+			<div id="MainBoard">
+				<div id="GameBoard">
+					<div id="GameBoardCenter"></div>
+					<div id="GameBoardCircle"></div>
+					<button class="Smaller" id="TurnBoardCCWButton" style="top:26%;left:2%;width:5%;height:7%" onmousedown="RotateBegin(-1)" onmouseup="RotateEnd()"><</button>
+					<button class="Smaller" id="TurnBoardCWButton" style="top:26%;left:14%;width:5%;height:7%" onmousedown="RotateBegin(1)" onmouseup="RotateEnd()">></button>
+				</div>
+				<button id="new-product-button" class="Smaller" style="top:80%;left:3%;width:10%;height:8%;">New<br>Product</button>		
+			</div>
+		</div>
+<!-- hidden dom elements -->		
+		<div class="popup" id="new-product-dialog">
+			<h1>New Product</h1>
+			<p>
+			</p>
+			<div>
+				<button class="Medium RoundEdge" id="new-product-make-button">Make</button>
+				<button class="Medium RoundEdge" id="new-product-cancel-button">Cancel</button>
+			</div>
+			</div>
+		</div>
+	</body>
+</html>

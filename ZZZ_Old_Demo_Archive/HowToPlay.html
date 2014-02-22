@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script type="text/javascript" src="Shared.js"></script>
+		<link rel="stylesheet" type="text/css" href="Shared.css"></link>
+		<script>
+			function Initialize(){
+				// nothin right now
+			}
+			function GoToMenu(){
+				window.location="MainMenu.html";
+			}
+		</script>
+		<style>
+			div.HowToPlayBox{
+				position:absolute;
+				border-style:solid;
+				border-width:5px;
+				font-family:"Arial";
+				font-size:15px;
+				font-weight:900;
+				font-color:white;
+				width:60%;
+				height:50%;
+				box-shadow: 0px 0px 40px 5px #AAAAAA;
+			}
+			div.HTPText{
+				position:absolute;
+				font-family:"Arial";
+				font-size:20px;
+				font-weight:900;
+				text-align:center;
+				color:rgba(255,255,255,1);
+			}
+		</style>
+	</head>
+	<body>
+		<div id="MainBackground">
+			<div class="BigText" id="MainTitle" style="left:34%;top:10%;">How To Play</div>
+			<div class="HowToPlayBox" id="HowToPlayBox" style="left:20%;top:25%;">
+			<!-- Codes by HTML.am -->
+			<div class="HTPText" style="text-wrap:normal;width:98%;height:96%;overflow-y:auto;overflow-x:hidden;padding:5px;">
+			
+			The world of entrepreneurship is large, full of possibility,
+			and--most of all-- random. The best method to teach you of the
+			process behind and entrepreneurial venture is, and always will be,
+			experience.<br><br>
+			In this simulation, you take the role of an entrepreneur who is in
+			the process of starting their own business. In order to begin your
+			process, though, you must have the courage to pursue
+			and market a new idea or invention to the public.<br><br>
+			You will also need money. Fortunately, you start with enough to
+			begin the pursuit of one venture, but you can stay at your day job for
+			longer in order to acquire more starting funds.<br><br>
+			As you go through your venture, you will
+			fail. A lot. But after failure comes success.
+			
+			</div>
+			</div>
+			<button class="Big RoundEdge" id="ToMenu" style="left:35%;top:80%;" onclick="GoToMenu()">Return to Menu</button>
+		</div>
+	</body>
+</html>

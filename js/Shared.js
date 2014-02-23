@@ -59,7 +59,14 @@ var PlayerColors={
 	White:"rgb(255,255,255)",
 	Black:"rgb(50,50,50)"
 }
-
+var NumberNameTable={
+	1:"One",
+	2:"Two",
+	3:"Three",
+	4:"Four",
+	5:"Five",
+	6:"Six"
+}
 function Product(player,name,category,sub,color){
 	this.Name=name;
 	this.Category=category;

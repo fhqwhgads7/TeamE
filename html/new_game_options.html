@@ -5,10 +5,7 @@
 		<script src="../js/shared.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
 		<script>
-		
-			var TheServer;
-			var Self;
-			
+			var TheBrandNewGame;
 			var GameDifficulty;			//EASY, NORMAL, HARD, LUNATIC
 			var CPUIntelligence;		//BEGINNER, STANDARD, EXPERT
 			var NumberOfRounds;			//Between 40 and 60
@@ -21,6 +18,7 @@
 				LoadOptions();
 				checkOptions();
 				//alert(GameDifficulty + " " + CPUIntelligence + " " + NumberOfRounds + " " + PatentingEnabled + " " + RetirementMinimum);
+				TheBrandNewGame=JSON.parse(localStorage.getItem("TheBrandNewGame"));
 			}
 			
 			function GoBack(){
@@ -51,11 +49,12 @@
 			}
 			function SaveOptions()
 			{
-				localStorage.setItem('GameDifficulty',GameDifficulty);
-				localStorage.setItem('CPUIntelligence',CPUIntelligence);
-				localStorage.setItem('NumberOfRounds',NumberOfRounds.toString());
-				localStorage.setItem('PatentingEnabled',PatentingEnabled.toString());
-				//localStorage.setItem('RetirementMinimum',RetirementMinimum.toString());
+				TheBrandNewGame.Options=new Object();
+				TheBrandNewGame.Options.GameDifficulty=GameDifficulty;
+				TheBrandNewGame.Options.CPUIntelligence=CPUIntelligence;
+				TheBrandNewGame.Options.NumberOfRounds=NumberOfRounds.toString();
+				TheBrandNewGame.Options.PatentingEnabled=PatentingEnabled.toString();
+				localStorage.setItem("TheBrandNewGame",JSON.stringify(TheBrandNewGame));
 			}
 			function RestorePrevious()
 			{

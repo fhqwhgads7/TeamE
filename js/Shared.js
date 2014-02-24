@@ -88,3 +88,25 @@ function Product(player,name,category,sub,color){
 	}
 	return this;
 }
+function Back(){
+    day=new Date()
+    x=day.getHours()
+    if(x>=0 && x<8) {
+             var body = document.getElementsByTagName('body')[0];
+                               body.style.backgroundImage = 'url(background_morning_1.jpg)';
+                           
+	                       }
+                           else if(x>=8 && x<11) {
+                               var body = document.getElementsByTagName('body')[0];
+                               body.style.backgroundImage = 'url(background_noon_1.jpg)';
+                           }
+                           else if(x>=11 && x<18) {
+                               var body = document.getElementsByTagName('body')[0];
+                               body.style.backgroundImage = 'url(background_afternoon_1.jpg)';
+                           }
+                           else if(x>=18 && x<24) {
+                               var body = document.getElementsByTagName('body')[0];
+                               body.style.backgroundImage = 'url(background_night_1.jpg)';
+                           }
+	                   
+			}

@@ -95,6 +95,26 @@
 				width:800px;
 				height:600px;
 			}
+			div.PlayerBox{
+				position:absolute;
+				border-style:solid;
+				border-width:7px;
+				width:30%;
+				height:15%;
+				box-shadow: 0px 0px 40px 5px #AAAAAA;
+			}
+			div.PlayerBox{
+				position:absolute;
+				border-style:solid;
+				border-width:7px;
+				width:30%;
+				height:15%;
+				box-shadow: 0px 0px 40px 5px #AAAAAA;
+				background:rgba(0,0,0,.1);
+				-moz-border-radius:10px;
+				-webkit-border-radius:10px;
+				border-radius:10px;
+			}
 		</style>
 	</head>
 	
@@ -102,6 +122,15 @@
 	<body onload="Initialize()">
 		<div id="MainBackground">
 			<div id="MainBoard">
+				<div class="PlayerBox" id="PlyOneScbdBox" style="border-color:grey;width:25%;left:1%;top:1%;">
+					<div class="StandardText" id="PlyOneScbdName" style="font-size:25px;left:14%;top:5%;">nil</div>
+					<div class="StandardText" style="font-size:18px;left:14%;top:35%;color:rgb(120,120,120)">$<span id="PlyOneScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
+					<div class="StandardText" style="font-size:10px;left:12%;top:62%;color:rgb(120,120,120);font-size:10px">Products <span id="PlyOneScbdProds" style="color:white">nil</span></div>
+					<div class="StandardText" style="font-size:10px;left:54%;top:62%;color:rgb(120,120,120);font-size:10px">Builders <span id="PlyOneScbdEmps" style="color:white">nil</span></div>
+					<div class="StandardText" style="font-size:10px;left:12%;top:77%;color:rgb(120,120,120);font-size:10px">Designers <span id="PlyOneScbdProds" style="color:white">nil</span></div>
+					<div class="StandardText" style="font-size:10px;left:54%;top:77%;color:rgb(120,120,120);font-size:10px">Testers <span id="PlyOneScbdEmps" style="color:white">nil</span></div>
+				</div>
+				</div>
 				<div id="GameBoard">
 					<div id="GameBoardCenter"></div>
 					<div id="GameBoardCircle"></div>

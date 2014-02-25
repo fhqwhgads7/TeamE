@@ -113,7 +113,7 @@ function Background(){
         //body.style.backgroundImage = 'url(background_night_1.jpg)';
     }                   
 }
-MakeBGM(){	
+function MakeBGM(){	
 	var audioArray = document.getElementsByClassName('playsong');
 		
 	//document.write(audioArray.length);
@@ -159,7 +159,5 @@ MakeBGM(){
 				nowPlaying.play();
 			});
 			//nowPlaying.pause();
-		});
-		//})
-	
-});	
+		});	
+}

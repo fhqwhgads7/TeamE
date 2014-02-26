@@ -1,0 +1,57 @@
+<html>
+<head>
+	<title>Bottom Scrolling Marquee </title>
+	
+	<script src = "http://code.jquery.com/jquery-2.1.0.min.js"></script>
+	
+	<script>
+	
+	var phrases =[
+		"Don't drink and drive.",
+		"Don't fail too hard or else flying monkeys will appear out of nowhere and eat your face.",
+		"Try the salad; it's delicious.",
+		"If you lose your entire investment on a product with no designers, testers, or developers, it's probably your own fault.",
+		"Lisa needs braces.",
+		"YOU MUST RECOVER",
+		"Innovation requires taking risks.",
+		"The more risks you take, the higher your chances of success will be.",
+		"Make a product!",
+		"Don't die!",
+		"Nineteen!",
+		"2+2 = Fish!",
+		"Employees will cost money over time. Produce a profitable product to gain it back!"
+	]
+	function pickone()
+{
+    document.getElementById("PAUSER").innerHTML = 
+        phrases[ Math.floor( Math.random() * phrases.length ) ];
+}
+			
+			//setInterval("TipThink();",10);
+
+	
+	</script>
+<style type="text/css">
+marquee#PAUSER
+{
+    font-family: calibri, verdana, arial, sans-serif; 
+    font-size: 30pt; 
+    color: #FF0000;
+    cursor: hand;
+}
+body 
+{
+    background-color: white;
+}
+</style>
+
+</head>
+
+<body onload="pickone()">
+
+<marquee id="PAUSER" scrollamount="5" 
+         onmouseover="this.scrollAmount=0;" onmouseout="this.scrollAmount=5;">
+</marquee>
+
+</body>
+</html>

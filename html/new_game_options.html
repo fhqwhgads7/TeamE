@@ -5,20 +5,19 @@
 		<script src="../js/shared.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
 		<script>
-			var TheBrandNewGame;
+			var TheBrandNewGame=null;
 			var GameDifficulty;			//EASY, NORMAL, HARD, LUNATIC
 			var CPUIntelligence;		//BEGINNER, STANDARD, EXPERT
 			var NumberOfRounds;			//Between 40 and 60
 			var PatentingEnabled;		//true/false
-			//var RetirementMinimum;		//401k, 500k, 600k, 700k, 800k, 900k, 1m, 999999999
 			
 			function Initialize()
 			{
 				GlobalInitialize();
+				if(localStorage.getItem("TheBrandNewGame")){
+					TheBrandNewGame=JSON.parse(localStorage.getItem("TheBrandNewGame"));
+				}
 				LoadOptions();
-				checkOptions();
-				//alert(GameDifficulty + " " + CPUIntelligence + " " + NumberOfRounds + " " + PatentingEnabled + " " + RetirementMinimum);
-				TheBrandNewGame=JSON.parse(localStorage.getItem("TheBrandNewGame"));
 			}
 			
 			function GoBack(){
@@ -27,21 +26,18 @@
 			}
 			
 			function LoadOptions()
-			{		
-				GameDifficulty = localStorage.getItem('GameDifficulty');
-				CPUIntelligence = localStorage.getItem('CPUIntelligence');
-				NumberOfRounds = parseInt(localStorage.getItem('NumberOfRounds'));
-				PatentingEnabled = (localStorage.getItem('PatentingEnabled') == 'true');
-				//RetirementMinimum = parseInt(localStorage.getItem('RetirementMinimum'));
-				
-				$( "#GameDifficulty").val(GameDifficulty);
-				$( "#CPUIntelligence").val(CPUIntelligence);
-				$( "#NumberOfRounds").val(NumberOfRounds);
-				if (PatentingEnabled)
-					$( "#Patenting").val("On");
-				else
-					$( "#Patenting").val("Off");
-				//$( "#RetirementMinimum").val(RetirementMinimum);
+			{
+				if(TheBrandNewGame){
+					if(TheBrandNewGame.Options){
+						$( "#GameDifficulty").val(TheBrandNewGame.Options.GameDifficulty);
+						$( "#CPUIntelligence").val(TheBrandNewGame.Options.CPUIntelligence);
+						$( "#NumberOfRounds").val(TheBrandNewGame.Options.NumberOfRounds);
+						if (TheBrandNewGame.Options.PatentingEnabled)
+							$( "#Patenting").val("On");
+						else
+							$( "#Patenting").val("Off");
+					}
+				}
 			}
 			function CreateGame(){
 				SaveOptions();
@@ -50,10 +46,10 @@
 			function SaveOptions()
 			{
 				TheBrandNewGame.Options=new Object();
-				TheBrandNewGame.Options.GameDifficulty=GameDifficulty;
-				TheBrandNewGame.Options.CPUIntelligence=CPUIntelligence;
-				TheBrandNewGame.Options.NumberOfRounds=NumberOfRounds.toString();
-				TheBrandNewGame.Options.PatentingEnabled=PatentingEnabled.toString();
+				TheBrandNewGame.Options.GameDifficulty=$("#GameDifficulty option:selected").val();
+				TheBrandNewGame.Options.CPUIntelligence=$("#CPUIntelligence option:selected").val();
+				TheBrandNewGame.Options.NumberOfRounds=$("#NumberOfRounds option:selected").val().toString();
+				TheBrandNewGame.Options.PatentingEnabled=$("#Patenting option:selected").val().toString();
 				localStorage.setItem("TheBrandNewGame",JSON.stringify(TheBrandNewGame));
 			}
 			function RestorePrevious()
@@ -68,14 +64,6 @@
 					return ($(this).value() == theValue);
 				}).prop('selected', true);
 			}
-			
-			//STV = Selection to Value
-			
-			function STV_GameDifficulty() { GameDifficulty = $( "#GameDifficulty").val(); }
-			function STV_CPUIntelligence() { CPUIntelligence = $( "#CPUIntelligence").val(); }
-			function STV_NumberOfRounds() { NumberOfRounds = parseInt($( "#NumberOfRounds").val()); }
-			function STV_PatentingEnabled() { PatentingEnabled = ($( "#Patenting").val() == 'On'); }
-			//function STV_RetirementMinimum() { RetirementMinimum = parseInt($( "#RetirementMinimum").val()); }
 			
 		</script>
 		<style>
@@ -116,22 +104,22 @@
 					<div class="StandardText" style="font-size:23px;left:3%;top:41%;">Number of Rounds</div>
 					<!--<div class="StandardText" style="font-size:23px;left:3%;top:41%;">Retirement Minimum</div>-->
 					
-					<select class="Options" id="GameDifficulty" style="top:5%;" onchange="STV_GameDifficulty()">
+					<select class="Options" id="GameDifficulty" style="top:5%;">
 							<option value="EASY">Easy</option>
 							<option value="NORMAL" selected="selected">Normal</option>
 							<option value="HARD">Hard</option>
 							<option value="LUNATIC">Lunatic</option>
 						</select>
-						<select class="Options" id="CPUIntelligence" style="top:17%;" onchange="STV_CPUIntelligence()">
+						<select class="Options" id="CPUIntelligence" style="top:17%;">
 							<option value="BEGINNER">Beginner</option>
 							<option value="STANDARD" selected="selected">Standard</option>
 							<option value="EXPERT">Expert</option>
 						</select>
-						<select class="Options" id="Patenting" style="top:29%;" onchange="STV_PatentingEnabled()">
+						<select class="Options" id="Patenting" style="top:29%;">
 							<option value="On" selected="selected">On</option>
 							<option value="Off">Off</option>
 						</select>
-						<select class="Options" id="NumberOfRounds" style="top:41%;" onchange="STV_NumberOfRounds()">
+						<select class="Options" id="NumberOfRounds" style="top:41%;">
 							<option value=40 selected="selected">40</option>
 							<option value=45>45</option>
 							<option value=50>50</option>

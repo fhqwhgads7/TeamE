@@ -7,7 +7,7 @@
 		-->
 		<script src="../js/jquery.js"></script>
 		<script src="../js/shared.js"></script>
-		<script src="../js/SinglePlayer.js"></script>
+		<script src="../js/primary_gameboard_operation.js"></script>
 		<script type="text/javascript">
 
 			var RotateDir=0;
@@ -19,7 +19,7 @@
 				//When something screws up during runtime, other functions just stop.
 				//So I had to comment them out to allow the game board to rotate, which it does.
 				GlobalInitialize();
-				checkOptions();
+				GameInitialize();
 				//var Game=JSON.parse(localStorage.MainGame);
 				//alert(Game.Name);
 				setInterval("RotateThink();",50);

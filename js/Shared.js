@@ -167,22 +167,23 @@ function Player(game,name,type,color){
 	return this;
 }
 function Game(id){
-	this.ClassName="GAME_OBJECT";
-	this.ID=id;
-	this.Players={};
-	this.NumPlayers=0;
-	this.PlayerProducts={};
-	this.CurrentPlayer=null;
-	this.CurrentPlayerNum=0;
-	this.Settings={
+	var newGame = new Object();
+	newGame.ClassName="GAME_OBJECT";
+	newGame.ID=id;
+	newGame.Players={};
+	newGame.NumPlayers=0;
+	newGame.PlayerProducts={};
+	newGame.CurrentPlayer=null;
+	newGame.CurrentPlayerNum=0;
+	newGame.Settings={
 		Difficulty:null,
 		CPUIntelligence:null,
 		PatentingEnabled:null,
 		NumberOfRounds:null
 	}
-	this.GameState="Uninitialized"; // this game-state is going to become very important when we start the networking
-	this.toString=function(){
-		return this.ClassName+" "+this.ID.toString();
+	newGame.GameState="Uninitialized"; // this game-state is going to become very important when we start the networking
+	newGame.toString=function(){
+		return newGame.ClassName+" "+this.ID.toString();
 	}
-	return this;
+	return newGame;
 }

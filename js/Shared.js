@@ -54,25 +54,21 @@ var NumberNameTable={
 function Background(){
     day=new Date()
     x=day.getHours()
-    if(x>=3 && x<9) {
-         //var body = document.getElementsByTagName('body')[0];
-         $("#MainBackground").css("background-image", 'url(../images/background_morning_1.jpg)')
-		 //body.style.backgroundImage = 'url(background_morning_1.jpg)';                 
+    if(x>=5 && x<9)
+	{
+        $("#MainBackground").css("background-image", 'url(../images/background_morning_1.jpg)')
 	}
-    else if(x>=9 && x<15) {
-        //var body = document.getElementsByTagName('MainBackground')[0];
+    else if(x>=9 && x<15)
+	{
         $("#MainBackground").css("background-image", 'url(../images/background_noon_1.jpg)')
-        //body.style.backgroundImage = 'url(background_noon_1.jpg)';
     }
-    else if(x>=15 && x<20) {
-        //var body = document.getElementsByTagName('MainBackground')[0];
+    else if(x>=15 && x<19)
+	{
         $("#MainBackground").css("background-image", 'url(../images/background_afternoon_1.jpg)')
-        //body.style.backgroundImage = 'url(background_afternoon_1.jpg)';
     }
-    else {
-        //var body = document.getElementsByTagName('MainBackground')[0];
+    else
+	{
         $("#MainBackground").css("background-image", 'url(../images/background_night_1.jpg)')
-        //body.style.backgroundImage = 'url(background_night_1.jpg)';
     }                   
 }
 function MakeBGM(){	

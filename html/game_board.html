@@ -72,6 +72,27 @@
 				})
 
 			});
+			$(document).ready(function() {
+				$("#employee_button").click(function() {
+					displayEmployeeDialog();
+				})
+
+			});
+				function displayEmployeeDialog() {
+				$("#employee_dialog").show();
+				
+			}
+			$(document).ready(function() {
+				$("#employee_cancel_button").click(function() {
+					hideEmployeeDialog();
+				})
+
+			});
+				function hideEmployeeDialog() {
+				$("#employee_dialog").hide();
+				
+			}			
+
 			
 		</script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
@@ -138,7 +159,8 @@
 					<button class="Smaller" id="TurnBoardCCWButton" style="top:26%;left:2%;width:5%;height:7%" onmousedown="RotateBegin(-1)" onmouseup="RotateEnd()"><</button>
 					<button class="Smaller" id="TurnBoardCWButton" style="top:26%;left:14%;width:5%;height:7%" onmousedown="RotateBegin(1)" onmouseup="RotateEnd()">></button>
 				</div>
-				<button id="new-product-button" class="Smaller" style="top:80%;left:3%;width:10%;height:8%;">New<br>Product</button>		
+				<button id="new-product-button" class="Smaller" style="top:80%;left:3%;width:10%;height:8%;">New<br>Product</button>
+				<button id="employee_button" class="Smaller" style="top:80%;left:13%;width:10%;height:8%;">Add<br>Employee</button>			
 			</div>
 		</div>
 <!-- hidden dom elements -->		
@@ -156,5 +178,25 @@
 			</div>
 			</div>
 		</div>
+        <div class="popup" id="employee_dialog">
+			<h1>Employees</h1>
+			<p>
+			</p>
+			<div>
+				<p>
+				 <td>Add Tester:
+					<select name="Tester">
+					<option value="One">1</option>
+					<option value="Two">2</option>
+					<option value="Three">3</option>
+					<option value="Four">4</option>
+					</select>
+				</td>
+				</p>
+				<button class="Medium RoundEdge" id="add_employee_button">Add</button>
+				<button class="Medium RoundEdge" id="employee_cancel_button">Cancel</button>
+			</div>
+			</div>
+		</div>		
 	</body>
 </html>

@@ -149,22 +149,23 @@ function Product(player,name,category,sub,color){
 	return newProduct;
 }
 function Player(game,name,type,color){
-	this.ClassName="PLAYER";
-	this.Name=name;
-	this.Color=color;
-	this.Type=type;
+	var newPlayer = new Object();
+	newPlayer.ClassName="PLAYER";
+	newPlayer.Name=name;
+	newPlayer.Color=color;
+	newPlayer.Type=type;
 	if(game != null){
-		game.Players.push(this);
+		game.Players.push(newPlayer);
 		game.NumPlayers=game.Players.length;
 		this.Number=game.NumPlayers;
 		this.GlobalID=this.Number;
 	}else{
 		alert("Created player without a parent game!");
 	}
-	this.toString = function () {
-		return this.ClassName+" "+this.GlobalID+": "+this.Name+", "+this.Type+", "+this.Color;
+	newPlayer.toString = function () {
+		return newPlayer.ClassName+" "+newPlayer.GlobalID+": "+newPlayer.Name+", "+newPlayer.Type+", "+newPlayer.Color;
 	}
-	return this;
+	return newPlayer;
 }
 function Game(id){
 	var newGame = new Object();

@@ -32,8 +32,14 @@
 			function CreateSPGame(){
 				SwitchToPage("new_game_players.html");
 			}
+			function SystemOptions(){
+				alert("Gamewide options not implemented yet");
+			}
 			function LoadGame(){
 				SwitchToPage("load.html");
+			}
+			function HowToPlay(){
+				SwitchToPage("HowToPlay.html");
 			}
 			function BackFromSP(){
 				$("#ButtonSheetOne").css("left","0%");
@@ -64,8 +70,10 @@
 			<div id="ContentContainer">
 				<div class="FancyText" id="StartNewGameTitle" style="left:20%;top:20%;">Entrepreneurship</div> 
 				<div id="ButtonSheetOne" class="ButtonSheet" style="height:100%">
-					<button class="Standard" style="left:34%;top:55%;width:38%" onclick="LocalGame()">Local Game</button>
-					<button class="Standard" style="left:33.75%;top:65%" onclick="NetworkedGame()">Networked Game</button>
+					<button class="Standard" style="left:32%;top:45%;width:40%" onclick="LocalGame()">Local Game</button>
+					<button class="Standard" style="left:32%;top:55%;width:40%" onclick="NetworkedGame()">Networked Game</button>
+					<button class="Standard" style="left:32%;top:65%;width:40%" onclick="SystemOptions()">Options</button>
+					<button class="Standard" style="left:32%;top:75%;width:40%" onclick="HowToPlay()">How To Play</button>
 				</div>
 				<div id="ButtonSheetTwo" class="ButtonSheet" style="left:-100%">
 					<button class="Standard" style="left:27%;top:55%;width:25%" onclick="CreateMPGame()">Create</button>

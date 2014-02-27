@@ -125,31 +125,32 @@ function MakeBGM(){
 }
 //-- CLASS DEFINITIONS --//
 function Product(player,name,category,sub,color){
-	this.ClassName="PRODUCT";
-	this.Name=name;
-	this.Category=category;
-	this.SubCategory=sub;
-	this.Color=color;
-	this.IdeaStrength=0;
-	this.DesignStrength=0;
-	this.BuildStrength=0;
-	this.Phase="nil";
+	var newProduct = new Object();
+	newProduct.ClassName="PRODUCT";
+	newProduct.Name=name;
+	newProduct.Category=category;
+	newProduct.SubCategory=sub;
+	newProduct.Color=color;
+	newProduct.IdeaStrength=0;
+	newProduct.DesignStrength=0;
+	newProduct.BuildStrength=0;
+	newProduct.Phase="nil";
 	if(player != null){
 		player.Products.push(this);
-		this.Number=player.Products.length-1;
-		this.OwnerNumber=player.Number;
-		this.Owner=player;
+		newProduct.Number=player.Products.length-1;
+		newProduct.OwnerNumber=player.Number;
+		newProduct.Owner=player;
 		player.NumProducts=player.Products.length;
 		player.ParentGame.PlayerProducts.push(this);
-		this.GlobalID=player.ParentGame.PlayerProducts.length;
+		newProduct.GlobalID=player.ParentGame.PlayerProducts.length;
 	}else{
 		alert("Created product without an owner!");
 	}
-	this.DisplayItemID="nil";
-	this.toString = function () {
-		return this.ClassName+" "+this.GlobalID+": "+this.Owner.Name+", "+this.Category+", "+this.SubCategory+", "+this.Color;
+	newProduct.DisplayItemID="nil";
+	newProduct.toString = function () {
+		return newProduct.ClassName+" "+this.GlobalID+": "+this.Owner.Name+", "+this.Category+", "+this.SubCategory+", "+this.Color;
 	}
-	return this;
+	return newProduct;
 }
 function Player(game,name,type,color){
 	this.ClassName="PLAYER";

@@ -9,7 +9,11 @@
 			function Initialize(){
 				GlobalInitialize();
 				PopulatePlayerColorFields();
-				TheBrandNewGame=new Object();
+				if(localStorage.getItem("TheBrandNewGame")){
+					TheBrandNewGame=JSON.parse(localStorage.getItem("TheBrandNewGame"));
+				}else{
+					TheBrandNewGame=new Object();
+				}
 			}
 			function PopulatePlayerColorFields(){
 				var BigNum=1;

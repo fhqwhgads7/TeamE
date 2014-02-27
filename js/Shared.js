@@ -1,4 +1,5 @@
 function GlobalInitialize(){
+	Background();
 	$(document).on('mousemove',function(e){
 		$("#ContentContainer").css({
 		   left:-e.pageX/100+3,
@@ -28,23 +29,6 @@ function SwitchToPage(page){
 		window.location=page;
 	},149);
 }
-function checkOptions(){
-	//Checks if 'GameDifficulty' is 'EASY', 'NORMAL', 'HARD', or 'LUNATIC'. Sets to 'NORMAL' if otherwise.
-	if (!((localStorage.getItem('GameDifficulty') == 'EASY') || (localStorage.getItem('GameDifficulty') == 'NORMAL') || (localStorage.getItem('GameDifficulty') == 'HARD') || (localStorage.getItem('GameDifficulty') == 'LUNATIC')))
-		localStorage.setItem('GameDifficulty','NORMAL');
-	//Checks if 'CPUIntelligence' is 'BEGINNER', 'STANDARD', or 'EXPERT'. Sets to 'STANDARD' if otherwise.
-	if (!((localStorage.getItem('CPUIntelligence') == 'BEGINNER') || (localStorage.getItem('CPUIntelligence') == 'STANDARD') || (localStorage.getItem('CPUIntelligence') == 'EXPERT')))
-		localStorage.setItem('CPUIntelligence','STANDARD');
-	//Checks if 'NumberOfRounds' is 40, 45, 50, 55, or 60. Sets to '40' if otherwise.
-	if (!((parseInt(localStorage.getItem('NumberOfRounds'))/5 >= 8)&&(parseInt(localStorage.getItem('NumberOfRounds'))/5 <= 12)) || localStorage.getItem('NumberOfRounds')==null)
-		localStorage.setItem('NumberOfRounds','40');
-	//Checks if 'PatentingEnabled' is 'true' or 'false'. Sets to 'true' if otherwise.
-	if (!((localStorage.getItem('PatentingEnabled') == 'true') || (localStorage.getItem('PatentingEnabled') == 'false')))
-		localStorage.setItem('PatentingEnabled','true');
-	//Dummied out: Checks if 'RetirementMinimum' is 401000, 500000, 600000, 700000, 800000, 900000, 1000000, or 999999999. Sets to '401000' if otherwise.
-	//if (!((localStorage.getItem('RetirementMinimum') == '401000') || ((parseInt(localStorage.getItem('RetirementMinimum'))/100000 >= 5) && (parseInt(localStorage.getItem('RetirementMinimum'))/100000 <= 10)) || (localStorage.getItem('RetirementMinimum') == '999999999')))
-	//	localStorage.setItem('RetirementMinimum','401000');
-}
 var PlayerColors={
 	Red:"rgb(255,30,30)",
 	Green:"rgb(0,170,0)",
@@ -67,46 +51,140 @@ var NumberNameTable={
 	5:"Five",
 	6:"Six"
 }
-function Product(player,name,category,sub,color){
-	this.Name=name;
-	this.Category=category;
-	this.SubCategory=sub;
-	this.Color=color;
-	this.IdeaStrength=0;
-	this.DesignStrength=0;
-	this.BuildStrength=0;
-	this.Phase="nil";
-	if(player != null){
-		player.Products.push(this);
-		this.Number=player.Products.length-1;
-		this.OwnerNumber=player.Number;
-		player.NumProducts=player.Products.length;
-	}
-	this.DisplayItemID="nil";
-	this.toString = function () {
-		return this.Name + ', ' + this.Category + ', ' + this.SubCategory + ', ' + this.Color;
-	}
-	return this;
-}
-function Back(){
+function Background(){
     day=new Date()
     x=day.getHours()
-    if(x>=0 && x<8) {
-             var body = document.getElementsByTagName('body')[0];
-                               body.style.backgroundImage = 'url(background_morning_1.jpg)';
-                           
-	                       }
-                           else if(x>=8 && x<11) {
-                               var body = document.getElementsByTagName('body')[0];
-                               body.style.backgroundImage = 'url(background_noon_1.jpg)';
-                           }
-                           else if(x>=11 && x<18) {
-                               var body = document.getElementsByTagName('body')[0];
-                               body.style.backgroundImage = 'url(background_afternoon_1.jpg)';
-                           }
-                           else if(x>=18 && x<24) {
-                               var body = document.getElementsByTagName('body')[0];
-                               body.style.backgroundImage = 'url(background_night_1.jpg)';
-                           }
-	                   
+    if(x>=5 && x<9)
+	{
+        $("#MainBackground").css("background-image", 'url(../images/background_morning_1.jpg)')
+	}
+    else if(x>=9 && x<15)
+	{
+        $("#MainBackground").css("background-image", 'url(../images/background_noon_1.jpg)')
+    }
+    else if(x>=15 && x<19)
+	{
+        $("#MainBackground").css("background-image", 'url(../images/background_afternoon_1.jpg)')
+    }
+    else
+	{
+        $("#MainBackground").css("background-image", 'url(../images/background_night_1.jpg)')
+    }                   
+}
+function MakeBGM(){	
+	var audioArray = document.getElementsByClassName('playsong');
+		
+	//document.write(audioArray.length);
+		var i = 0;
+		var nowPlaying = audioArray[i];
+		nowPlaying.load();
+		nowPlaying.play();
+		//alert("hi");
+		/*$('.play').on('click', function() {
+			nowPlaying.play();
+		});
+		
+		$('.stop').on('click', function() {
+			nowPlaying.pause();
+		});
+		
+		$('.next').on('click', function() {*/
+		//alert(audioArray.length);
+		$('#player').on('ended', function(){
+    // done playing
+			//alert("Player stopped");
+			//alert(i);
+			/*$.each($('audio.playsong'), function(){
+				this.pause();
+			});
+			
+			if(i>=audioArray.length-1){
+				i=0;
 			}
+			else{
+				i++;
+			}*/
+			
+			//document.write(audioArray.length);
+			nowPlaying = audioArray[1];
+			nowPlaying.load();
+			nowPlaying.play();
+			
+			$('#player2').on('ended', function(){
+			
+				nowPlaying = audioArray[2];
+				nowPlaying.load();
+				nowPlaying.play();
+			});
+			//nowPlaying.pause();
+		});	
+}
+//-- CLASS DEFINITIONS --//
+function Product(player,name,category,sub,color){
+	var newProduct = new Object();
+	newProduct.ClassName="PRODUCT";
+	newProduct.Name=name;
+	newProduct.Category=category;
+	newProduct.SubCategory=sub;
+	newProduct.Color=color;
+	newProduct.IdeaStrength=0;
+	newProduct.DesignStrength=0;
+	newProduct.BuildStrength=0;
+	newProduct.Phase="nil";
+	if(player != null){
+		player.Products.push(this);
+		newProduct.Number=player.Products.length-1;
+		newProduct.OwnerNumber=player.Number;
+		newProduct.Owner=player;
+		player.NumProducts=player.Products.length;
+		player.ParentGame.PlayerProducts.push(this);
+		newProduct.GlobalID=player.ParentGame.PlayerProducts.length;
+	}else{
+		alert("Created product without an owner!");
+	}
+	newProduct.DisplayItemID="nil";
+	newProduct.toString = function () {
+		return newProduct.ClassName+" "+this.GlobalID+": "+this.Owner.Name+", "+this.Category+", "+this.SubCategory+", "+this.Color;
+	}
+	return newProduct;
+}
+function Player(game,name,type,color){
+	var newPlayer = new Object();
+	newPlayer.ClassName="PLAYER";
+	newPlayer.Name=name;
+	newPlayer.Color=color;
+	newPlayer.Type=type;
+	if(game != null){
+		game.Players.push(newPlayer);
+		game.NumPlayers=game.Players.length;
+		this.Number=game.NumPlayers;
+		this.GlobalID=this.Number;
+	}else{
+		alert("Created player without a parent game!");
+	}
+	newPlayer.toString = function () {
+		return newPlayer.ClassName+" "+newPlayer.GlobalID+": "+newPlayer.Name+", "+newPlayer.Type+", "+newPlayer.Color;
+	}
+	return newPlayer;
+}
+function Game(id){
+	var newGame = new Object();
+	newGame.ClassName="GAME_OBJECT";
+	newGame.ID=id;
+	newGame.Players={};
+	newGame.NumPlayers=0;
+	newGame.PlayerProducts={};
+	newGame.CurrentPlayer=null;
+	newGame.CurrentPlayerNum=0;
+	newGame.Settings={
+		Difficulty:null,
+		CPUIntelligence:null,
+		PatentingEnabled:null,
+		NumberOfRounds:null
+	}
+	newGame.GameState="Uninitialized"; // this game-state is going to become very important when we start the networking
+	newGame.toString=function(){
+		return newGame.ClassName+" "+this.ID.toString();
+	}
+	return newGame;
+}

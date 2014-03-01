@@ -20,9 +20,12 @@
 				LoadOptions();
 			}
 			
-			function GoBack(){
+			function LoadPlayersPage(){
 				SaveOptions();
 				SwitchToPage("new_game_players.html");
+			}
+			function GoBackToMainMenu(){
+				SwitchToPage("title.html");
 			}
 			
 			function LoadOptions()
@@ -38,10 +41,6 @@
 							$( "#Patenting").val("Off");
 					}
 				}
-			}
-			function CreateGame(){
-				SaveOptions();
-				SwitchToPage("game_board.html");
 			}
 			function SaveOptions()
 			{
@@ -171,8 +170,8 @@
 					
 				</div>
 				<div class="StandardText" id="OptionsTitle" style="font-size:40px;margin:10px;width:800px;top:19%;">New Game: Options</div> 
-				<button class="Standard" onclick="CreateGame()" style="right:19%;width:28%;top:73%;font-size:20px">Create Game</button>
-				<button class="Standard" onclick="GoBack()" style="left:20%;width:28%;top:73%;font-size:20px">Back</button>
+				<button class="Standard" onclick="LoadPlayersPage()" style="right:19%;width:28%;top:73%;font-size:20px">Continue</button>
+				<button class="Standard" onclick="GoBackToMainMenu()" style="left:20%;width:28%;top:73%;font-size:20px">Main Menu</button>
 			</div>
 		</div>
 	</body>

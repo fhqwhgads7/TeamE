@@ -72,7 +72,7 @@
 				border-style:solid;
 				border-width:5px;
 				width:60%;
-				height:60%;
+				height:35%;
 				box-shadow: 0px 0px 40px 5px #AAAAAA;
 				background-color:rgba(0,0,0,.1);
 			}
@@ -96,30 +96,30 @@
 	<body onload="Initialize()">
 		<div id="MainBackground">
 			<div id="ContentContainer">
-				<div class="OptionsBox" id="OptionsBox" style="left:20%;top:20%;">
+				<div class="OptionsBox" id="OptionsBox" style="left:20%;top:32.5%;">
 				
-					<div class="StandardText" style="font-size:23px;left:3%;top:5%;">Game Difficulty</div>
-					<div class="StandardText" style="font-size:23px;left:3%;top:17%;">CPU Intelligence</div>
-					<div class="StandardText" style="font-size:23px;left:3%;top:29%;">Product Patenting</div>
-					<div class="StandardText" style="font-size:23px;left:3%;top:41%;">Number of Rounds</div>
+					<div class="StandardText" style="font-size:23px;left:3%;top:7%;">Game Difficulty</div>
+					<div class="StandardText" style="font-size:23px;left:3%;top:31%;">CPU Intelligence</div>
+					<div class="StandardText" style="font-size:23px;left:3%;top:55%;">Product Patenting</div>
+					<div class="StandardText" style="font-size:23px;left:3%;top:79%;">Number of Rounds</div>
 					<!--<div class="StandardText" style="font-size:23px;left:3%;top:41%;">Retirement Minimum</div>-->
 					
-					<select class="Options" id="GameDifficulty" style="top:5%;">
+					<select class="Options" id="GameDifficulty" style="top:7%;">
 							<option value="EASY">Easy</option>
 							<option value="NORMAL" selected="selected">Normal</option>
 							<option value="HARD">Hard</option>
 							<option value="LUNATIC">Lunatic</option>
 						</select>
-						<select class="Options" id="CPUIntelligence" style="top:17%;">
+						<select class="Options" id="CPUIntelligence" style="top:31%;">
 							<option value="BEGINNER">Beginner</option>
 							<option value="STANDARD" selected="selected">Standard</option>
 							<option value="EXPERT">Expert</option>
 						</select>
-						<select class="Options" id="Patenting" style="top:29%;">
+						<select class="Options" id="Patenting" style="top:55%;">
 							<option value="On" selected="selected">On</option>
 							<option value="Off">Off</option>
 						</select>
-						<select class="Options" id="NumberOfRounds" style="top:41%;">
+						<select class="Options" id="NumberOfRounds" style="top:79%;">
 							<option value=40 selected="selected">40</option>
 							<option value=45>45</option>
 							<option value=50>50</option>
@@ -139,8 +139,9 @@
 						</select>
 						-->
 					
+					<!-- TO BE MOVED TO A SYSTEM-WIDE OPTIONS PAGE>
 					<form>
-
+						
 						<TABLE bgcolor="FFFFFF" border="5" style="position:absolute;top:53%;left:2%;width:96%">
 							<TR>
 						  <TH COLSPAN="2">Background Music
@@ -164,13 +165,14 @@
 						</TABLE>
 						
 					</form>
+					<--->
 					
 					
 					
 				</div>
-				<div class="StandardText" id="OptionsTitle" style="font-size:40px;margin:10px;width:800px;top:7%;">New Game: Options</div> 
-				<button class="Standard" onclick="CreateGame()" style="right:19%;width:28%;top:85%;font-size:20px">Create Game</button>
-				<button class="Standard" onclick="GoBack()" style="left:20%;width:28%;top:85%;font-size:20px">Back</button>
+				<div class="StandardText" id="OptionsTitle" style="font-size:40px;margin:10px;width:800px;top:19%;">New Game: Options</div> 
+				<button class="Standard" onclick="CreateGame()" style="right:19%;width:28%;top:73%;font-size:20px">Create Game</button>
+				<button class="Standard" onclick="GoBack()" style="left:20%;width:28%;top:73%;font-size:20px">Back</button>
 			</div>
 		</div>
 	</body>

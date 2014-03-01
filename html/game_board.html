@@ -59,41 +59,14 @@
 			function displayNewProductDialog() {
 				$("#new-product-dialog").show();		
 			}
-
-			$(document).ready(function() {
-
-				// Event assignments
-
-				$("#new-product-button").click(function() {
-					displayNewProductDialog();
-				})
-				$("#new-product-make-button").click(function() {
-					createNewProduct();	
-				})
-
-			});
-			$(document).ready(function() {
-				$("#employee_button").click(function() {
-					displayEmployeeDialog();
-				})
-
-			});
-				function displayEmployeeDialog() {
+			function displayEmployeeDialog() {
 				$("#employee_dialog").show();
 				
 			}
-			$(document).ready(function() {
-				$("#employee_cancel_button").click(function() {
-					hideEmployeeDialog();
-				})
-
-			});
-				function hideEmployeeDialog() {
+			function hideEmployeeDialog() {
 				$("#employee_dialog").hide();
 				
-			}			
-
-			
+			}
 		</script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
 		<style>
@@ -132,10 +105,13 @@
 				width:30%;
 				height:15%;
 				box-shadow: 0px 0px 40px 5px #AAAAAA;
-				background:rgba(0,0,0,.1);
+				background:rgba(0,0,0,.75);
 				-moz-border-radius:10px;
 				-webkit-border-radius:10px;
 				border-radius:10px;
+			}
+			div.PlayerBox:hover{
+				background:rgba(50,50,50,.75);
 			}
 		</style>
 	</head>
@@ -143,24 +119,26 @@
 	
 	<body onload="Initialize()">
 		<div id="MainBackground">
-			<div id="MainBoard">
-				<div class="PlayerBox" id="PlyOneScbdBox" style="border-color:grey;width:25%;left:1%;top:1%;">
-					<div class="StandardText" id="PlyOneScbdName" style="font-size:25px;left:14%;top:5%;">nil</div>
-					<div class="StandardText" style="font-size:18px;left:14%;top:35%;color:rgb(120,120,120)">$<span id="PlyOneScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
-					<div class="StandardText" style="font-size:10px;left:12%;top:62%;color:rgb(120,120,120);font-size:10px">Products <span id="PlyOneScbdProds" style="color:white">nil</span></div>
-					<div class="StandardText" style="font-size:10px;left:54%;top:62%;color:rgb(120,120,120);font-size:10px">Builders <span id="PlyOneScbdEmps" style="color:white">nil</span></div>
-					<div class="StandardText" style="font-size:10px;left:12%;top:77%;color:rgb(120,120,120);font-size:10px">Designers <span id="PlyOneScbdProds" style="color:white">nil</span></div>
-					<div class="StandardText" style="font-size:10px;left:54%;top:77%;color:rgb(120,120,120);font-size:10px">Testers <span id="PlyOneScbdEmps" style="color:white">nil</span></div>
+			<div id="ContentContainer">
+				<div id="MainBoard" style="top:2%;left:2%">
+					<div class="PlayerBox" id="PlyOneScbdBox" style="border-color:grey;width:25%;left:1%;top:1%;">
+						<div class="StandardText" id="PlyOneScbdName" style="font-size:25px;left:10%;top:5%;">nil</div>
+						<div class="StandardText" style="font-size:18px;left:10%;top:35%;color:rgb(160,160,160)">$<span id="PlyOneScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
+						<div class="StandardText" style="font-size:10px;left:12%;top:62%;color:rgb(160,160,160);font-size:10px">Products <span id="PlyOneScbdProds" style="color:white">nil</span></div>
+						<div class="StandardText" style="font-size:10px;left:54%;top:62%;color:rgb(160,160,160);font-size:10px">Developers <span id="PlyOneScbdDevs" style="color:white">nil</span></div>
+						<div class="StandardText" style="font-size:10px;left:12%;top:77%;color:rgb(160,160,160);font-size:10px">Designers <span id="PlyOneScbdDsgns" style="color:white">nil</span></div>
+						<div class="StandardText" style="font-size:10px;left:54%;top:77%;color:rgb(160,160,160);font-size:10px">Testers <span id="PlyOneScbdTsts" style="color:white">nil</span></div>
+					</div>
+					</div>
+					<div id="GameBoard">
+						<div id="GameBoardCenter"></div>
+						<div id="GameBoardCircle"></div>
+						<button class="Standard" id="TurnBoardCCWButton" style="top:24%;left:3%;width:2%;height:7%;padding:.2em 1.6em" onmousedown="RotateBegin(-1)" onmouseup="RotateEnd()"><b><</b></button>
+						<button class="Standard" id="TurnBoardCWButton" style="top:24%;left:14%;width:2%;height:7%;padding:.2em 1.6em" onmousedown="RotateBegin(1)" onmouseup="RotateEnd()"><b>></b></button>
+					</div>
+					<button id="new-product-button" class="Standard Compact" style="top:80%;left:3%;width:10%;height:8%;"onclick="displayNewProductDialog()">New<br>Product</button>
+					<button id="employee_button" class="Standard Compact" style="top:80%;left:13%;width:11%;height:8%;" onclick="">Manage<br>Employees</button>			
 				</div>
-				</div>
-				<div id="GameBoard">
-					<div id="GameBoardCenter"></div>
-					<div id="GameBoardCircle"></div>
-					<button class="Smaller" id="TurnBoardCCWButton" style="top:26%;left:2%;width:5%;height:7%" onmousedown="RotateBegin(-1)" onmouseup="RotateEnd()"><</button>
-					<button class="Smaller" id="TurnBoardCWButton" style="top:26%;left:14%;width:5%;height:7%" onmousedown="RotateBegin(1)" onmouseup="RotateEnd()">></button>
-				</div>
-				<button id="new-product-button" class="Smaller" style="top:80%;left:3%;width:10%;height:8%;">New<br>Product</button>
-				<button id="employee_button" class="Smaller" style="top:80%;left:13%;width:10%;height:8%;">Add<br>Employee</button>			
 			</div>
 		</div>
 <!-- hidden dom elements -->		

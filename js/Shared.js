@@ -125,7 +125,7 @@ function MakeBGM(){
 }
 //-- CLASS DEFINITIONS --//
 function Product(player,name,category,sub,color){
-	var newProduct = new Object();
+	var newProduct=new Object();
 	newProduct.ClassName="PRODUCT";
 	newProduct.Name=name;
 	newProduct.Category=category;
@@ -153,16 +153,22 @@ function Product(player,name,category,sub,color){
 	return newProduct;
 }
 function Player(game,name,type,color){
-	var newPlayer = new Object();
+	var newPlayer=new Object();
 	newPlayer.ClassName="PLAYER";
 	newPlayer.Name=name;
 	newPlayer.Color=color;
 	newPlayer.Type=type;
+	newPlayer.Products=[];
+	newPlayer.NumProducts=0;
+	newPlayer.NumDevs=0;
+	newPlayer.NumQA=0;
+	newPlayer.NumCreative=0;
+	newPlayer.Money=2000;
 	if(game != null){
 		game.Players.push(newPlayer);
 		game.NumPlayers=game.Players.length;
-		this.Number=game.NumPlayers;
-		this.GlobalID=this.Number;
+		newPlayer.Number=game.NumPlayers;
+		newPlayer.GlobalID=newPlayer.Number;
 	}else{
 		alert("Created player without a parent game!");
 	}
@@ -172,12 +178,12 @@ function Player(game,name,type,color){
 	return newPlayer;
 }
 function Game(id){
-	var newGame = new Object();
+	var newGame=new Object();
 	newGame.ClassName="GAME_OBJECT";
 	newGame.ID=id;
-	newGame.Players={};
+	newGame.Players=[];
 	newGame.NumPlayers=0;
-	newGame.PlayerProducts={};
+	newGame.PlayerProducts=[];
 	newGame.CurrentPlayer=null;
 	newGame.CurrentPlayerNum=0;
 	newGame.Settings={

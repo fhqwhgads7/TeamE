@@ -5,11 +5,11 @@ var CurrentlySelectedProduct;
 var ShowCashAlert=false;
 function GameInitialize(){
 	var GameCreationInfo=JSON.parse(localStorage.getItem("TheBrandNewGame"));
-	TheGame=new Game();
+	TheGame=new Game("2947");
 	TheGame.GameState="PlayerTurnIdle";
 	TransferGameStartupInfo(GameCreationInfo,TheGame);
 	TheGame.CurrentPlayer=TheGame.Players[TheGame.CurrentPlayerNum];
-	//UpdatePlayerDisplay();
+	UpdatePlayerDisplay();
 	//PopulateNewProdCategories();
 	//document.getElementById("RoundNumberDisplay").innerHTML=TheGame.CurrentRound.toString();
 	//setInterval("TipThink();",10);
@@ -20,16 +20,31 @@ function GameInitialize(){
 }
 function TransferGameStartupInfo(from,to){
 	for(var i=1;i<=6;i++){
-		var Ply=from.Players["Player"+NumberNameTable[i]];
+		var Ply=from.Players["Ply"+NumberNameTable[i]];
 		if(Ply){
 			new Player(to,Ply.Name,Ply.Type,Ply.Color);
 		}
 	}
 	to.Settings={}
-	to.Settings.Difficulty=from.Settings.Difficulty;
-	to.Settings.CPUIntelligence=from.Settings.CPUIntelligence;
-	to.Settings.PatentingEnabled=from.Settings.PatentingEnabled;
-	to.Settings.NumberOfRounds=from.Settings.NumberOfRounds;
+	to.Settings.Difficulty=from.Options.Difficulty;
+	to.Settings.CPUIntelligence=from.Options.CPUIntelligence;
+	to.Settings.PatentingEnabled=from.Options.PatentingEnabled;
+	to.Settings.NumberOfRounds=from.Options.NumberOfRounds;
+}
+function UpdatePlayerDisplay(){
+	var OldCash=parseInt($("#PlyOneScbdMoney").html());
+	var OldName=$("#PlyOneScbdName").html;
+	var Ply=TheGame.CurrentPlayer;
+	var MainBox=$("#PlyOneScbdBox");
+	MainBox.css("border-color",Ply.Color);
+	$("#PlyOneScbdName").html(Ply.Name);
+	if(Ply.Name.length>15){$("#PlyOneScbdName").title=Ply.Name;}
+	$("#PlyOneScbdMoney").html(Ply.Money.toString());
+	$("#PlyOneScbdProds").html(Ply.NumProducts.toString());
+	$("#PlyOneScbdDsgns").html(Ply.NumCreative.toString());
+	$("#PlyOneScbdDevs").html(Ply.NumDevs.toString());
+	$("#PlyOneScbdTsts").html(Ply.NumQA.toString());
+	//setTimeout(VisualCashAlert,100);
 }
 /*-
 function Appear(){
@@ -61,21 +76,6 @@ function SelectProductCategory(){
 		SubSel.appendChild(Opt);
 	}
 	SubSel.options[0].selected=true;
-}
-function UpdatePlayerDisplay(){
-	var OldCash=parseInt(document.getElementById("CurrentPlayerMoney").innerHTML);
-	var OldName=document.getElementById("CurrentPlayerName").innerHTML;
-	var Ply=TheGame.ActivePlayer;
-	var MainBox=document.getElementById("CurrentPlayerDisplay");
-	MainBox.style.borderColor=Ply.Color;
-	document.getElementById("CurrentPlayerName").innerHTML=Ply.Name;
-	if(Ply.Name.length>15){document.getElementById("CurrentPlayerName").title=Ply.Name;}
-	document.getElementById("CurrentPlayerMoney").innerHTML=Ply.Money.toString();
-	document.getElementById("CurrentPlayerProdNum").innerHTML=Ply.NumProducts.toString();
-	document.getElementById("CurrentPlayerDesigners").innerHTML=Ply.NumCreative.toString();
-	document.getElementById("CurrentPlayerDevelopers").innerHTML=Ply.NumDevs.toString();
-	document.getElementById("CurrentPlayerTesters").innerHTML=Ply.NumQA.toString();
-	setTimeout(VisualCashAlert,100);
 }
 function CycleTurn(){
 	if(TheGame.NumPlayers>1){

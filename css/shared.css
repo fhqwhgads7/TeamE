@@ -146,6 +146,19 @@ div.popup {
 	background: white;
 	text-align: center;
 }
+div.popup2 {
+	position: absolute;
+	display: none;
+	z-index: 10;
+	top: 30%;
+	left: 30%;
+	color: black;
+	height: 17em;
+	width: 15em;
+	border: 1px black solid;
+	background: white;
+	text-align: center;
+}
 div.NewActionModal{
 	position:absolute;
 	font-align:center;

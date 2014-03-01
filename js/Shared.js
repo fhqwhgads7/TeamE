@@ -1,5 +1,5 @@
 function GlobalInitialize(){
-	Background();
+	Background(new Date().getHours());
 	$(document).on('mousemove',function(e){
 		$("#ContentContainer").css({
 		   left:-e.pageX/100+3,
@@ -51,25 +51,29 @@ var NumberNameTable={
 	5:"Five",
 	6:"Six"
 }
-function Background(){
-    day=new Date()
-    x=day.getHours()
+function Background(x){
+	timeOfDay = "";
     if(x>=5 && x<9)
 	{
-        $("#MainBackground").css("background-image", 'url(../images/background_morning_1.jpg)')
+        $("#MainBackground").css("background-image", 'url(../images/background_morning_1.jpg)');
+		timeOfDay = "Morning";
 	}
     else if(x>=9 && x<15)
 	{
-        $("#MainBackground").css("background-image", 'url(../images/background_noon_1.jpg)')
+        $("#MainBackground").css("background-image", 'url(../images/background_noon_1.jpg)');
+		timeOfDay = "Noon";
     }
     else if(x>=15 && x<19)
 	{
-        $("#MainBackground").css("background-image", 'url(../images/background_afternoon_1.jpg)')
+        $("#MainBackground").css("background-image", 'url(../images/background_afternoon_1.jpg)');
+		timeOfDay = "Afternoon";
     }
     else
 	{
-        $("#MainBackground").css("background-image", 'url(../images/background_night_1.jpg)')
+        $("#MainBackground").css("background-image", 'url(../images/background_night_1.jpg)');
+		timeOfDay = "Night";
     }                   
+	return timeOfDay;
 }
 function MakeBGM(){	
 	var audioArray = document.getElementsByClassName('playsong');

@@ -35,6 +35,12 @@
 			function LoadGame(){
 				SwitchToPage("load.html");
 			}
+			function HowToPlay(){
+				SwitchToPage("howtoplay.html");
+			}
+			function SystemOptions(){
+				alert("Currently incomplete.");
+			}
 			function BackFromSP(){
 				$("#ButtonSheetOne").css("left","0%");
 				setTimeout(function(){
@@ -62,11 +68,13 @@
 	<body onload="Initialize()">
 		<div id="MainBackground">
 			<div id="ContentContainer">
-				<div class="FancyText" id="StartNewGameTitle" style="left:22%;top:20%;">Entrepreneurship</div> 
+				<div class="FancyText" id="StartNewGameTitle" style="left:18%;top:20%;">Entrepreneurship</div> 
 				
 				<div id="ButtonSheetOne" class="ButtonSheet" style="height:100%">
-					<button class="Standard"  style="left:34%;top:55%;width:38%" onclick="LocalGame()">Local Game</button>
-					<button class="Standard" style="left:33.75%;top:65%" onclick="NetworkedGame()">Networked Game</button>
+					<button class="Standard"  style="left:30%;top:45%;width:40%" onclick="LocalGame()">Local Game</button>
+					<button class="Standard" style="left:30%;top:55%;width:40%" onclick="NetworkedGame()">Networked Game</button>
+					<button class="Standard" style="left:30%;top:65%;width:40%" onclick="SystemOptions()">Settings</button>
+					<button class="Standard" style="left:30%;top:75%;width:40%" onclick="HowToPlay()">How to Play</button>
 				</div>
 				<div id="ButtonSheetTwo" class="ButtonSheet" style="left:-100%">
 					<button class="Standard" style="left:27%;top:55%;width:25%" onclick="CreateMPGame()">Create</button>

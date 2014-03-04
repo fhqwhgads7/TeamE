@@ -59,6 +59,9 @@
 			function displayNewProductDialog() {
 				$("#new-product-dialog").show();		
 			}
+			function hideNewProductDialog() {
+				$("#new-product-dialog").hide();
+			}
 			function displayEmployeeDialog() {
 				$("#employee_dialog").show();
 				
@@ -119,7 +122,7 @@
 	
 	<body onload="Initialize()">
 		<div id="MainBackground">
-			<div id="ContentContainer">
+			<!-- <div id="ContentContainer"> -->
 				<div id="MainBoard" style="top:2%;left:2%">
 					<div class="PlayerBox" id="PlyOneScbdBox" style="border-color:grey;width:25%;left:1%;top:1%;">
 						<div class="StandardText" id="PlyOneScbdName" style="font-size:25px;left:10%;top:5%;">nil</div>
@@ -137,8 +140,8 @@
 						<button class="Standard" id="TurnBoardCWButton" style="top:24%;left:14%;width:2%;height:7%;padding:.2em 1.6em" onmousedown="RotateBegin(1)" onmouseup="RotateEnd()"><b>></b></button>
 					</div>
 					<button id="new-product-button" class="Standard Compact" style="top:80%;left:3%;width:10%;height:8%;"onclick="displayNewProductDialog()">New<br>Product</button>
-					<button id="employee_button" class="Standard Compact" style="top:80%;left:13%;width:11%;height:8%;" onclick="">Manage<br>Employees</button>			
-				</div>
+					<button id="employee_button" class="Standard Compact" style="top:80%;left:13%;width:11%;height:8%;" onclick="displayEmployeeDialog()">Manage<br>Employees</button>			
+				<!-- </div> -->
 			</div>
 		</div>
 <!-- hidden dom elements -->		
@@ -152,7 +155,7 @@
 					<input id="new-product-name-input" type="text">
 				</p>
 				<button class="Medium RoundEdge" id="new-product-make-button">Make</button>
-				<button class="Medium RoundEdge" id="new-product-cancel-button">Cancel</button>
+				<button class="Medium RoundEdge" id="new-product-cancel-button" onclick="hideNewProductDialog()">Cancel</button>
 			</div>
 			</div>
 		</div>
@@ -195,7 +198,7 @@
 				</td>
 				</p>				
 				<button class="Medium RoundEdge" id="add_employee_button">Add</button>
-				<button class="Medium RoundEdge" id="employee_cancel_button">Cancel</button>
+				<button class="Medium RoundEdge" id="employee_cancel_button" onclick="hideEmployeeDialog()">Cancel</button>
 			</div>
 			</div>
 		</div>		

@@ -22,3 +22,11 @@ test("background can actually change", function(){
 	for (i = 19; (i < 5 || i >= 19); i=(i%24)+1){
 		equal(timesOfDay3, Background(i), "Hour is " + i.toString() + " and should return Night.");}
 });
+
+/*
+test("Game options and values properly stored", function(){
+	
+	This is a test that has yet to be written.
+	
+});
+*/

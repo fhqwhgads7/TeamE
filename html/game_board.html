@@ -8,6 +8,7 @@
 		<script src="../js/jquery.js"></script>
 		<script src="../js/shared.js"></script>
 		<script src="../js/primary_gameboard_operation.js"></script>
+		<script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
 		<script type="text/javascript">
 
 			var RotateDir=0;
@@ -23,6 +24,7 @@
 				//var Game=JSON.parse(localStorage.MainGame);
 				//alert(Game.Name);
 				setInterval("RotateThink();",50);
+				pickATip();
 			}
 			function RotateBegin(dir){
 				RotateDir=dir*5;
@@ -50,7 +52,11 @@
 					*/
 				}
 			}
-
+			function pickATip()
+			{
+				    document.getElementById("GameAdvice").innerHTML = 
+						theTips[ Math.floor( Math.random() * theTips.length ) ];
+			}
 			function createNewProduct() {
 				var newProductName = $("#new-product-name-input").val();
 				window.product = Product(null, newProductName, 'Product Category', 'Product Sub-Category', 'Player Color');
@@ -118,6 +124,13 @@
 			div.PlayerBox:hover{
 				background:rgba(50,50,50,.75);
 			}
+			marquee#GameAdvice
+			{
+				font-family: calibri, verdana, arial, sans-serif; 
+				font-size: 15pt; 
+				color: #CCCCCC;
+				cursor: hand;
+			}
 		</style>
 	</head>
 	
@@ -143,10 +156,10 @@
 				</div>
 				<button id="new-product-button" class="Standard Compact" style="top:80%;left:3%;width:10%;height:8%;"onclick="displayNewProductDialog()">New<br>Product</button>
 				<button id="employee_button" class="Standard Compact" style="top:80%;left:13%;width:11%;height:8%;" onclick="displayEmployeeDialog()">Manage<br>Employees</button>
-				<html>
-<marquee id="PAUSER" scrollamount="10" 
-         onmouseover="this.scrollAmount=0;" onmouseout="this.scrollAmount=5;">
-</marquee>
+
+				<marquee id="GameAdvice" scrollamount="20" style="top:80%;" onmouseover="this.scrollAmount=0;" onmouseout="this.scrollAmount=20;">
+				</marquee>
+
 				<div class="PopupOverlay" id="PopupOverlay">
 					<div class="popup" id="new-product-dialog">
 						<div class="StandardText">New Product</div>

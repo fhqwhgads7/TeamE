@@ -18,7 +18,7 @@
 				//The commented code does not function properly yet.
 				//When something screws up during runtime, other functions just stop.
 				//So I had to comment them out to allow the game board to rotate, which it does.
-				GlobalInitialize();
+				GlobalInitialize(true);
 				GameInitialize();
 				//var Game=JSON.parse(localStorage.MainGame);
 				//alert(Game.Name);
@@ -57,7 +57,12 @@
 				alert("New Product: " + window.product.toString());
 			}
 			function displayNewProductDialog() {
+				$("#PopupOverlay").show();
 				$("#new-product-dialog").show();		
+			}
+			function hideNewProductDialog() {
+				$("#new-product-dialog").hide();
+				$("#PopupOverlay").hide();
 			}
 			function displayEmployeeDialog() {
 				$("#employee_dialog").show();
@@ -96,7 +101,7 @@
 				border-width:7px;
 				width:30%;
 				height:15%;
-				box-shadow: 0px 0px 40px 5px #AAAAAA;
+				/*box-shadow: 0px 0px 40px 5px #AAAAAA;*/
 			}
 			div.PlayerBox{
 				position:absolute;
@@ -104,7 +109,7 @@
 				border-width:7px;
 				width:30%;
 				height:15%;
-				box-shadow: 0px 0px 40px 5px #AAAAAA;
+				/*box-shadow: 0px 0px 40px 5px #AAAAAA;*/
 				background:rgba(0,0,0,.75);
 				-moz-border-radius:10px;
 				-webkit-border-radius:10px;
@@ -129,33 +134,32 @@
 						<div class="StandardText" style="font-size:10px;left:12%;top:77%;color:rgb(160,160,160);font-size:10px">Designers <span id="PlyOneScbdDsgns" style="color:white">nil</span></div>
 						<div class="StandardText" style="font-size:10px;left:54%;top:77%;color:rgb(160,160,160);font-size:10px">Testers <span id="PlyOneScbdTsts" style="color:white">nil</span></div>
 					</div>
+				</div>
+				<div id="GameBoard">
+					<div id="GameBoardCenter"></div>
+					<div id="GameBoardCircle"></div>
+					<button class="Standard" id="TurnBoardCCWButton" style="top:24%;left:3%;width:2%;height:7%;padding:.2em 1.6em" onmousedown="RotateBegin(-1)" onmouseup="RotateEnd()"><b><</b></button>
+					<button class="Standard" id="TurnBoardCWButton" style="top:24%;left:14%;width:2%;height:7%;padding:.2em 1.6em" onmousedown="RotateBegin(1)" onmouseup="RotateEnd()"><b>></b></button>
+				</div>
+				<button id="new-product-button" class="Standard Compact" style="top:80%;left:3%;width:10%;height:8%;"onclick="displayNewProductDialog()">New<br>Product</button>
+				<button id="employee_button" class="Standard Compact" style="top:80%;left:13%;width:11%;height:8%;" onclick="displayEmployeeDialog()">Manage<br>Employees</button>
+				<div class="PopupOverlay" id="PopupOverlay">
+					<div class="popup" id="new-product-dialog">
+						<div class="StandardText">New Product</div>
+						<div>
+							<p>
+								Name:
+								<input id="new-product-name-input" type="text">
+							</p>
+							<button class="Medium RoundEdge" id="new-product-make-button">Make</button>
+							<button class="Medium RoundEdge" id="new-product-cancel-button" onclick="hideNewProductDialog()">Cancel</button>
+						</div>
+						</div>
 					</div>
-					<div id="GameBoard">
-						<div id="GameBoardCenter"></div>
-						<div id="GameBoardCircle"></div>
-						<button class="Standard" id="TurnBoardCCWButton" style="top:24%;left:3%;width:2%;height:7%;padding:.2em 1.6em" onmousedown="RotateBegin(-1)" onmouseup="RotateEnd()"><b><</b></button>
-						<button class="Standard" id="TurnBoardCWButton" style="top:24%;left:14%;width:2%;height:7%;padding:.2em 1.6em" onmousedown="RotateBegin(1)" onmouseup="RotateEnd()"><b>></b></button>
-					</div>
-					<button id="new-product-button" class="Standard Compact" style="top:80%;left:3%;width:10%;height:8%;"onclick="displayNewProductDialog()">New<br>Product</button>
-					<button id="employee_button" class="Standard Compact" style="top:80%;left:13%;width:11%;height:8%;" onclick="">Manage<br>Employees</button>			
 				</div>
 			</div>
 		</div>
 <!-- hidden dom elements -->		
-		<div class="popup" id="new-product-dialog">
-			<h1>New Product</h1>
-			<p>
-			</p>
-			<div>
-				<p>
-					Name:
-					<input id="new-product-name-input" type="text">
-				</p>
-				<button class="Medium RoundEdge" id="new-product-make-button">Make</button>
-				<button class="Medium RoundEdge" id="new-product-cancel-button">Cancel</button>
-			</div>
-			</div>
-		</div>
         <div class="popup2" id="employee_dialog">
 			<h1>Add Employees</h1>
 			<p>
@@ -195,7 +199,7 @@
 				</td>
 				</p>				
 				<button class="Medium RoundEdge" id="add_employee_button">Add</button>
-				<button class="Medium RoundEdge" id="employee_cancel_button">Cancel</button>
+				<button class="Medium RoundEdge" id="employee_cancel_button" onclick="hideEmployeeDialog()">Cancel</button>
 			</div>
 			</div>
 		</div>		

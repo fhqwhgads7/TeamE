@@ -11,7 +11,7 @@
 .progress-container {
 	width:265px;
 	height:51px;
-	background:url(TeamE/images/selection_bar.png) no-repeat;
+	background:url(../images/selection_bar.png) no-repeat;
 	margin:10px auto;
 }
 

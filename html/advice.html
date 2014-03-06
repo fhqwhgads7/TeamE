@@ -1,7 +1,4 @@
-
-<html>
-<head>
-	<title>Bottom Scrolling Marquee </title>
+<title>Bottom Scrolling Marquee </title>
 	
 	<script src = "http://code.jquery.com/jquery-2.1.0.min.js"></script>
 	
@@ -23,6 +20,9 @@
 <style type="text/css">
 marquee#PAUSER
 {
+   position: relative;
+	margin-top: 100%;
+	height: 0px;
     font-family: calibri, verdana, arial, sans-serif; 
     font-size: 30pt; 
     color: #FF0000;
@@ -37,8 +37,8 @@ body
 
 <body onload="pickone()">
 
-<marquee id="PAUSER" scrollamount="20" 
-         onmouseover="this.scrollAmount=0;" onmouseout="this.scrollAmount=20;">
+<marquee id="PAUSER" scrollamount="10" 
+         onmouseover="this.scrollAmount=0;" onmouseout="this.scrollAmount=5;">
 </marquee>
 
 </body>

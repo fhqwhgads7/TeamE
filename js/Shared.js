@@ -1,20 +1,14 @@
 function GlobalInitialize(){
 	Background(new Date().getHours());
-	$(document).on('mousemove',function(e){
-		$("#ContentContainer").css({
-		   left:-e.pageX/100+3,
-		   top:-e.pageY/100+2
-		});
-	});
-	$(document.body).append('<div id="PageFadeIn"></div>')
+	//$(document).on('mousemove',function(e){
+	//	$("#ContentContainer").css({
+	//	   left:-e.pageX/100+3,
+	//	   top:-e.pageY/100+2
+	//	});
+	//});
 	setTimeout(function(){
-		$("#PageFadeIn").css("background-color","rgba(128,128,128,0)");
+		$("#ContentContainer").css("top","2px")
 	},1);
-	setTimeout(function(){
-		$("#PageFadeIn").remove();
-	},174);
-	$(":button.Standard").mouseenter( function(){playSound(GameSounds.ButtonHover)});
-	$(":button.Standard").click( function(){playSound(GameSounds.ButtonSelect)});
 }
 function GameObject(name){
 	this.Name=name;
@@ -23,13 +17,10 @@ function GameObject(name){
 	}
 }
 function SwitchToPage(page){
-	$(document.body).append('<div id="PageFadeOut"></div>')
-	setTimeout(function(){
-		$("#PageFadeOut").css("background-color","rgba(128,128,128,1)");
-	},1);
+	$("#ContentContainer").css("top","600px")
 	setTimeout(function(){
 		window.location=page;
-	},149);
+	},250);
 }
 var PlayerColors={
 	Red:"rgb(255,30,30)",

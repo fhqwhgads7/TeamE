@@ -25,6 +25,7 @@
 			}
 			function NextTab()
 			{
+				playSound(GameSounds.PageDoneLoading);
 				$("#Tab"+tabNumber).css("visibility", "hidden");
 				tabNumber++;
 				$("#Tab"+tabNumber).css("visibility", "visible");
@@ -32,6 +33,7 @@
 			}
 			function PreviousTab()
 			{
+				playSound(GameSounds.PageDoneLoading);
 				$("#Tab"+tabNumber).css("visibility", "hidden");
 				tabNumber--;
 				$("#Tab"+tabNumber).css("visibility", "visible");

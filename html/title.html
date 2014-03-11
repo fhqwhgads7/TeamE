@@ -11,20 +11,21 @@
 				$("#ButtonSheetTwo").css("left","-100%");
 				$("#ButtonSheetThree").css("left","100%");
 			}
-			function LaunchPage(){
-				GlobalInitialize();
-				$("#ButtonSheetFour").css("left","0%");
-				$("#ButtonSheetFive").css("left","-100%");
-			}
 			function LocalGame(){
+				$("#ButtonSheetThree").children().attr('disabled', false);
+				$("#ButtonSheetOne").children().attr('disabled', true);
 				setTimeout(function(){
 					$("#ButtonSheetOne").css("left","-100%");
+					playSound(GameSounds.PageSwitch);
 				},150);
 				$("#ButtonSheetThree").css("left","0%");
 			}
 			function NetworkedGame(){
+				$("#ButtonSheetTwo").children().attr('disabled', false);
+				$("#ButtonSheetOne").children().attr('disabled', true);
 				setTimeout(function(){
 					$("#ButtonSheetOne").css("left","100%");
+					playSound(GameSounds.PageSwitch);
 				},150);
 				$("#ButtonSheetTwo").css("left","0%");
 			}
@@ -48,13 +49,19 @@
 			}
 			function BackFromSP(){
 				$("#ButtonSheetOne").css("left","0%");
+				$("#ButtonSheetOne").children().attr('disabled', false);
+				$("#ButtonSheetThree").children().attr('disabled', true);
 				setTimeout(function(){
+					playSound(GameSounds.PageSwitch);
 					$("#ButtonSheetThree").css("left","100%");
 				},150);
 			}
 			function BackFromMP(){
 				$("#ButtonSheetOne").css("left","0%");
+				$("#ButtonSheetOne").children().attr('disabled', false);
+				$("#ButtonSheetTwo").children().attr('disabled', true);
 				setTimeout(function(){
+					playSound(GameSounds.PageSwitch);
 					$("#ButtonSheetTwo").css("left","-100%");
 				},150);
 			}

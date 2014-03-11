@@ -1,5 +1,6 @@
 function GlobalInitialize(){
 	Background(new Date().getHours());
+	playSound(GameSounds.PageLoad);
 	//$(document).on('mousemove',function(e){
 	//	$("#ContentContainer").css({
 	//	   left:-e.pageX/100+3,
@@ -9,6 +10,11 @@ function GlobalInitialize(){
 	setTimeout(function(){
 		$("#ContentContainer").css("top","2px")
 	},1);
+	setTimeout(function(){
+		playSound(GameSounds.PageDoneLoading);
+	},333);
+	$(":button.Standard").mouseenter( function(){playSound(GameSounds.ButtonHover)});
+	$(":button.Standard").click( function(){playSound(GameSounds.ButtonSelect)});
 }
 function GameObject(name){
 	this.Name=name;
@@ -19,8 +25,11 @@ function GameObject(name){
 function SwitchToPage(page){
 	$("#ContentContainer").css("top","600px")
 	setTimeout(function(){
+		playSound(GameSounds.PageSwitch);
+	},50);
+	setTimeout(function(){
 		window.location=page;
-	},250);
+	},400);
 }
 var PlayerColors={
 	Red:"rgb(255,30,30)",
@@ -50,15 +59,19 @@ var theTips=[
 var GameSounds={
 	ButtonHover: '../sounds/sfx/button_hover.wav',
 	ButtonSelect: '../sounds/sfx/button_select.wav',
+	PageSwitch: '../sounds/sfx/switchpage.wav',
+	PageLoad: '../sounds/sfx/loadpage.wav',
+	PageDoneLoading: '../sounds/sfx/pagedoneloading.wav',
 	GainMoney: '../sounds/sfx/gainmoney.wav',
 	LoseMoney: '../sounds/sfx/losemoney.wav',
-	ProductPlacement: '../sfx/sounds/product.wav',
-	AdvanceProduct: '../sfx/sounds/advance.wav',
+	ProductPlacement: '../sounds/sfx/product.wav',
+	AdvanceProduct: '../sounds/sfx/advance.wav',
 	NextTurn: '../sounds/sfx/nextplayersturn.wav',
 	NextRound: '../sounds/sfx/nextround.wav',
 	Message: '../sounds/sfx/message.wav',
 	Event: '../sounds/sfx/event.wav',
-	Wrong: '..sounds/sfx/wrong.wav'
+	Wrong: '../sounds/sfx/wrong.wav',
+	GameOver: '../sounds/sfx/gameover.wav'
 }
 function playSound(sound){
 	new Audio(sound).play();

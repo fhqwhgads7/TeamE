@@ -9,6 +9,7 @@
 		<script src="../js/shared.js"></script>
 		<script src="../js/primary_gameboard_operation.js"></script>
 		<script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
 		<script type="text/javascript">
 
 			var RotateDir=0;
@@ -39,7 +40,6 @@
 					//if((RotateDir>=360)||(RotateDir<=-360)){RotateDir=0;}
 					document.getElementById("GameBoardCircle").style.webkitTransform="rotate("+Rotation.toString()+"deg)";
 					document.getElementById("GameBoardCircle").style.MozTransform="rotate("+Rotation.toString()+"deg)";
-					/*
 					var Prods=document.getElementsByClassName("ProductDisplayItem");
 					if(Prods.length>0){
 						for(Key in Prods){
@@ -49,18 +49,12 @@
 							}
 						}
 					}
-					*/
 				}
 			}
 			function pickATip()
 			{
 				    document.getElementById("GameAdvice").innerHTML = 
 						theTips[ Math.floor( Math.random() * theTips.length ) ];
-			}
-			function createNewProduct() {
-				var newProductName = $("#new-product-name-input").val();
-				window.product = Product(null, newProductName, 'Product Category', 'Product Sub-Category', 'Player Color');
-				alert("New Product: " + window.product.toString());
 			}
 			function displayNewProductDialog() {
 				$("#PopupOverlay").show();
@@ -79,7 +73,6 @@
 				
 			}
 		</script>
-		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
 		<style>
 			#GameBoardCircle
 			{
@@ -185,17 +178,17 @@
 				</marquee>
 
 				<div class="PopupOverlay" id="PopupOverlay">
-					<div class="popup" id="new-product-dialog">
-						<div class="StandardText">New Product</div>
-						<div>
-							<p>
-								Name:
-								<input id="new-product-name-input" type="text">
-							</p>
-							<button class="Medium RoundEdge" id="new-product-make-button">Make</button>
-							<button class="Medium RoundEdge" id="new-product-cancel-button" onclick="hideNewProductDialog()">Cancel</button>
-						</div>
-						</div>
+					<div class="Popup" id="new-product-dialog">
+						<div class="StandardText" style="left:25%;top:10%">New Product</div></div>
+						<textarea id="NewProdName" placeholder="New Product Name" style="position:absolute;resize:none;top:40%;left:30%;width:40%"></textarea>
+						<select class="OneColumn" id="NewProductCategory" style="top:55%;left:30%;width:40%;" onchange="SelectProductCategory()">
+							<!-- dynamic -->
+						</select>
+						<select class="OneColumn" id="NewProductSubCategory" style="top:60%;left:30%;width:40%;">
+							<!-- dynamic -->
+						</select>
+						<button class="Standard" style="left:25%;top:68%" onclick="hideNewProductDialog()">Cancel</button>
+						<button class="Standard" style="left:51%;top:68%" onclick="createNewProduct()">Create</button>
 					</div>
 				</div>
 			</div>

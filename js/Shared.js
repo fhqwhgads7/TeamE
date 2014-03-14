@@ -167,7 +167,7 @@ function Product(player,name,category,sub,color){
 	}
 	newProduct.DisplayItemID="nil";
 	newProduct.toString = function () {
-		return newProduct.ClassName+" "+this.GlobalID+": "+this.Owner.Name+", "+this.Category+", "+this.SubCategory+", "+this.Color;
+		return newProduct.ClassName+" "+this.GlobalID+": "+this.Name+", "+this.Owner.Name+", "+this.Category+", "+this.SubCategory+", "+this.Color;
 	}
 	return newProduct;
 }
@@ -184,6 +184,7 @@ function Player(game,name,type,color){
 	newPlayer.NumCreative=0;
 	newPlayer.Money=2000;
 	if(game != null){
+		newPlayer.ParentGame=game;
 		game.Players.push(newPlayer);
 		game.NumPlayers=game.Players.length;
 		newPlayer.Number=game.NumPlayers;

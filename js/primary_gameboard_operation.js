@@ -3,6 +3,55 @@ var RotateDir=0;
 var Rotation=0;
 var CurrentlySelectedProduct;
 var ShowCashAlert=false;
+var EVENT_CHANCE=0.5;
+var BaseCosts={
+	HireDev:20,
+	HireQA:15,
+	HireCreative:14,
+	PayDev:5,
+	PayQA:5,
+	PayCreative:7,
+	Prototype:230,
+	PostDepBugCost:100,
+	Deployment:370
+}
+var BasePayouts={
+	DayJobEachTurn:30,
+	TaxBreak:1000
+}
+var ProductPhases={
+	Idea:"Idea",
+	Design:"Design",
+	Prototype:"Prototype",
+	PrototypeTesting:"PrototypeTesting",
+	Development:"Development",
+	PreDepTesting:"PreDeploymentTesting",
+	Deployment:"Deployment",
+	PostDepTesting:"PostDeploymentTesting",
+	Maintenance:"Maintenance"
+}
+var PhasePositions={
+	Idea:[350,50],
+	Design:[480,180],
+	Prototype:[480,340],
+	PrototypeTesting:[350,480],
+	Development:[190,480],
+	PreDeploymentTesting:[60,340],
+	Deployment:[60,180],
+	PostDeploymentTesting:[190,50],
+	Maintenance:[260,260]
+}
+var RandomEvents=[
+	["Tax break!","AllPlayers","CashChange",750]
+]
+var ProductCategories={
+	Energy:["Hydroelectric","Solar","FossilFuel","Wind"],
+	Transportation:["Space","Air","Land","Sea"],
+	Hardware:["Desktop","Laptop","Peripheral","Printer"],
+	Software:["Communication","OfficeProgram","VideoGame","WebApplication"],
+	Houseware:["Cleaning","Furniture","Kitchen","Barbecue"],
+	Other:["School","Shoes","Musical","KeyHolder"]
+}
 function GameInitialize(){
 	var GameCreationInfo=JSON.parse(localStorage.getItem("TheBrandNewGame"));
 	TheGame=new Game("2947");
@@ -10,6 +59,7 @@ function GameInitialize(){
 	TransferGameStartupInfo(GameCreationInfo,TheGame);
 	TheGame.CurrentPlayer=TheGame.Players[TheGame.CurrentPlayerNum];
 	UpdatePlayerDisplay();
+	PopulateNewProdCategories();
 	//PopulateNewProdCategories();
 	//document.getElementById("RoundNumberDisplay").innerHTML=TheGame.CurrentRound.toString();
 	//setInterval("TipThink();",10);
@@ -45,6 +95,67 @@ function UpdatePlayerDisplay(){
 	$("#PlyOneScbdDevs").html(Ply.NumDevs.toString());
 	$("#PlyOneScbdTsts").html(Ply.NumQA.toString());
 	//setTimeout(VisualCashAlert,100);
+}
+function PopulateNewProdCategories(){
+	var Sel=$("#NewProductCategory");
+	for(Item in ProductCategories){
+		Sel.append('<option>'+Item+'</option>');
+	}
+	Sel.selectedIndex=0;
+	SelectProductCategory();
+}
+function SelectProductCategory(){
+	var Sel=$("#NewProductCategory");
+	var SubSel=$("#NewProductSubCategory");
+	SubSel.children().remove()
+	var Cat=Sel.val()
+	for(var i=0;i<ProductCategories[Cat].length;i++){
+		SubSel.append('<option>'+ProductCategories[Cat][i]+'</option>')
+	}
+	SubSel.selectedIndex=0;
+}
+function createNewProduct(){
+	var nam=$("#NewProdName").val();
+	var prod=Product(TheGame.CurrentPlayer,nam,$("#NewProductCategory option:selected").val(),$("#NewProductSubCategory option:selected").val(),TheGame.CurrentPlayer.Color);
+	prod.Phase="Idea";
+	CreateProductDisplay(prod);
+	hideNewProductDialog();
+}
+function CreateProductDisplay(prod){
+	var GameBoard=document.getElementById("GameBoardCircle");
+	var ProdElem=document.createElement("div");
+	ProdElem.id="ProductDisplayItem_"+prod.OwnerNumber+"_"+prod.Number;
+	prod.DisplayItemID=ProdElem.id;
+	ProdElem.addEventListener("click",function(){UpdateCurProdDisplay(ProdElem.id);});
+	ProdElem.className="ProductDisplayItem";
+	ProdElem.style.backgroundImage="url('../images/ProductIcons/"+prod.Category.toLowerCase()+"_"+prod.SubCategory.toLowerCase()+".png')";
+	ProdElem.style.left="0px";
+	ProdElem.style.top="0px";
+	ProdElem.style.borderStyle="outset";
+	ProdElem.style.borderColor=PlayerColors[prod.Color];
+	ProdElem.style.backgroundColor=prod.Color;
+	ProdElem.style.webkitTransform="rotate("+(-Rotation).toString()+"deg)";
+	ProdElem.style.MozTransform="rotate("+(-Rotation).toString()+"deg)";
+	GameBoard.appendChild(ProdElem);
+	UpdateProductDisplayPosition(prod);
+	UpdatePlayerDisplay();
+	//UpdateCurProdDisplay(ProdElem.id);
+}
+function UpdateProductDisplayPosition(prod){
+	var AlreadyThere=-2;
+	for(Biz in TheGame.Players){
+		for(Prod in TheGame.Players[Biz].Products){
+			if(TheGame.Players[Biz].Products[Prod].Phase==prod.Phase){
+				AlreadyThere=AlreadyThere+1;
+			}
+		}
+	}
+	var Add=15*AlreadyThere;
+	var ProdElem=$("#"+"ProductDisplayItem_"+prod.OwnerNumber+"_"+prod.Number);
+	setTimeout(function(){
+		ProdElem.css("left",(PhasePositions[prod.Phase][0]+Add).toString()+"px");
+		ProdElem.css("top",(PhasePositions[prod.Phase][1]+Add).toString()+"px");
+	},1);
 }
 /*-
 function Appear(){

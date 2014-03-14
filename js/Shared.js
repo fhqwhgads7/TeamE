@@ -1,12 +1,6 @@
 function GlobalInitialize(){
 	Background(new Date().getHours());
 	playSound(GameSounds.PageLoad);
-	//$(document).on('mousemove',function(e){
-	//	$("#ContentContainer").css({
-	//	   left:-e.pageX/100+3,
-	//	   top:-e.pageY/100+2
-	//	});
-	//});
 	setTimeout(function(){
 		$("#ContentContainer").css("top","2px")
 	},1);
@@ -223,3 +217,9 @@ function Game(id){
 	}
 	return newGame;
 }
+//$(document).on('mousemove',function(e){
+//	$("#ContentContainer").css({
+//	   left:-e.pageX/100+3,
+//	   top:-e.pageY/100+2
+//	});
+//});

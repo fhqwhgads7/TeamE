@@ -1,0 +1,1 @@
+../../js/qunit-junit-plugin.js

@@ -65,7 +65,8 @@ var GameSounds={
 	Message: '../sounds/sfx/message.wav',
 	Event: '../sounds/sfx/event.wav',
 	Wrong: '../sounds/sfx/wrong.wav',
-	GameOver: '../sounds/sfx/gameover.wav'
+	GameOver: '../sounds/sfx/gameover.wav',
+	MinorFail: '../sounds/sfx/minor_fail.wav'
 }
 function playSound(sound){
 	new Audio(sound).play();
@@ -155,13 +156,13 @@ function Product(player,name,category,sub,color){
 	newProduct.BuildStrength=0;
 	newProduct.Phase="nil";
 	if(player != null){
-		player.Products.push(this);
+		player.Products.push(newProduct);
 		newProduct.Number=player.Products.length-1;
 		newProduct.OwnerNumber=player.Number;
 		newProduct.Owner=player;
 		player.NumProducts=player.Products.length;
-		player.ParentGame.PlayerProducts.push(this);
-		newProduct.GlobalID=player.ParentGame.PlayerProducts.length;
+		player.ParentGame.PlayerProducts.push(newProduct);
+		newProduct.GlobalID=player.ParentGame.PlayerProducts.length-1;
 	}else{
 		alert("Created product without an owner!");
 	}
@@ -177,17 +178,18 @@ function Player(game,name,type,color){
 	newPlayer.Name=name;
 	newPlayer.Color=color;
 	newPlayer.Type=type;
-	newPlayer.Products=[];
+	newPlayer.Products=new Array();
 	newPlayer.NumProducts=0;
 	newPlayer.NumDevs=0;
 	newPlayer.NumQA=0;
 	newPlayer.NumCreative=0;
 	newPlayer.Money=2000;
+	newPlayer.LastDisplayedMoney=newPlayer.Money;
 	if(game != null){
 		newPlayer.ParentGame=game;
 		game.Players.push(newPlayer);
 		game.NumPlayers=game.Players.length;
-		newPlayer.Number=game.NumPlayers;
+		newPlayer.Number=game.NumPlayers-1;
 		newPlayer.GlobalID=newPlayer.Number;
 	}else{
 		alert("Created player without a parent game!");
@@ -201,11 +203,12 @@ function Game(id){
 	var newGame=new Object();
 	newGame.ClassName="GAME_OBJECT";
 	newGame.ID=id;
-	newGame.Players=[];
+	newGame.Players=new Array();
 	newGame.NumPlayers=0;
-	newGame.PlayerProducts=[];
+	newGame.PlayerProducts=new Array();
 	newGame.CurrentPlayer=null;
 	newGame.CurrentPlayerNum=0;
+	newGame.CurrentRound=0;
 	newGame.Settings={
 		Difficulty:null,
 		CPUIntelligence:null,

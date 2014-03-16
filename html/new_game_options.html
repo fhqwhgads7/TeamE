@@ -44,6 +44,7 @@
 			}
 			function SaveOptions()
 			{
+				if(!TheBrandNewGame){TheBrandNewGame=new Object();}
 				TheBrandNewGame.Options=new Object();
 				TheBrandNewGame.Options.GameDifficulty=$("#GameDifficulty option:selected").val();
 				TheBrandNewGame.Options.CPUIntelligence=$("#CPUIntelligence option:selected").val();

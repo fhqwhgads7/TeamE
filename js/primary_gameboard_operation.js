@@ -55,18 +55,15 @@ var ProductCategories={
 function GameInitialize(){
 	var GameCreationInfo=JSON.parse(localStorage.getItem("TheBrandNewGame"));
 	TheGame=new Game("2947");
-	TheGame.GameState="PlayerTurnIdle";
 	TransferGameStartupInfo(GameCreationInfo,TheGame);
 	TheGame.CurrentPlayer=TheGame.Players[TheGame.CurrentPlayerNum];
+	TheGame.CurrentPlayerNum=TheGame.CurrentPlayer.Number;
 	UpdatePlayerDisplay();
 	PopulateNewProdCategories();
-	//PopulateNewProdCategories();
-	//document.getElementById("RoundNumberDisplay").innerHTML=TheGame.CurrentRound.toString();
 	//setInterval("TipThink();",10);
-	//setInterval("RotateThink();",50);
-	//setTimeout(DisplayNewRoundEvent,100);
-	//document.getElementById("MainBoard").style.visibility="hidden";
-	//setTimeout(Appear,750);
+	setTimeout(DisplayNewRoundEvent,100);
+	$("#MainBoard").hide();
+	setTimeout(Appear,750);
 }
 function TransferGameStartupInfo(from,to){
 	for(var i=1;i<=6;i++){
@@ -82,19 +79,19 @@ function TransferGameStartupInfo(from,to){
 	to.Settings.NumberOfRounds=from.Options.NumberOfRounds;
 }
 function UpdatePlayerDisplay(){
-	var OldCash=parseInt($("#PlyOneScbdMoney").html());
-	var OldName=$("#PlyOneScbdName").html;
+	var OldCash=parseInt($("#CurPlyMoney").html());
+	var OldName=$("#CurPlyName").html;
 	var Ply=TheGame.CurrentPlayer;
-	var MainBox=$("#PlyOneScbdBox");
+	var MainBox=$("#CurPlyBox");
 	MainBox.css("border-color",Ply.Color);
-	$("#PlyOneScbdName").html(Ply.Name);
-	if(Ply.Name.length>15){$("#PlyOneScbdName").title=Ply.Name;}
-	$("#PlyOneScbdMoney").html(Ply.Money.toString());
-	$("#PlyOneScbdProds").html(Ply.NumProducts.toString());
-	$("#PlyOneScbdDsgns").html(Ply.NumCreative.toString());
-	$("#PlyOneScbdDevs").html(Ply.NumDevs.toString());
-	$("#PlyOneScbdTsts").html(Ply.NumQA.toString());
-	//setTimeout(VisualCashAlert,100);
+	$("#CurPlyName").html(Ply.Name);
+	if(Ply.Name.length>15){$("#CurPlyName").title=Ply.Name;}
+	$("#CurPlyMoney").html(Ply.Money.toString());
+	$("#CurPlyProds").html(Ply.NumProducts.toString());
+	$("#CurPlyDsgns").html(Ply.NumCreative.toString());
+	$("#CurPlyDevs").html(Ply.NumDevs.toString());
+	$("#CurPlyTsts").html(Ply.NumQA.toString());
+	setTimeout(VisualCashAlert,100);
 }
 function PopulateNewProdCategories(){
 	var Sel=$("#NewProductCategory");
@@ -124,7 +121,7 @@ function createNewProduct(){
 function CreateProductDisplay(prod){
 	var GameBoard=document.getElementById("GameBoardCircle");
 	var ProdElem=document.createElement("div");
-	ProdElem.id="ProductDisplayItem_"+prod.OwnerNumber+"_"+prod.Number;
+	ProdElem.id="ProductDisplayItem_"+prod.GlobalID;
 	prod.DisplayItemID=ProdElem.id;
 	ProdElem.addEventListener("click",function(){UpdateCurProdDisplay(ProdElem.id);});
 	ProdElem.className="ProductDisplayItem";
@@ -139,71 +136,194 @@ function CreateProductDisplay(prod){
 	GameBoard.appendChild(ProdElem);
 	UpdateProductDisplayPosition(prod);
 	UpdatePlayerDisplay();
-	//UpdateCurProdDisplay(ProdElem.id);
+	UpdateCurProdDisplay(ProdElem.id);
 }
 function UpdateProductDisplayPosition(prod){
 	var AlreadyThere=-2;
 	for(Biz in TheGame.Players){
-		for(Prod in TheGame.Players[Biz].Products){
+		var Ply=TheGame.Players[Biz]
+		for(Prod in Ply.Products){
 			if(TheGame.Players[Biz].Products[Prod].Phase==prod.Phase){
 				AlreadyThere=AlreadyThere+1;
 			}
 		}
 	}
 	var Add=15*AlreadyThere;
-	var ProdElem=$("#"+"ProductDisplayItem_"+prod.OwnerNumber+"_"+prod.Number);
+	var ProdElem=$("#"+"ProductDisplayItem_"+prod.GlobalID);
 	setTimeout(function(){
 		ProdElem.css("left",(PhasePositions[prod.Phase][0]+Add).toString()+"px");
 		ProdElem.css("top",(PhasePositions[prod.Phase][1]+Add).toString()+"px");
 	},1);
 }
-/*-
-function Appear(){
-	document.getElementById("MainBoard").style.visibility="visible";
-	ShowCashAlert=true;
+function EmployeeChange(type,num){
+	var ply=TheGame.CurrentPlayer;
+	if(type=="des"){
+		if((ply.NumCreative==0)&&(num<0)){return;}
+		ply.NumCreative=ply.NumCreative+num;
+	}else if(type=="dev"){
+		if((ply.NumDevs==0)&&(num<0)){return;}
+		ply.NumDevs=ply.NumDevs+num;
+	}else if(type=="tes"){
+		if((ply.NumQA==0)&&(num<0)){return;}
+		ply.NumQA=ply.NumQA+num;
+	}
+	UpdateEmpPopupDisplays();
+	UpdatePlayerDisplay();
 }
-function PopulateNewProdCategories(){
-	var Sel=document.getElementById("NewProductCategory");
-	for(Item in ProductCategories){
-		var Opt=document.createElement("option");
-		Opt.value=Item;
-		Opt.innerHTML=Item;
-		Sel.appendChild(Opt);
+function UpdateCurProdDisplay(id){
+	if(id){
+		var Prod=GetProdFromDispElemID(id);
+		CurrentlySelectedProduct=Prod;
+		$("#ProductWindow").show();
+		if(Prod.OwnerNumber==TheGame.CurrentPlayerNum){
+			$("#CurProdAdvanceButton").prop("disabled",false);
+			$("#CurProdRevertButton").prop("disabled",false);
+		}else{
+			$("#CurProdAdvanceButton").prop("disabled",true);
+			$("#CurProdRevertButton").prop("disabled",true);
+		}
+		document.getElementById("ProdDisplayName").innerHTML=Prod.Name;
+		document.getElementById("ProdOwnerDisplayName").innerHTML=Prod.Owner.Name;
+		document.getElementById("DisplayCAT").innerHTML=Prod.Category;
+		document.getElementById("DisplaySUBCAT").innerHTML=Prod.SubCategory;
+		document.getElementById("DisplayPIS").innerHTML=Prod.IdeaStrength.toString();
+		document.getElementById("DisplayPDS").innerHTML=Prod.DesignStrength.toString();
+		document.getElementById("DisplayPBS").innerHTML=Prod.BuildStrength.toString();
+		document.getElementById("DisplayPPhase").innerHTML=Prod.Phase;
+		document.getElementById("DisplayPFID").innerHTML=Prod.Number.toString();
 	}
-	Sel.options[0].selected="true";
-	SelectProductCategory();
 }
-function SelectProductCategory(){
-	var Sel=document.getElementById("NewProductCategory");
-	var SubSel=document.getElementById("NewProductSubCategory");
-	while(SubSel.options.length>0){
-		SubSel.options[0]=null;
+function GetProdFromDispElemID(id){
+	var NewID=id.replace("ProductDisplayItem_","");
+	NewID=parseInt(NewID);
+	var Prod=TheGame.PlayerProducts[NewID];
+	return Prod;
+}
+function TryToAdvanceProduct(){
+	var CurPhase=CurrentlySelectedProduct.Phase;
+	if(CurPhase!=ProductPhases.Maintenance)
+		playSound(GameSounds.AdvanceProduct);
+	if(CurPhase==ProductPhases.Idea){
+		CurrentlySelectedProduct.Phase=ProductPhases.Design;
+	}else if(CurPhase==ProductPhases.Design){
+		CurrentlySelectedProduct.Phase=ProductPhases.Prototype;
+	}else if(CurPhase==ProductPhases.Prototype){
+		TheGame.CurrentPlayer.Money=TheGame.CurrentPlayer.Money-BaseCosts.Prototype;
+		CurrentlySelectedProduct.Phase=ProductPhases.PrototypeTesting;
+	}else if(CurPhase==ProductPhases.PrototypeTesting){
+		CurrentlySelectedProduct.Phase=ProductPhases.Development;
+	}else if(CurPhase==ProductPhases.Development){
+		CurrentlySelectedProduct.Phase=ProductPhases.PreDepTesting;
+	}else if(CurPhase==ProductPhases.PreDepTesting){
+		CurrentlySelectedProduct.Phase=ProductPhases.Deployment;
+	}else if(CurPhase==ProductPhases.Deployment){
+		TheGame.CurrentPlayer.Money=TheGame.CurrentPlayer.Money-BaseCosts.Deployment;
+		CurrentlySelectedProduct.Phase=ProductPhases.PostDepTesting;
+	}else if(CurPhase==ProductPhases.PostDepTesting){
+		CurrentlySelectedProduct.Phase=ProductPhases.Maintenance;
+	}else if(CurPhase==ProductPhases.Maintenance){
+		playSound(GameSounds.Wrong);
 	}
-	var Cat=Sel.options[Sel.selectedIndex].value;
-	for(var i=0;i<ProductCategories[Cat].length;i++){
-		var Opt=document.createElement("option");
-		Opt.value=ProductCategories[Cat][i];
-		Opt.innerHTML=ProductCategories[Cat][i];
-		SubSel.appendChild(Opt);
+	UpdateProductDisplayPosition(CurrentlySelectedProduct);
+	UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
+	UpdatePlayerDisplay();
+}
+function TryToRevertProduct(){
+	var CurPhase=CurrentlySelectedProduct.Phase;
+	if(CurPhase!=ProductPhases.Idea){playSound(GameSounds.MinorFail);}
+	if(CurPhase==ProductPhases.Idea){
+		playSound(GameSounds.Wrong);
+	}else if(CurPhase==ProductPhases.Design){
+		CurrentlySelectedProduct.Phase=ProductPhases.Idea;
+		CurrentlySelectedProduct.DesignStrength=0;
+	}else if(CurPhase==ProductPhases.Prototype){
+		CurrentlySelectedProduct.Phase=ProductPhases.Design;
+	}else if(CurPhase==ProductPhases.PrototypeTesting){
+		CurrentlySelectedProduct.Phase=ProductPhases.Prototype;
+	}else if(CurPhase==ProductPhases.Development){
+		CurrentlySelectedProduct.Phase=ProductPhases.PrototypeTesting;
+		CurrentlySelectedProduct.BuildStrength=0;
+	}else if(CurPhase==ProductPhases.PreDepTesting){
+		CurrentlySelectedProduct.Phase=ProductPhases.Development;
+	}else if(CurPhase==ProductPhases.Deployment){
+		CurrentlySelectedProduct.Phase=ProductPhases.PreDepTesting;
+		TheGame.CurrentPlayer.Money=TheGame.CurrentPlayer.Money-BaseCosts.Deployment/2;
+	}else if(CurPhase==ProductPhases.PostDepTesting){
+		CurrentlySelectedProduct.Phase=ProductPhases.Deployment;
+		TheGame.CurrentPlayer.Money=TheGame.CurrentPlayer.Money-BaseCosts.Deployment/2;
+	}else if(CurPhase==ProductPhases.Maintenance){
+		CurrentlySelectedProduct.Phase=ProductPhases.PostDepTesting;
 	}
-	SubSel.options[0].selected=true;
+	UpdateProductDisplayPosition(CurrentlySelectedProduct);
+	UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
+	UpdatePlayerDisplay();
+}
+function VisualCashAlert(){
+	var Ply=TheGame.CurrentPlayer;
+	var Amt=Ply.Money-Ply.LastDisplayedMoney;
+	if(!ShowCashAlert){return;}
+	if(Amt==0){return;}
+	var Elem=$("#CashAlert");
+	var Str="";
+	var Col="";
+	if(Amt<0){
+		Col="red";
+		Str="-$";
+		playSound(GameSounds.LoseMoney);
+	}else{
+		Col="cyan";
+		Str="+$";
+		playSound(GameSounds.GainMoney);
+	}
+	Str=Str+Amt.toString().replace("-","");
+	ResetCashDisplayPos();
+	Elem.html(Str);
+	Elem.css("color",Col);
+	Elem.css("visibility","visible");
+	Elem.css("transition","top 2.2s ease-in,left 2.2s ease-in,opacity 2s ease-in");
+	Elem.css("top","5%");
+	Elem.css("left","40%");
+	Elem.css("opacity","0");
+	setTimeout(ResetCashDisplayPos,2200);
+	Ply.LastDisplayedMoney=Ply.Money;
+}
+function ResetCashDisplayPos(){
+	var Elem=$("#CashAlert");
+	Elem.css("transition","none");
+	Elem.css("top","9%");
+	Elem.css("left","20%");
+	Elem.css("opacity","1");
+	Elem.css("visibility","hidden");
+}
+function PopulateScoreboard(){
+	for(PlyNum in TheGame.Players){
+		var Ply=TheGame.Players[PlyNum];
+		var Str="";
+		if(PlyNum==0){Str="PlyOne";}else if(PlyNum==1){Str="PlyTwo";}else if(PlyNum==2){Str="PlyThree";}else if(PlyNum==3){Str="PlyFour";}else if(PlyNum==4){Str="PlyFive";}else if(PlyNum==5){Str="PlySix";}
+		$("#"+Str+"ScbdBox").show();
+		$("#"+Str+"ScbdBox").css("border-color",Ply.Color);
+		$("#"+Str+"ScbdName").html(Ply.Name);
+		$("#"+Str+"ScbdMoney").html(Ply.Money);
+		$("#"+Str+"ScbdProds").html(Ply.NumProducts);
+		$("#"+Str+"ScbdEmps").html(Ply.NumQA+Ply.NumDevs+Ply.NumCreative);
+	}
 }
 function CycleTurn(){
 	if(TheGame.NumPlayers>1){
 		var WillGo=false;
-		var NewPlyNum=TheGame.ActivePlayerNum+1;
+		var NewPlyNum=TheGame.CurrentPlayerNum+1;
 		if(NewPlyNum>(TheGame.NumPlayers-1)){
 			NewPlyNum=0;
-			var WillGo=true;
+			WillGo=true;
 		}
-		TheGame.ActivePlayerNum=NewPlyNum;
-		TheGame.ActivePlayer=TheGame.Players[TheGame.ActivePlayerNum];
-		document.getElementById("CurProdAdvanceButton").disabled=true;
-		document.getElementById("ProductWindow").style.visibility="hidden";
+		TheGame.CurrentPlayerNum=NewPlyNum;
+		TheGame.CurrentPlayer=TheGame.Players[TheGame.CurrentPlayerNum];
+		$("#CurProdAdvanceButton").prop("disabled",true);
+		$("#CurProdRevertButton").prop("disabled",true);
+		$("#ProductWindow").hide();
 		if(CurrentlySelectedProduct!=null){
 			UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayElemID);
 		}
-		TheGame.State=GameStates.PlayerTurnIdle;
 		if(WillGo){
 			DisplayNewRoundEvent();
 		}else{
@@ -213,6 +333,42 @@ function CycleTurn(){
 	}else{
 		DisplayNewRoundEvent();
 	}
+}
+function DisplayNewRoundEvent(){
+	var Num=TheGame.CurrentRound+1;
+	if(Num>TheGame.MaxRounds){
+		FinishGame();
+		return;
+	}
+	var Elem=document.getElementById("MainBoard");
+	Elem.style.transition="left .75s ease-out";
+	Elem.style.left="800px";
+	Elem=document.getElementById("RoundAnnouncer");
+	Elem.innerHTML="ROUND<br>"+Num;
+	Elem.style.transition="top .9s ease-out";
+	Elem.style.top="100px";
+	playSound(GameSounds.NextRound);
+	setTimeout(function(){
+		var Elem=document.getElementById("MainBoard");
+		Elem.style.transition="none";
+		Elem.style.left="-800px";
+		setTimeout(function(){
+			var Elem=document.getElementById("MainBoard");
+			Elem.style.transition="left .65s ease-out";
+			Elem.style.left="0px";
+			Elem=document.getElementById("RoundAnnouncer");
+			Elem.style.transition="top .5s ease-out";
+			Elem.style.top="600px";
+			setTimeout(function(){
+				var Elem=document.getElementById("MainBoard");
+				Elem.style.transition="none";
+				Elem=document.getElementById("RoundAnnouncer");
+				Elem.style.transition="none";
+				Elem.style.top="-600px";
+				NewRoundCalc();
+			},650);
+		},750);
+	},650);
 }
 function NewRoundCalc(){
 	for(var i=0;i<TheGame.Players.length;i++){
@@ -259,13 +415,18 @@ function NewRoundCalc(){
 		Ply.Money=Ply.Money+Net;
 	}
 	TheGame.CurrentRound=TheGame.CurrentRound+1;
-	document.getElementById("RoundNumberDisplay").innerHTML=TheGame.CurrentRound.toString();
-	if(Math.random()<EVENT_CHANCE){RandomEvent();}
+	//document.getElementById("RoundNumberDisplay").innerHTML=TheGame.CurrentRound.toString();
+	//if(Math.random()<EVENT_CHANCE){RandomEvent();}
 	UpdatePlayerDisplay();
 	if(CurrentlySelectedProduct!=null){
 		UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
 	}
 }
+function Appear(){
+	$("#MainBoard").show();
+	ShowCashAlert=true;
+}
+/*-
 function RandomEvent(){
 	playSound(GameSounds.Event);
 	var Event=RandomEvents[Math.floor(Math.random()*RandomEvents.length)];
@@ -297,276 +458,8 @@ function CloseEventModal(){
 	document.getElementById("RandomEventModal").style.visibility="hidden";
 	document.getElementById("ModalOverlay").style.visibility="hidden";
 }
-function DisplayNewRoundEvent(){
-	var Num=TheGame.CurrentRound+1;
-	if(Num>TheGame.MaxRounds){
-		FinishGame();
-		return;
-	}
-	var Elem=document.getElementById("MainBoard");
-	Elem.style.transition="left .75s ease-out";
-	Elem.style.left="800px";
-	Elem=document.getElementById("RoundAnnouncer");
-	Elem.innerHTML="ROUND<br>"+Num;
-	Elem.style.transition="top .9s ease-out";
-	Elem.style.top="100px";
-	playSound(GameSounds.NextRound);
-	setTimeout(function(){
-		var Elem=document.getElementById("MainBoard");
-		Elem.style.transition="none";
-		Elem.style.left="-800px";
-		setTimeout(function(){
-			var Elem=document.getElementById("MainBoard");
-			Elem.style.transition="left .65s ease-out";
-			Elem.style.left="0px";
-			Elem=document.getElementById("RoundAnnouncer");
-			Elem.style.transition="top .5s ease-out";
-			Elem.style.top="600px";
-			setTimeout(function(){
-				var Elem=document.getElementById("MainBoard");
-				Elem.style.transition="none";
-				Elem=document.getElementById("RoundAnnouncer");
-				Elem.style.transition="none";
-				Elem.style.top="-600px";
-				NewRoundCalc();
-			},650);
-		},750);
-	},650);
-}
 function FinishGame(){
 	OpenScoreboard(true);
-}
-function OpenNewProductModal(){
-	TheGame.State=GameStates.PlayerCreatingProduct;
-	document.getElementById("NewProductModalPlayerName").innerHTML=TheGame.ActivePlayer.Name;
-	document.getElementById("NewProductName").value="";
-	document.getElementById("ModalOverlay").style.visibility="visible";
-	document.getElementById("NewProductModal").style.visibility="visible";
-}
-function OpenEmployeeModal(){
-	TheGame.State=GameStates.PlayerManagingEmployees;
-	document.getElementById("EmployeeModalPlayerName").innerHTML=TheGame.ActivePlayer.Name;
-	UpdateEmployeeModalDisplay()
-	document.getElementById("ModalOverlay").style.visibility="visible";
-	document.getElementById("EmployeeModal").style.visibility="visible";
-}
-function TryToCreateNewProduct(){
-	var Name=document.getElementById("NewProductName").value;
-	var CatElem=document.getElementById("NewProductCategory");
-	var Cat=CatElem.options[CatElem.selectedIndex].value;
-	var SubCatElem=document.getElementById("NewProductSubCategory");
-	var SubCat=SubCatElem.options[SubCatElem.selectedIndex].value;
-	if((Name)&&(Cat)&&(SubCat)){
-		var NewProd=new Product(TheGame.ActivePlayer,Name,Cat,SubCat,TheGame.ActivePlayer.Color)
-		NewProd.Phase=ProductPhases.Idea;
-		playSound(GameSounds.ProductPlacement);
-		document.getElementById("ModalOverlay").style.visibility="hidden";
-		document.getElementById("NewProductModal").style.visibility="hidden";
-		CreateProductDisplay(NewProd);
-		TheGame.State=GameStates.PlayerTurnIdle;
-	}else{
-		ModalFailure(document.getElementById("NewProductModal"));
-	}
-}
-function ModalFailure(elem){
-	elem.style.borderColor="red";
-	setTimeout(function(){elem.style.borderColor="gray";},100);
-	setTimeout(function(){elem.style.borderColor="red";},200);
-	setTimeout(function(){elem.style.borderColor="gray";},300);
-	setTimeout(function(){elem.style.borderColor="red";},400);
-	setTimeout(function(){elem.style.borderColor="gray";},500);
-	playSound(GameSounds.Wrong);
-}
-function CreateProductDisplay(prod){
-	var GameBoard=document.getElementById("GameBoardCircle");
-	var ProdElem=document.createElement("div");
-	ProdElem.id="ProductDisplayItem_"+prod.OwnerNumber+"_"+prod.Number;
-	prod.DisplayItemID=ProdElem.id;
-	ProdElem.addEventListener("click",function(){UpdateCurProdDisplay(ProdElem.id);});
-	ProdElem.className="ProductDisplayItem";
-	ProdElem.style.backgroundImage="url('product_icons/"+prod.Category.toLowerCase()+"_"+prod.SubCategory.toLowerCase()+".png')";
-	ProdElem.style.left="0px";
-	ProdElem.style.top="0px";
-	ProdElem.style.borderStyle="outset";
-	ProdElem.style.borderColor=PlayerColors[prod.Color];
-	ProdElem.style.backgroundColor=prod.Color;
-	ProdElem.style.webkitTransform="rotate("+(-Rotation).toString()+"deg)";
-	ProdElem.style.MozTransform="rotate("+(-Rotation).toString()+"deg)";
-	GameBoard.appendChild(ProdElem);
-	UpdateProductDisplayPosition(prod);
-	UpdatePlayerDisplay();
-	UpdateCurProdDisplay(ProdElem.id);
-}
-function GetPlyAndProdFromDispElemID(id){
-	var NewID=id.replace("ProductDisplayItem_","");
-	var IDNums=NewID.split("_");
-	var PlayerID=parseInt(IDNums[0]);
-	var ProductID=parseInt(IDNums[1]);
-	var Ply=TheGame.Players[PlayerID]
-	var Prod=Ply.Products[ProductID]
-	return [Ply,Prod];
-}
-function UpdateCurProdDisplay(id){
-	if(id){
-		var PlyProd=GetPlyAndProdFromDispElemID(id);
-		CurrentlySelectedProduct=PlyProd[1];
-		if(PlyProd[1].OwnerNumber==TheGame.ActivePlayerNum){
-			document.getElementById("CurProdAdvanceButton").disabled=false;
-			document.getElementById("ProductWindow").style.visibility="visible";
-		}else{
-			document.getElementById("CurProdAdvanceButton").disabled=true;
-			document.getElementById("ProductWindow").style.visibility="hidden";
-		}
-		document.getElementById("ProdDisplayName").innerHTML=PlyProd[1].Name;
-		document.getElementById("ProdOwnerDisplayName").innerHTML=PlyProd[0].Name;
-		document.getElementById("DisplayCAT").innerHTML=PlyProd[1].Category;
-		document.getElementById("DisplaySUBCAT").innerHTML=PlyProd[1].SubCategory;
-		document.getElementById("DisplayPIS").innerHTML=PlyProd[1].IdeaStrength.toString();
-		document.getElementById("DisplayPDS").innerHTML=PlyProd[1].DesignStrength.toString();
-		document.getElementById("DisplayPBS").innerHTML=PlyProd[1].BuildStrength.toString();
-		document.getElementById("DisplayPPhase").innerHTML=PlyProd[1].Phase;
-		document.getElementById("DisplayPFID").innerHTML=PlyProd[1].Number.toString();
-	}
-}
-function UpdateProductDisplayPosition(prod){
-	var AlreadyThere=-2;
-	for(Biz in TheGame.Players){
-		for(Prod in TheGame.Players[Biz].Products){
-			if(TheGame.Players[Biz].Products[Prod].Phase==prod.Phase){
-				AlreadyThere=AlreadyThere+1;
-			}
-		}
-	}
-	var Add=15*AlreadyThere;
-	var ProdElem=document.getElementById("ProductDisplayItem_"+prod.OwnerNumber+"_"+prod.Number);
-	setTimeout(function(){
-		ProdElem.style.left=(PhasePositions[prod.Phase][0]+Add).toString()+"px";
-		ProdElem.style.top=(PhasePositions[prod.Phase][1]+Add).toString()+"px";
-	},1);
-}
-function TryToAdvanceProduct(){
-	var CurPhase=CurrentlySelectedProduct.Phase;
-	if(CurPhase!=ProductPhases.Maintenance)
-		playSound(GameSounds.AdvanceProduct);
-	if(CurPhase==ProductPhases.Idea){
-		CurrentlySelectedProduct.Phase=ProductPhases.Design;
-	}else if(CurPhase==ProductPhases.Design){
-		CurrentlySelectedProduct.Phase=ProductPhases.Prototype;
-	}else if(CurPhase==ProductPhases.Prototype){
-		TheGame.ActivePlayer.Money=TheGame.ActivePlayer.Money-BaseCosts.Prototype;
-		UpdatePlayerDisplay();
-		CurrentlySelectedProduct.Phase=ProductPhases.PrototypeTesting;
-	}else if(CurPhase==ProductPhases.PrototypeTesting){
-		CurrentlySelectedProduct.Phase=ProductPhases.Development;
-	}else if(CurPhase==ProductPhases.Development){
-		CurrentlySelectedProduct.Phase=ProductPhases.PreDepTesting;
-	}else if(CurPhase==ProductPhases.PreDepTesting){
-		CurrentlySelectedProduct.Phase=ProductPhases.Deployment;
-	}else if(CurPhase==ProductPhases.Deployment){
-		TheGame.ActivePlayer.Money=TheGame.ActivePlayer.Money-BaseCosts.Deployment;
-		UpdatePlayerDisplay();
-		CurrentlySelectedProduct.Phase=ProductPhases.PostDepTesting;
-	}else if(CurPhase==ProductPhases.PostDepTesting){
-		CurrentlySelectedProduct.Phase=ProductPhases.Maintenance;
-	}else if(CurPhase==ProductPhases.Maintenance){
-		playSound(GameSounds.Wrong);
-	}
-	UpdateProductDisplayPosition(CurrentlySelectedProduct);
-	UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
-	UpdatePlayerDisplay();
-}
-function CancelNewProduct(){
-	document.getElementById("ModalOverlay").style.visibility="hidden";
-	document.getElementById("NewProductModal").style.visibility="hidden";
-}
-function CloseEmployeeModal(){
-	UpdatePlayerDisplay()
-	document.getElementById("ModalOverlay").style.visibility="hidden";
-	document.getElementById("EmployeeModal").style.visibility="hidden";
-	TheGame.State=GameStates.PlayerTurnIdle;
-}
-function VisualCashAlert(){
-	var Ply=TheGame.ActivePlayer;
-	var Amt=Ply.Money-Ply.LastDisplayedMoney;
-	if(Amt==0){return;}
-	var Elem=document.getElementById("CashAlert");
-	var Str="";
-	var Col="";
-	if(Amt<0){
-		Col="red";
-		Str="-$";
-		playSound(GameSounds.LoseMoney);
-	}else{
-		Col="cyan";
-		Str="+$";
-		playSound(GameSounds.GainMoney);
-	}
-	Str=Str+Amt.toString().replace("-","");
-	ResetCashDisplayPos();
-	Elem.innerHTML=Str;
-	Elem.style.color=Col;
-	Elem.style.transition="top 2.2s ease-in,left 2.2s ease-in,opacity 2s ease-in";
-	Elem.style.top="5%";
-	Elem.style.left="40%";
-	Elem.style.opacity="0";
-	if(ShowCashAlert){Elem.style.visibility="visible";}
-	setTimeout(ResetCashDisplayPos,2200);
-	Ply.LastDisplayedMoney=Ply.Money;
-}
-function ResetCashDisplayPos(){
-	var Elem=document.getElementById("CashAlert");
-	Elem.style.transition="none";
-	Elem.style.top="9%";
-	Elem.style.left="20%";
-	Elem.style.opacity="1";
-	Elem.style.visibility="hidden";
-}
-function RotateBegin(dir){
-	RotateDir=dir*5;
-}
-function RotateEnd(){
-	RotateDir=0;
-}
-function RotateThink(){
-	if(RotateDir!=0){
-		Rotation=Rotation+RotateDir;
-		if((RotateDir>=360)||(RotateDir<=-360)){RotateDir=0;}
-		document.getElementById("GameBoardCircle").style.webkitTransform="rotate("+Rotation.toString()+"deg)";
-		document.getElementById("GameBoardCircle").style.MozTransform="rotate("+Rotation.toString()+"deg)";
-		var Prods=document.getElementsByClassName("ProductDisplayItem");
-		if(Prods.length>0){
-			for(Key in Prods){
-				if(Prods[Key].style){
-					Prods[Key].style.webkitTransform="rotate("+(-Rotation).toString()+"deg)";
-					Prods[Key].style.MozTransform="rotate("+(-Rotation).toString()+"deg)";
-				}
-			}
-		}
-	}
-}
-function ChangeEmployee(type,num){
-	TheGame.ActivePlayer[type]=TheGame.ActivePlayer[type]+num;
-	if(num>0){
-		var Val=0;
-		if(type=="NumDevs"){
-			Val=BaseCosts.HireDev;
-		}else if(type=="NumQA"){
-			Val=BaseCosts.HireQA;
-		}else{
-			Val=BaseCosts.HireCreative;
-		}
-		TheGame.ActivePlayer.Money=TheGame.ActivePlayer.Money-num*Val;
-	}
-	if(TheGame.ActivePlayer[type]<0){
-		TheGame.ActivePlayer[type]=0;
-	}
-	UpdateEmployeeModalDisplay();
-}
-function UpdateEmployeeModalDisplay(){
-	document.getElementById("EmployeeModalCreativeNum").innerHTML=TheGame.ActivePlayer.NumCreative.toString();
-	document.getElementById("EmployeeModalDevNum").innerHTML=TheGame.ActivePlayer.NumDevs.toString();
-	document.getElementById("EmployeeModalQANum").innerHTML=TheGame.ActivePlayer.NumQA.toString();
-	document.getElementById("EmployeeModalQANum").innerHTML=TheGame.ActivePlayer.NumQA.toString();
 }
 function OpenScoreboard(end){
 	TheGame.State=GameStates.PlayerWatchingScoreboard;

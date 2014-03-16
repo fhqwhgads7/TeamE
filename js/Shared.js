@@ -1,12 +1,15 @@
 function GlobalInitialize(){
 	Background(new Date().getHours());
-	playSound(GameSounds.PageLoad);
 	setTimeout(function(){
 		$("#ContentContainer").css("top","2px")
 	},1);
-	setTimeout(function(){
-		playSound(GameSounds.PageDoneLoading);
-	},333);
+	if (document.URL.indexOf("game_board.html") < 0)
+	{
+		playSound(GameSounds.PageLoad);
+		setTimeout(function(){
+			playSound(GameSounds.PageDoneLoading);
+		},333);
+	}
 	$(":button.Standard").mouseenter( function(){playSound(GameSounds.ButtonHover)});
 	$(":button.Standard").click( function(){playSound(GameSounds.ButtonSelect)});
 }

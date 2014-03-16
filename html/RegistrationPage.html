@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<script src="../js/jquery.js"></script>
+		<script src="../js/shared.js"></script>
+		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
+
+		<script>
+			var tabNumber;
+			var TABCOUNT = 4;
+			function Initialize()
+			{
+				tabNumber = 1;
+				GlobalInitialize();
+				buttonCheck();
+				$("#Tab"+tabNumber).css("visibility", "visible");
+			}
+			function GoBackToMainMenu()
+			{
+				SwitchToPage("title.html");
+			}
+			function CreateMPGame(){
+				alert("match hosting not implemented yet");
+			}
+			function FindGame(){
+				alert("matchmaking not implemented yet");
+			}
+			function CreateSPGame(){
+				SwitchToPage("new_game_options.html");
+			}
+			function LoadGame(){
+				SwitchToPage("load.html");
+			}
+		</script>
+		<style>
+			div.OptionsBox{
+				position:absolute;
+				border-style:solid;
+				border-width:5px;
+				width:60%;
+				height:60%;
+				box-shadow: 0px 0px 40px 5px #AAAAAA;
+				background-color:rgba(0,0,0,.8);
+			}
+			div.OptionsBox:hover{
+				background-color:rgba(0,0,0,.6);
+			}
+			.Options{
+				position:absolute;
+				right:3%;
+				width:28%;
+				font-family:"Arial";
+				font-size:15px;
+				font-weight:900;
+			}
+			.roundSlider{
+				position:absolute;
+				width:100px;
+			}
+			button.Smaller{
+				outline:none;
+				position:absolute;
+				padding:0.4em 2em;
+				font-size:0.8em;
+				font-family:Arial;
+				background:rgba(255,255,255,0.75);
+				color:rgba(0,0,0,0.7);
+				text-shadow:1px 1px 0 rgba(255,255,255,0.1);
+				text-decoration:none;
+				border:solid 1px rgba(20,20,20,1);
+				border-radius:10px;
+				box-shadow:inset 1px 1px 1px rgba(255,255,255,0.05),inset 0 0 35px rgba(0,0,0,0.6),0 10px 10px -6px rgba(0,0,0,0.75);
+			}
+			button.Smaller:hover {
+				background:rgba(255,255,255,1);
+				box-shadow:inset 1px 1px 1px rgba(255,255,255,0.05),inset 0 0 35px rgba(0,0,0,0.6),0 10px 10px -6px rgba(0,0,0,1);
+			}
+			button.Smaller:active {
+				top:5px;
+				box-shadow:inset 0 1px 1px rgba(0,0,0,0.4),inset 0 0 35px rgba(0,0,0,0.6),0 1px 1px rgba(255,255,255,0.1),inset 0 6px 4px rgba(0,0,0,0.4);
+			}
+
+		</style>
+	</head>
+
+
+	<body onload="Initialize()">
+		<div id="MainBackground">
+			<div id="ContentContainer">
+				<div class="FancyText" id="StartNewGameTitle" style="left:33%;top:20%;">Register</div> 
+				
+				<div id="ButtonSheetOne" class="ButtonSheet" style="height:100%">
+					
+					<textarea id="Username" class="OneColumn" placeholder="Username" style="overflow:hidden;resize:none;top:40%;left:32%;height:5%;width:35%;"></textarea>
+					<textarea id="Password" class="OneColumn" placeholder="Password" style="overflow:hidden;resize:none;top:47%;left:32%;height:5%;width:35%;"></textarea>
+					<textarea id="reenterPassword" class="OneColumn" placeholder="Re-Enter Password" style="overflow:hidden;resize:none;top:54%;left:32%;height:5%;width:35%;"></textarea>
+					<textarea id="Email" class="OneColumn" placeholder="Email" style="overflow:hidden;resize:none;top:61%;left:32%;height:5%;width:35%;"></textarea>
+					<button class="Standard" style="left:30%;top:70%;width:40%" onclick="HowToPlay()">Submit</button>
+					<button class="Standard" onclick="GoBackToMainMenu()" style="left:34%;top:86%;width:32%">Main Menu</button>
+				</div>
+				
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

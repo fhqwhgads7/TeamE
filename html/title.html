@@ -66,11 +66,11 @@
 					$("#ButtonSheetTwo").css("left","-100%");
 				},150);
 			}
-			function userPage(){
-				alert("Not yet implemented");
+			function LoginPage(){
+				SwitchToPage("LoginPage.html");
 			}
-			function Registration(){
-				SwitchToPage("registration.html");
+			function RegistrationPage(){
+				SwitchToPage("RegistrationPage.html");
 			}
 		</script>
 		<style type="text/css">
@@ -98,8 +98,8 @@
 				<div id="ButtonSheetTwo" class="ButtonSheet" style="left:-100%">
 					<button class="Standard" style="left:24%;top:55%;width:25%" onclick="CreateMPGame()">Create</button>
 					<button class="Standard" style="left:52%;top:55%;width:25%" onclick="FindGame()">Find</button>
-					<button class="Standard" style="left:24%;top:66%;width:25%" onclick="userPage()">Log in</button>
-					<button class="Standard" style="left:52%;top:66%;width:25%" onclick="Registration()">Register</button>
+					<button class="Standard" style="left:24%;top:66%;width:25%" onclick="LoginPage()">Log in</button>
+					<button class="Standard" style="left:52%;top:66%;width:25%" onclick="RegistrationPage()">Register</button>
 					<button class="Standard" style="left:40%;top:77%" onclick="BackFromMP()">Back</button>
 				</div>
 				<div id="ButtonSheetThree" class="ButtonSheet" style="left:100%">
@@ -107,6 +107,7 @@
 					<button class="Standard" style="left:52%;top:55%;width:25%" onclick="LoadGame()">Load</button>
 					<button class="Standard" style="left:40%;top:66%" onclick="BackFromSP()">Back</button>
 				</div>
+				<p>Please use the on screen controls to navigate through the pages, do not use your browsers back button</p>
 			</div>
 		</div>
 	</body>

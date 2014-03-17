@@ -1,3 +1,16 @@
+/*-----------------------------------------------------------------------------
+	PARSE.COM
+	email: ajmurill@asu.edu
+	password: Reinforcements1!
+	username: EntrepreneurshipCST316
+	our data: https://www.parse.com/apps/entrepreneurshipgame/collections
+		application ID: xjUxyY8bghFGuSnM3ptEZkV3BiWOlD3VhkRLt4kz
+		client key: 1EhZ7nrrYMz5BVp58jBXMf07eU8xW2k4LDFFxIVL
+		net key: 8XJD3yidSyRUuDwPvT8l7oTKpmwKaHwzgQHjIRaE
+		javascript key: iZCS2S7ZuWn9keMoooLaHMlB7HMXpcqD1M60JVjp
+		REST API key: C1GSXmeSV6oVWvLjZ3rA1j5Ey4RsmnMHHxlFQTip
+		master key: lOqdFFVjQViO7PCp7EtH86i8DXSTrH6SedXny4Rr
+-----------------------------------------------------------------------------*/
 function GlobalInitialize(){
 	Background(new Date().getHours());
 	setTimeout(function(){

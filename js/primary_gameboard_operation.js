@@ -426,87 +426,6 @@ function Appear(){
 	$("#MainBoard").show();
 	ShowCashAlert=true;
 }
-/*-
-function RandomEvent(){
-	playSound(GameSounds.Event);
-	var Event=RandomEvents[Math.floor(Math.random()*RandomEvents.length)];
-	var Msg=Event[0];
-	var AoE=Event[1];
-	var Action=Event[2];
-	var Num=Event[3];
-	var Desc="";
-	if(AoE=="AllPlayers"){
-		Desc="Everyone";
-		if(Action=="CashChange"){
-			if(Num>0){
-				Desc=Desc+"'s cash increases by ";
-			}
-			Desc=Desc+Num.toString();
-			Desc=Desc+" dollars.";
-			for(PlyNum in TheGame.Players){
-				var Ply=TheGame.Players[PlyNum];
-				Ply.Money=Ply.Money+Num;
-			}
-		}
-	}
-	document.getElementById("RandomEventTitle").innerHTML=Msg;
-	document.getElementById("RandomEventDesc").innerHTML=Desc;
-	document.getElementById("ModalOverlay").style.visibility="visible";
-	document.getElementById("RandomEventModal").style.visibility="visible";
-}
-function CloseEventModal(){
-	document.getElementById("RandomEventModal").style.visibility="hidden";
-	document.getElementById("ModalOverlay").style.visibility="hidden";
-}
-function FinishGame(){
-	OpenScoreboard(true);
-}
-function OpenScoreboard(end){
-	TheGame.State=GameStates.PlayerWatchingScoreboard;
-	if(end){
-		document.getElementById("ScoreboardTitle").innerHTML="Game Over";
-		document.getElementById("ScoreboardClose").innerHTML="Quit";
-	}else{
-		document.getElementById("ScoreboardTitle").innerHTML="Competitors";
-		document.getElementById("ScoreboardClose").innerHTML="Done";
-	}
-	for(PlyNum in TheGame.Players){
-		var Ply=TheGame.Players[PlyNum];
-		var Str="";
-		if(PlyNum==0){Str="PlyOne";}else if(PlyNum==1){Str="PlyTwo";}else if(PlyNum==2){Str="PlyThree";}else if(PlyNum==3){Str="PlyFour";}else if(PlyNum==4){Str="PlyFive";}else if(PlyNum==5){Str="PlySix";}
-		if((TheGame.ActivePlayerNum!=PlyNum)||(end)){
-			document.getElementById(Str+"ScbdBox").style.visibility="visible";
-			document.getElementById(Str+"ScbdBox").style.borderColor=Ply.Color;
-			document.getElementById(Str+"ScbdName").innerHTML=Ply.Name;
-			document.getElementById(Str+"ScbdMoney").innerHTML=Ply.Money;
-			document.getElementById(Str+"ScbdProds").innerHTML=Ply.NumProducts;
-			document.getElementById(Str+"ScbdEmps").innerHTML=Ply.NumQA+Ply.NumDevs+Ply.NumCreative;
-		}
-	}
-	document.getElementById("ModalOverlay").style.visibility="visible";
-	document.getElementById("Scoreboard").style.visibility="visible";
-}
-function CloseScoreboard(){
-	TheGame.State=GameStates.PlayerTurnIdle;
-	if(document.getElementById("ScoreboardClose").innerHTML=="Quit"){
-		window.location="MainMenu.html";
-	}else{
-		document.getElementById("ModalOverlay").style.visibility="hidden";
-		document.getElementById("Scoreboard").style.visibility="hidden";
-		document.getElementById("PlyOneScbdBox").style.visibility="hidden";
-		document.getElementById("PlyTwoScbdBox").style.visibility="hidden";
-		document.getElementById("PlyThreeScbdBox").style.visibility="hidden";
-		document.getElementById("PlyFourScbdBox").style.visibility="hidden";
-		document.getElementById("PlyFiveScbdBox").style.visibility="hidden";
-		document.getElementById("PlySixScbdBox").style.visibility="hidden";
-	}
-}
-function QuitGame(){
-	SetGame("nil");
-	window.location="MainMenu.html";
-}
--*/
-
 
 //A function to get a player by searching for its globalID
 function getPlayerIndexByID(game, globalID)
@@ -517,14 +436,13 @@ function getPlayerIndexByID(game, globalID)
 	
 	while (index == -1 && i < game.NumPlayers)
 	{
-		if (game.Players[i].GlobalID = globalID)
+		if (game.Players[i].GlobalID == globalID)
 			index = i;
 		i++;
 	}
 	
 	return index;
 }
-
 
 //A function for a game to create a tracker of Patents.
 function PatentTracker()
@@ -554,7 +472,6 @@ function PatentTracker()
 	
 	return PatentTracker;
 }
-
 
 //A function that aids in buying a patent for a particular product category
 function BuyPatent(player, product, patentTracker)

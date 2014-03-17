@@ -171,6 +171,9 @@
 				background:rgba(30,30,30,.75);
 			}
 			marquee#GameAdvice{
+				position:absolute;
+				bottom:3%;
+				height:0px;
 				font-family: calibri, verdana, arial, sans-serif; 
 				font-size: 15pt; 
 				color: #CCCCCC;
@@ -182,6 +185,10 @@
 		<div id="MainBackground">
 			<div id="ContentContainer">
 				<div id="MainBoard" style="top:0%;left:0%">
+					
+				<marquee id="GameAdvice" scrollamount="20" onmouseover="this.scrollAmount=0;" onmouseout="this.scrollAmount=20;">
+				</marquee>
+				
 					<div class="PlayerBox" id="CurPlyBox" style="border-color:grey;width:25%;left:2%;top:4%;">
 						<div class="StandardText" id="CurPlyName" style="font-size:25px;left:10%;top:5%;">nil</div>
 						<div class="StandardText" style="font-size:18px;left:10%;top:35%;color:rgb(160,160,160)">$<span id="CurPlyMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
@@ -216,9 +223,6 @@
 					<button class="Standard Compact" style="top:88%;left:13%;width:11%;height:8%;" onclick="EndCurrentTurn()">End Turn</button>
 					
 					<button class="Standard Compact" style="top:92%;left:90%;width:8%;height:5%;" onclick="TryToQuitGame()">Quit</button>
-					
-					<marquee id="GameAdvice" scrollamount="20" style="top:80%;" onmouseover="this.scrollAmount=0;" onmouseout="this.scrollAmount=20;">
-					</marquee>
 
 					<div class="PopupOverlay" id="PopupOverlay">
 						<div class="Popup" id="new-product-dialog">

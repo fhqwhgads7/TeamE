@@ -508,6 +508,24 @@ function QuitGame(){
 -*/
 
 
+//A function to get a player by searching for its globalID
+function getPlayerIndexByID(game, globalID)
+{
+	//Initializes iteration and index variables.
+	var i = 0;
+	var index = -1;
+	
+	while (index == -1 && i < game.NumPlayers)
+	{
+		if (game.Players[i].GlobalID = globalID)
+			index = i;
+		i++;
+	}
+	
+	return index;
+}
+
+
 //A function for a game to create a tracker of Patents.
 function PatentTracker()
 {

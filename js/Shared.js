@@ -10,8 +10,14 @@ function GlobalInitialize(){
 			playSound(GameSounds.PageDoneLoading);
 		},333);
 	}
-	$(":button.Standard").mouseenter( function(){playSound(GameSounds.ButtonHover)});
-	$(":button.Standard").click( function(){playSound(GameSounds.ButtonSelect)});
+	$(":button.Standard").mouseenter( function(){
+		if ((this.getAttribute('id') != "TurnBoardCCWButton")&&(this.getAttribute('id') != "TurnBoardCWButton"))
+			playSound(GameSounds.ButtonHover);
+	});
+	$(":button.Standard").click( function(){
+		if ((this.getAttribute('id') != "TurnBoardCCWButton")&&(this.getAttribute('id') != "TurnBoardCWButton"))
+			playSound(GameSounds.ButtonSelect);
+	});
 }
 function GameObject(name){
 	this.Name=name;

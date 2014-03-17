@@ -506,3 +506,100 @@ function QuitGame(){
 	window.location="MainMenu.html";
 }
 -*/
+
+
+//A function for a game to create a tracker of Patents.
+function PatentTracker()
+{
+	//Creates a PatentTracker object and declares variables for it.
+	var PatentTracker = new Object();
+	PatentTracker.ClassName="PATENTTRACKER";
+	PatentTracker.Categories = new Array();
+	
+	//Creates a 1D array out of the 2D Array of the Product categories.
+	for (i = 0; i < ProductCatagories.length; i++)
+	{
+		PatentTracker.Cagetories.concat(ProductCatagories[i]);
+	}
+	
+	//Declares a record-keeping array using the 1D Array of the Product categories.
+	PatentTracker.Records = new Array();
+	
+	//The idea is this:
+	//For each element in the records array, element 0 is the category,
+	//and element 1 is the player who holds the patent for that category.
+	//Initially, element 1 is null, because no one /starts/ with a patent.
+	for (i = 0; i < PatentTracker.Categories.length; i++)
+	{
+		PatentTracker.Records[i] = [PatentTracker.Categories[i], null];
+	}
+	
+	return PatentTracker;
+}
+
+
+//A function that aids in buying a patent for a particular product category
+function BuyPatent(player, product, patentTracker)
+{
+	//The amount needed to buy a patent is hardcoded for now.
+	//Other factors will determine how much the product patent is worth, such as the category and the product's overall strength.
+	
+	var cost = 2000;
+	//The default message. Changes if the patent purchase fails.
+	var patentMessage = "Product " + product.Name + " was successfully patented!"
+	
+	//This variable has two purposes:
+	//First to help determine if a product category is patented already
+	//Second to help add a player to the patent records if the purchase succeeds
+	var categoryIndex = patentTracker.Categories.indexOf(product.Category);
+	
+	var isPatentedAlready = patentTracker.Records[categoryIndex][1] != null;
+	//Product category cannot be patented already.
+	var inPatentableCategory = true;
+	//Patent must be statutory, or the type of product must be able to be patented.
+	var preMaintenance = (product.Phase != "Maintenance");
+	//Product can't already be on the market.
+	var wellBuiltEnough = ((product.IdeaStrength^2)*(product.DesignStrength^1.1)*(product.BuildStrength^1.1)*4) >= 1000;
+	//It has to be a well developed product.
+	var hasTheMoney = (player.Money >= limit);
+	//Player needs the money for the patent.
+	
+	//Series of if-statements to either determine the failure message or purchase the patent.
+	if (isPatentedAlready)
+	{
+		patentOwner = patentTracker.Records[categoryIndex][1];
+		
+		if (patentOwner = player.GlobalID)
+			patentMessage = "You've already purchased a patent for this type of product!";
+		else
+		{
+			//I plan to have this message tell the player who has the patent in the future. For now, this generic message will do.
+			patnetMessage = "Another player has purchased a patent for this type of product!";
+			//patentMessage = "Player " +  + " has the patent for this product category!";
+		}
+	}
+	else if (!inPatentableCategory)
+	{
+		patentMessage = product.Category + "-type products cannot be patented!";
+	}
+	else if (!preMaintenance)
+	{
+		patentMessage = "Products that are not new cannot be patented!";
+	}
+	else if (!wellBuiltEnough)
+	{
+		patentMessage = "Your product isn't impressive enough just yet!";
+	}
+	else if (!hasTheMoney)
+	{
+		patentMessage = "You are $" + (cost - player.Money).toString() + " short!";
+	}
+	else
+	{
+		player.Money -= cost;
+		patentTracker.Records[categoryIndex][1] = player.GlobalID;
+	}
+	
+	//Returns the function completion message.
+	return patentMessage;
+}

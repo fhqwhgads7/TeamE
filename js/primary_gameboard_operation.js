@@ -427,23 +427,6 @@ function Appear(){
 	ShowCashAlert=true;
 }
 
-//A function to get a player by searching for its globalID
-function getPlayerIndexByID(game, globalID)
-{
-	//Initializes iteration and index variables.
-	var i = 0;
-	var index = -1;
-	
-	while (index == -1 && i < game.NumPlayers)
-	{
-		if (game.Players[i].GlobalID == globalID)
-			index = i;
-		i++;
-	}
-	
-	return index;
-}
-
 //A function for a game to create a tracker of Patents.
 function PatentTracker()
 {
@@ -451,6 +434,7 @@ function PatentTracker()
 	var PatentTracker = new Object();
 	PatentTracker.ClassName="PATENTTRACKER";
 	PatentTracker.Categories = new Array();
+	PatentTracker.numPatents = 0;
 	
 	//Creates a 1D array out of the 2D Array of the Product categories.
 	for (i = 0; i < ProductCatagories.length; i++)
@@ -474,7 +458,7 @@ function PatentTracker()
 }
 
 //A function that aids in buying a patent for a particular product category
-function BuyPatent(player, product, patentTracker)
+function BuyPatent(player, product, patentTracker, game)
 {
 	//The amount needed to buy a patent is hardcoded for now.
 	//Other factors will determine how much the product patent is worth, such as the category and the product's overall strength.
@@ -508,9 +492,7 @@ function BuyPatent(player, product, patentTracker)
 			patentMessage = "You've already purchased a patent for this type of product!";
 		else
 		{
-			//I plan to have this message tell the player who has the patent in the future. For now, this generic message will do.
-			patnetMessage = "Another player has purchased a patent for this type of product!";
-			//patentMessage = "Player " +  + " has the patent for this product category!";
+			patentMessage = "Player " + (patentOwner+1).toString() + ": " + game.Players[patentOwner].name + " has the patent for this product category!";
 		}
 	}
 	else if (!inPatentableCategory)
@@ -533,6 +515,7 @@ function BuyPatent(player, product, patentTracker)
 	{
 		player.Money -= cost;
 		patentTracker.Records[categoryIndex][1] = player.GlobalID;
+		patentTracker.numPatents++;
 	}
 	
 	//Returns the function completion message.

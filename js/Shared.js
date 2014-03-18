@@ -30,7 +30,9 @@ function GlobalInitialize(){
 	},1);
 	if (document.URL.indexOf("game_board.html") < 0)
 	{
-		playSound(GameSounds.PageLoad);
+		setTimeout(function(){
+			playSound(GameSounds.PageLoad);
+		},3);
 		setTimeout(function(){
 			playSound(GameSounds.PageDoneLoading);
 		},333);
@@ -58,7 +60,7 @@ function SwitchToPage(page){
 	$("#ContentContainer").css("opacity","0.0");
 	setTimeout(function(){
 		playSound(GameSounds.PageSwitch);
-	},20);
+	},50);
 	setTimeout(function(){
 		window.location=page;
 	},250);
@@ -107,7 +109,9 @@ var GameSounds={
 	MinorFail: '../sounds/sfx/minor_fail.wav'
 }
 function playSound(sound){
-	new Audio(sound).play();
+	var theSound = new Audio(sound);
+	theSound.volume = 0.5;
+	theSound.play();
 }
 function Background(x){
 	timeOfDay = "";

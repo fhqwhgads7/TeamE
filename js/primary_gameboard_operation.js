@@ -491,9 +491,7 @@ function BuyPatent(player, product, patentTracker, game)
 		if (patentOwner = player.GlobalID)
 			patentMessage = "You've already purchased a patent for this type of product!";
 		else
-		{
 			patentMessage = "Player " + (patentOwner+1).toString() + ": " + game.Players[patentOwner].name + " has the patent for this product category!";
-		}
 	}
 	else if (!inPatentableCategory)
 	{
@@ -520,4 +518,23 @@ function BuyPatent(player, product, patentTracker, game)
 	
 	//Returns the function completion message.
 	return patentMessage;
+}
+
+//A function that helps handle the payment of royalties to players who own patents
+//It takes in a product and checks if that type of product has been patented by someone besides the owner of said product
+//It returns -1 if no royalties need to be paid
+
+function payRoyaltiesHelper(product, patentTracker)
+{
+	//Initializes a return value variable and an index variable.
+	var patentOwnerID = -1;
+	var index = patentTracker.Categories.indexOf(product.Category);
+	
+	//If another player owns that patent, set the return value to their ID
+	if (product.Owner.GlobalID == patentTracker.Records[index][1])
+	{
+		patentOwnerID = patentTracker.Records[index][1];
+	}
+	
+	return patentOwnerID;
 }

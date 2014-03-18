@@ -1,13 +1,10 @@
 #ContentContainer{
 	position:fixed;
-	top:600px; /*- transitions -*/
-	left:3px;
+	top:10px;
+	left:10px;
 	width:800px;
 	height:600px;
 	overflow:hidden;
-	transition: top 250ms ease-in-out;
-	-webkit-transition: top 250ms ease-in-out;
-    -moz-transition: top 250ms ease-in-out;
 }
 #MainBackground{
 	position:fixed;
@@ -100,13 +97,13 @@ div.FancyText{
 	color:white;
 	-webkit-font-smoothing:antialiased;
 	-moz-osx-font-smoothing:grayscale;
-	text-shadow:0px 0px 15px rgba(255,255,255,1);
-	box-shadow:0px 0px 50px rgba(0,0,0,1);
-	background-color:rgba(0,0,0,.5);
+	text-shadow:0px 0px 15px rgba(255,255,255,1), 0px 0px 45px rgba(0,0,0,1);
+	/*-box-shadow:0px 0px 50px rgba(0,0,0,1);-*/
+	/*-0background-color:rgba(0,0,0,.5);-*/
 	-moz-border-radius:20px;
 	-webkit-border-radius:20px;
 	border-radius:20px;
-	padding:.1em .2em;
+	/*-padding:.1em .2em;-*/
 }
 div.PopupOverlay{
 	display:none;

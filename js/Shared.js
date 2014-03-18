@@ -13,8 +13,19 @@
 -----------------------------------------------------------------------------*/
 function GlobalInitialize(){
 	Background(new Date().getHours());
+	$("#ContentContainer").children().attr("disabled",true);
+	$("#ContentContainer").css("transition","none");
+	$("#ContentContainer").css("opacity","0.0");
+	$("#ContentContainer").css("-webkit-transform","scale(2,2)");
+	$("#ContentContainer").css("-moz-transform","scale(2,2)");
 	setTimeout(function(){
-		$("#ContentContainer").css("top","2px")
+		$("#ContentContainer").children().attr("disabled",false);
+	},250);
+	setTimeout(function(){
+		$("#ContentContainer").css("transition","-webkit-transform 250ms ease-in, opacity 200ms ease-in");
+		$("#ContentContainer").css("-webkit-transform","scale(1,1)");
+		$("#ContentContainer").css("-moz-transform","scale(2,2)");
+		$("#ContentContainer").css("opacity","1.0");
 	},1);
 	if (document.URL.indexOf("game_board.html") < 0)
 	{
@@ -39,13 +50,16 @@ function GameObject(name){
 	}
 }
 function SwitchToPage(page){
-	$("#ContentContainer").css("top","600px")
+	$("#ContentContainer").css("transition","-webkit-transform 250ms ease-in, opacity 200ms ease-in");
+	$("#ContentContainer").css("-webkit-transform","scale(2,2)");
+	$("#ContentContainer").css("-moz-transform","scale(2,2)");
+	$("#ContentContainer").css("opacity","0.0");
 	setTimeout(function(){
 		playSound(GameSounds.PageSwitch);
-	},50);
+	},20);
 	setTimeout(function(){
 		window.location=page;
-	},400);
+	},250);
 }
 var PlayerColors={
 	Red:"rgb(255,30,30)",

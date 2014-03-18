@@ -61,7 +61,7 @@ function GameInitialize(){
 	UpdatePlayerDisplay();
 	PopulateNewProdCategories();
 	//setInterval("TipThink();",10);
-	setTimeout(DisplayNewRoundEvent,100);
+	setTimeout(DisplayNewRoundEvent,1);
 	$("#MainBoard").hide();
 	setTimeout(Appear,750);
 }

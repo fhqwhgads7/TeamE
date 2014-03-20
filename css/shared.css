@@ -1,10 +1,14 @@
 #ContentContainer{
 	position:fixed;
-	top:10px;
+	top:100px;
 	left:10px;
 	width:800px;
 	height:600px;
 	overflow:hidden;
+	transition: top 250ms ease-in-out;
+	-webkit-transition: top 250ms ease-in-out, opacity 200ms ease-in-out;
+    -moz-transition: top 250ms ease-in-out, opacity 200ms ease-in-out;
+	opacity: 0.0;
 }
 #MainBackground{
 	position:fixed;

@@ -1,10 +1,14 @@
 #ContentContainer{
 	position:fixed;
-	top:10px;
+	top:100px;
 	left:10px;
 	width:800px;
 	height:600px;
 	overflow:hidden;
+	transition: top 250ms ease-in-out;
+	-webkit-transition: top 250ms ease-in-out, opacity 200ms ease-in-out;
+    -moz-transition: top 250ms ease-in-out, opacity 200ms ease-in-out;
+	opacity: 0.0;
 }
 #MainBackground{
 	position:fixed;
@@ -90,15 +94,15 @@ div.StandardText{
 }
 div.FancyText{
 	position:absolute;
-	font-family:"Vivaldi";
+	font-family:"Georgia";
 	font-size:70px;
 	font-weight:400;
 	text-align:center;
 	color:white;
 	-webkit-font-smoothing:antialiased;
 	-moz-osx-font-smoothing:grayscale;
-	text-shadow:0px 0px 15px rgba(255,255,255,1), 0px 0px 45px rgba(0,0,0,1);
-	/*-box-shadow:0px 0px 50px rgba(0,0,0,1);-*/
+	text-shadow:0px 0px 15px rgba(255,255,255,1), 0px 0px 45px rgba(0,0,0,1), 0px 0px 45px rgba(0,0,0,1), 0px 0px 45px rgba(0,0,0,1);
+	/*-box-shadow:0px 0px 50px rgba(0,0,0,1);*/
 	/*-0background-color:rgba(0,0,0,.5);-*/
 	-moz-border-radius:20px;
 	-webkit-border-radius:20px;
@@ -174,8 +178,8 @@ div.ProductDisplayItem{
 	border-color:red;
 	box-shadow:4px 4px 15px -2px #000000;
 	transition:top 1s ease-out,left 1s ease-out;
-	-webkit-transform-origin:50% 50%;
-	-moz-transform-origin:50% 50%;
+	webkit-transform-origin:50% 50%;
+	moz-transform-origin:50% 50%;
 }
 .OneColumn{
 	position:absolute;

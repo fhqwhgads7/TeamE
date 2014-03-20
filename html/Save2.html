@@ -1,0 +1,58 @@
+<html>
+<head>
+
+<title>Store game object test</title>
+
+	<script src = "http://code.jquery.com/jquery-2.1.0.min.js"></script>
+
+	<script>
+	
+	var newGame=new Object();
+	
+	function saveObj(){
+		newGame.ClassName="GAME_OBJECT";
+		newGame.ID=document.getElementById('gID').value;
+		newGame.Players=[];
+		newGame.NumPlayers=document.getElementById('numPlay').value;
+		newGame.PlayerProducts=[];
+		newGame.CurrentPlayer=document.getElementById('currPlay').value;
+		newGame.CurrentPlayerNum=document.getElementById('currPlayNum').value;
+		newGame.Settings={
+			Difficulty:null,
+			CPUIntelligence:null,
+			PatentingEnabled:null,
+			NumberOfRounds:null
+		}
+		newGame.GameState="Uninitialized";
+		
+		alert("Game object created");
+	}
+	
+	function save(){
+	
+		//var fieldVal = document.getElementById('gID').value;
+		
+		localStorage.info = JSON.stringify(newGame);
+		alert("Game object was stringified and stored in the local storage");
+	
+	}
+	
+	</script>
+
+
+</head>
+
+<body onload = "load()">
+Enter some of the properties of the game:
+<br>
+<input placeholder = "Game ID" type = "text" id="gID" />
+<input placeholder = "Number of Players" type = "text" id="numPlay" />
+<input placeholder = "Current Player" type = "text" id="currPlay" />
+<input placeholder = "Current Player #" type = "text" id="currPlayNum" />
+<br>
+Now Test each part of saving and loading
+<br>
+<input type = "button" value="1. Create Game Object" onclick="saveObj()"/>
+<input type = "button" value="2. Save Game Object to local storage" onclick="save()"/>
+</body>
+</html>

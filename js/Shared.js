@@ -14,23 +14,18 @@
 function GlobalInitialize(){
 	Background(new Date().getHours());
 	$("#ContentContainer").children().attr("disabled",true);
-	$("#ContentContainer").css("transition","none");
-	$("#ContentContainer").css("opacity","0.0");
-	$("#ContentContainer").css("-webkit-transform","scale(2,2)");
-	$("#ContentContainer").css("-moz-transform","scale(2,2)");
 	setTimeout(function(){
 		$("#ContentContainer").children().attr("disabled",false);
 	},250);
 	setTimeout(function(){
-		$("#ContentContainer").css("transition","-webkit-transform 250ms ease-in, opacity 200ms ease-in");
-		$("#ContentContainer").css("transition","-moz-transform 250ms ease-in, opacity 200ms ease-in");
-		$("#ContentContainer").css("-webkit-transform","scale(1,1)");
-		$("#ContentContainer").css("-moz-transform","scale(1,1)");
+		$("#ContentContainer").css("top","10px");
 		$("#ContentContainer").css("opacity","1.0");
 	},1);
 	if (document.URL.indexOf("game_board.html") < 0)
 	{
-		playSound(GameSounds.PageLoad);
+		setTimeout(function(){
+			playSound(GameSounds.PageLoad);
+		},3);
 		setTimeout(function(){
 			playSound(GameSounds.PageDoneLoading);
 		},333);
@@ -43,7 +38,7 @@ function GlobalInitialize(){
 		if ((this.getAttribute('id') != "TurnBoardCCWButton")&&(this.getAttribute('id') != "TurnBoardCWButton"))
 			playSound(GameSounds.ButtonSelect);
 	});
-}
+} 
 function GameObject(name){
 	this.Name=name;
 	this.LoadGame=function(id){
@@ -51,14 +46,11 @@ function GameObject(name){
 	}
 }
 function SwitchToPage(page){
-	$("#ContentContainer").css("transition","-webkit-transform 250ms ease-in, opacity 200ms ease-in");
-	$("#ContentContainer").css("transition","-moz-transform 250ms ease-in, opacity 200ms ease-in");
-	$("#ContentContainer").css("-webkit-transform","scale(2,2)");
-	$("#ContentContainer").css("-moz-transform","scale(2,2)");
+	$("#ContentContainer").css("top","100px");
 	$("#ContentContainer").css("opacity","0.0");
 	setTimeout(function(){
 		playSound(GameSounds.PageSwitch);
-	},20);
+	},50);
 	setTimeout(function(){
 		window.location=page;
 	},250);
@@ -107,7 +99,9 @@ var GameSounds={
 	MinorFail: '../sounds/sfx/minor_fail.wav'
 }
 function playSound(sound){
-	new Audio(sound).play();
+	var theSound = new Audio(sound);
+	theSound.volume = 0.5;
+	theSound.play();
 }
 function Background(x){
 	timeOfDay = "";

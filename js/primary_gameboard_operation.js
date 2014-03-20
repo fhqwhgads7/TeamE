@@ -117,6 +117,9 @@ function createNewProduct(){
 	prod.Phase="Idea";
 	CreateProductDisplay(prod);
 	hideNewProductDialog();
+	setTimeout(function(){
+		playSound(GameSounds.ProductPlacement);
+	},750);
 }
 function CreateProductDisplay(prod){
 	var GameBoard=document.getElementById("GameBoardCircle");
@@ -153,7 +156,7 @@ function UpdateProductDisplayPosition(prod){
 	setTimeout(function(){
 		ProdElem.css("left",(PhasePositions[prod.Phase][0]+Add).toString()+"px");
 		ProdElem.css("top",(PhasePositions[prod.Phase][1]+Add).toString()+"px");
-	},1);
+	},1);	
 }
 function EmployeeChange(type,num){
 	var ply=TheGame.CurrentPlayer;

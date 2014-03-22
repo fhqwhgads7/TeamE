@@ -85,6 +85,15 @@
 			function EndCurrentTurn(){
 				CycleTurn();
 			}
+			function TryToPatentProduct(){
+				$("#PopupOverlay").show();
+				$("#PatentDialog").show();
+				PatentMessageDisplay(TryToBuyPatent(CurrentlySelectedProduct, TheGame));
+			}
+			function ClosePatentDialog(){
+				$("#PatentDialog").hide();
+				$("#PopupOverlay").hide();
+			}
 			function TryToQuitGame(){
 				$("#PopupOverlay").show();
 				$("#QuitDialog").show();
@@ -199,18 +208,18 @@
 						<button class="Standard Compact" id="TurnBoardCWButton" style="top:24%;left:19%;width:2%;height:7%;padding:.2em 1.6em" onmousedown="RotateBegin(1)" onmouseup="RotateEnd()" onmouseout="RotateEnd()" onmouseover="noSound()" onclick="noSound()"><b>></b></button>
 					</div>
 					<div id="ProductWindow" class="PlayerBox" style="overflow:hidden;display:none">
-						<div class="StandardText" style="left:10%;top:2%;color:white;font-size:14px;text-align:center"><span id="ProdDisplayName">nil</span><sup style="font-size:10px;color:rgb(120,120,120)">&reg;</sup></div>
-						<div class="StandardText" style="left:10%;top:14%;font-size:11px;text-align:left"><span style="color:rgb(120,120,120)">By </span><span id="ProdOwnerDisplayName">nil</span><sup style="color:rgb(120,120,120)">&trade;</sup></div>
-						<div class="StandardText" style="left:6%;top:27%;font-size:10px"><span style="color:rgb(120,120,120)">Category </span><span id="DisplayCAT">0</span></div>
-						<div class="StandardText" style="left:6%;top:34%;font-size:8px"><span style="color:rgb(120,120,120)">Subcategory </span><span id="DisplaySUBCAT">0</span></div>
-						<div class="StandardText" style="left:6%;top:39%;font-size:10px"><span style="color:rgb(120,120,120)">Idea Strength </span><span id="DisplayPIS">0</span></div>
-						<div class="StandardText" style="left:6%;top:45%;font-size:10px"><span style="color:rgb(120,120,120)">Design Strength </span><span id="DisplayPDS">0</span></div>
-						<div class="StandardText" style="left:6%;top:51%;font-size:10px"><span style="color:rgb(120,120,120)">Build Strength </span><span id="DisplayPBS">0</span></div>
-						<div class="StandardText" style="text-overflow:hidden;left:6%;top:58%;font-size:8px"><span style="color:rgb(120,120,120)">Phase </span><span id="DisplayPPhase">nil</span></div>
-						<div class="StandardText" style="left:6%;top:63%;font-size:10px"><span style="color:rgb(120,120,120)">PFID </span><span id="DisplayPFID">0</span></div>
-						<button class="Standard Compact" id="CurProdAdvanceButton" style="top:82%;left:6%;height:15%;width:42%;" onclick="TryToAdvanceProduct();" disabled>Progress</button>
-						<button class="Standard Compact" id="CurProdRevertButton" style="top:82%;left:52%;height:15%;width:42%;" onclick="TryToRevertProduct();" disabled>Regress</button>
-						<button class="Standard Compact" id="CurProdPatentButton" style="top:66%;left:52%;height:15%;width:42%;visibility:hidden" onclick="TryToPatentProduct();" disabled>Patent</button>
+						<div class="StandardText" style="left:6%;top:4%;color:white;font-size:14px;text-align:center"><span id="ProdDisplayName">nil</span><sup style="font-size:10px;color:rgb(120,120,120)">&reg;</sup></div>
+						<div class="StandardText" style="left:6%;top:16%;font-size:11px;text-align:left"><span style="color:rgb(120,120,120)">By </span><span id="ProdOwnerDisplayName">nil</span><sup style="color:rgb(120,120,120)">&trade;</sup></div>
+						<div class="StandardText" style="left:6%;top:29%;font-size:10px"><span style="color:rgb(120,120,120)">Category </span><span id="DisplayCAT">0</span></div>
+						<div class="StandardText" style="left:6%;top:36%;font-size:8px"><span style="color:rgb(120,120,120)">Subcategory </span><span id="DisplaySUBCAT">0</span></div>
+						<div class="StandardText" style="left:6%;top:41%;font-size:10px"><span style="color:rgb(120,120,120)">Idea Strength </span><span id="DisplayPIS">0</span></div>
+						<div class="StandardText" style="left:6%;top:47%;font-size:10px"><span style="color:rgb(120,120,120)">Design Strength </span><span id="DisplayPDS">0</span></div>
+						<div class="StandardText" style="left:6%;top:53%;font-size:10px"><span style="color:rgb(120,120,120)">Build Strength </span><span id="DisplayPBS">0</span></div>
+						<div class="StandardText" style="text-overflow:hidden;left:6%;top:58%;font-size:8px;visibility:hidden"><span style="color:rgb(120,120,120)">Phase </span><span id="DisplayPPhase">nil</span></div>
+						<div class="StandardText" style="left:6%;top:63%;font-size:10px;visibility:hidden"><span style="color:rgb(120,120,120)">PFID </span><span id="DisplayPFID">0</span></div>
+						<button class="Standard Compact" id="CurProdAdvanceButton" style="top:66%;left:6%;height:15%;width:42%;" onmouseover="noSound()" onclick="TryToAdvanceProduct(); noSound();" disabled>Progress</button>
+						<button class="Standard Compact" id="CurProdRevertButton" style="top:66%;left:52%;height:15%;width:42%;" onmouseover="noSound()" onclick="TryToRevertProduct(); noSound();" disabled>Regress</button>
+						<button class="Standard Compact" id="CurProdPatentButton" style="top:82%;left:52%;height:15%;width:42%;" onmouseover="noSound()" onclick="TryToPatentProduct(); noSound();" disabled>Patent</button>
 					</div>
 					<button id="new-product-button" class="Standard Compact" style="top:80%;left:3%;width:10%;height:8%;"onclick="displayNewProductDialog()">New<br>Product</button>
 					<button id="employee_button" class="Standard Compact" style="top:80%;left:13%;width:11%;height:8%;" onclick="displayEmployeeDialog()">Manage<br>Employees</button>
@@ -292,6 +301,12 @@
 								<div class="StandardText" style="left:55%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlySixScbdEmps" style="color:white">nil</span></div>
 							</div>
 							<button class="Standard" id="ScoreboardClose" onclick="HideScoreboard()" style="top:87%;left:10%;width:80%;height:10%">Done</button>
+						</div>
+						<div class="Popup" id="PatentDialog">
+							<div class="StandardText" id="PatentTitle" style="font-size:50px;margin:0px;width:100%;top:6%">ERROR!</div>
+							<div class="StandardText" id="PatentText" style="font-size:25px;margin:0px;width:100%;top:28%">Something got borked in your code!</div>
+							<div class="StandardText" id="PatentTip" style="font-size:10px;margin-left:10%;width:80%;top:63%">Have you tried a code review?</div>
+							<button class="Standard" style="left:14%;top:75%;width:72%" onclick="ClosePatentDialog()">Continue</button>
 						</div>
 						<div class="Popup" id="QuitDialog">
 							<div class="StandardText" style="margin:0px;width:100%;top:10%">Are You Sure?</div>

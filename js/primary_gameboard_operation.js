@@ -45,12 +45,12 @@ var RandomEvents=[
 	["Tax break!","AllPlayers","CashChange",750]
 ]
 var ProductCategories={
-	Energy:["Hydroelectric","Solar","FossilFuel","Wind"],
+	Energy:["Hydroelectric","Solar","Fossil Fuel","Wind"],
 	Transportation:["Space","Air","Land","Sea"],
 	Hardware:["Desktop","Laptop","Peripheral","Printer"],
-	Software:["Communication","OfficeProgram","VideoGame","WebApplication"],
-	Houseware:["Cleaning","Furniture","Kitchen","Barbecue"],
-	Other:["School","Shoes","Musical","KeyHolder"]
+	Software:["Communication","Office Program","Video Game","Web Application"],
+	Houseware:["Cleaning","Furniture","Kitchen","Barbeque"],
+	Other:["School","Shoes","Musical","Key Holder"]
 }
 function GameInitialize(){
 	var GameCreationInfo=JSON.parse(localStorage.getItem("TheBrandNewGame"));
@@ -58,6 +58,9 @@ function GameInitialize(){
 	TransferGameStartupInfo(GameCreationInfo,TheGame);
 	TheGame.CurrentPlayer=TheGame.Players[TheGame.CurrentPlayerNum];
 	TheGame.CurrentPlayerNum=TheGame.CurrentPlayer.Number;
+	if (TheGame.Settings.PatentingEnabled=="On"){
+		TheGame.PatentTracker = new PatentTracker();
+	}
 	UpdatePlayerDisplay();
 	PopulateNewProdCategories();
 	//setInterval("TipThink();",10);
@@ -104,8 +107,8 @@ function PopulateNewProdCategories(){
 function SelectProductCategory(){
 	var Sel=$("#NewProductCategory");
 	var SubSel=$("#NewProductSubCategory");
-	SubSel.children().remove()
-	var Cat=Sel.val()
+	SubSel.children().remove();
+	var Cat=Sel.val();
 	for(var i=0;i<ProductCategories[Cat].length;i++){
 		SubSel.append('<option>'+ProductCategories[Cat][i]+'</option>')
 	}
@@ -185,12 +188,24 @@ function UpdateCurProdDisplay(id){
 		var Prod=GetProdFromDispElemID(id);
 		CurrentlySelectedProduct=Prod;
 		$("#ProductWindow").show();
+		$("#ProductWindow").css("border-color",Prod.Owner.Color);
 		if(Prod.OwnerNumber==TheGame.CurrentPlayerNum){
 			$("#CurProdAdvanceButton").prop("disabled",false);
 			$("#CurProdRevertButton").prop("disabled",false);
+			if (TheGame.PatentTracker){
+				if (isThisCategoryPatented(Prod, TheGame) && isThisProductPatented(Prod, TheGame)){
+					$("#CurProdPatentButton").text("Patented!");
+					$("#CurProdPatentButton").prop("disabled",true);
+				}
+				else {
+					$("#CurProdPatentButton").text("Patent");
+					$("#CurProdPatentButton").prop("disabled",false);
+				}
+			}
 		}else{
 			$("#CurProdAdvanceButton").prop("disabled",true);
 			$("#CurProdRevertButton").prop("disabled",true);
+			$("#CurProdPatentButton").prop("disabled",true);
 		}
 		document.getElementById("ProdDisplayName").innerHTML=Prod.Name;
 		document.getElementById("ProdOwnerDisplayName").innerHTML=Prod.Owner.Name;
@@ -234,6 +249,12 @@ function TryToAdvanceProduct(){
 	}else if(CurPhase==ProductPhases.Maintenance){
 		playSound(GameSounds.Wrong_Low);
 	}
+	
+	//This if-block is for patenting reasons.
+	if (CurrentlySelectedProduct.isANewProduct && CurrentlySelectedProduct.Phase==ProductPhases.Maintenance){
+		CurrentlySelectedProduct.isANewProduct = false;
+	}
+	
 	UpdateProductDisplayPosition(CurrentlySelectedProduct);
 	UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
 	UpdatePlayerDisplay();
@@ -442,16 +463,16 @@ function PatentTracker()
 {
 	//Creates a PatentTracker object and declares variables for it.
 	var PatentTracker = new Object();
-	PatentTracker.ClassName="PATENTTRACKER";
+	PatentTracker.ClassName = "PATENTTRACKER";
 	PatentTracker.Categories = new Array();
 	PatentTracker.numPatents = 0;
 	
 	//Creates a 1D array out of the 2D Array of the Product categories.
-	for (i = 0; i < ProductCatagories.length; i++)
-	{
-		PatentTracker.Cagetories.concat(ProductCatagories[i]);
+	for(Item in ProductCategories){
+		for (SubItem in ProductCategories[Item]){
+			PatentTracker.Categories.push(ProductCategories[Item][SubItem]);
+		}
 	}
-	
 	//Declares a record-keeping array using the 1D Array of the Product categories.
 	PatentTracker.Records = new Array();
 	
@@ -459,16 +480,16 @@ function PatentTracker()
 	//For each element in the records array, element 0 is the category,
 	//and element 1 is the player who holds the patent for that category.
 	//Initially, element 1 is null, because no one /starts/ with a patent.
-	for (i = 0; i < PatentTracker.Categories.length; i++)
+	for (Item in PatentTracker.Categories)
 	{
-		PatentTracker.Records[i] = [PatentTracker.Categories[i], null];
+		PatentTracker.Records.push([PatentTracker.Categories[Item], null, null]);
 	}
 	
 	return PatentTracker;
 }
 
-//A function that aids in buying a patent for a particular product category
-function BuyPatent(player, product, patentTracker, game)
+//A function that aids in buying a patent for a particular product subcategory
+function TryToBuyPatent(product, game)
 {
 	//The amount needed to buy a patent is hardcoded for now.
 	//Other factors will determine how much the product patent is worth, such as the category and the product's overall strength.
@@ -478,38 +499,38 @@ function BuyPatent(player, product, patentTracker, game)
 	var patentMessage = "Product " + product.Name + " was successfully patented!"
 	
 	//This variable has two purposes:
-	//First to help determine if a product category is patented already
+	//First to help determine if a product subcategory is patented already
 	//Second to help add a player to the patent records if the purchase succeeds
-	var categoryIndex = patentTracker.Categories.indexOf(product.Category);
+	var categoryIndex = game.PatentTracker.Categories.indexOf(product.SubCategory);
 	
-	var isPatentedAlready = patentTracker.Records[categoryIndex][1] != null;
-	//Product category cannot be patented already.
-	var inPatentableCategory = true;
-	//Patent must be statutory, or the type of product must be able to be patented.
-	var preMaintenance = (product.Phase != "Maintenance");
+	var isPatentedAlready = isThisCategoryPatented(product, game);
+	//Product subcategory cannot be patented already.
+	var inPatentableCategory = true
+	//Patent must be statutory, or the type of product must be able to be patented. Currently, it holds true for all categories.
+	var preMaintenance = product.isANewProduct;
 	//Product can't already be on the market.
 	var wellBuiltEnough = ((product.IdeaStrength^2)*(product.DesignStrength^1.1)*(product.BuildStrength^1.1)*4) >= 1000;
 	//It has to be a well developed product.
-	var hasTheMoney = (player.Money >= limit);
+	var hasTheMoney = (game.CurrentPlayer.Money >= cost);
 	//Player needs the money for the patent.
 	
 	//Series of if-statements to either determine the failure message or purchase the patent.
 	if (isPatentedAlready)
 	{
-		patentOwner = patentTracker.Records[categoryIndex][1];
+		patentOwner = game.PatentTracker.Records[categoryIndex][1];
 		
-		if (patentOwner = player.GlobalID)
+		if (patentOwner == game.CurrentPlayer.GlobalID)
 			patentMessage = "You've already purchased a patent for this type of product!";
 		else
-			patentMessage = "Player " + (patentOwner+1).toString() + ": " + game.Players[patentOwner].name + " has the patent for this product category!";
+			patentMessage = "Player " + (patentOwner+1).toString() + ": " + game.Players[patentOwner].name + " already has the patent for this product category!";
 	}
 	else if (!inPatentableCategory)
 	{
-		patentMessage = product.Category + "-type products cannot be patented!";
+		patentMessage = product.SubCategory + "-type products cannot be patented!";
 	}
 	else if (!preMaintenance)
 	{
-		patentMessage = "Products that are not new cannot be patented!";
+		patentMessage = "This product has already been on the market!";
 	}
 	else if (!wellBuiltEnough)
 	{
@@ -517,17 +538,64 @@ function BuyPatent(player, product, patentTracker, game)
 	}
 	else if (!hasTheMoney)
 	{
-		patentMessage = "You are $" + (cost - player.Money).toString() + " short!";
+		patentMessage = "You are $" + (cost - game.CurrentPlayer.Money).toString() + " short!";
 	}
 	else
 	{
-		player.Money -= cost;
-		patentTracker.Records[categoryIndex][1] = player.GlobalID;
-		patentTracker.numPatents++;
+		game.CurrentPlayer.Money -= cost;
+		game.PatentTracker.Records[categoryIndex][1] = game.CurrentPlayer.GlobalID;
+		game.PatentTracker.Records[categoryIndex][2] = product.GlobalID;
+		game.PatentTracker.numPatents++;
+		UpdatePlayerDisplay();
+		UpdateCurProdDisplay(product.GlobalID);
 	}
 	
 	//Returns the function completion message.
 	return patentMessage;
+}
+
+//A function to check if a product's been patented already
+function isThisCategoryPatented(prod, game)
+{
+	return game.PatentTracker.Records[(game.PatentTracker.Categories.indexOf(prod.SubCategory))][1] != null;
+}
+//A function to check if this particular product is patented
+function isThisProductPatented(prod, game)
+{
+	return game.PatentTracker.Records[(game.PatentTracker.Categories.indexOf(prod.SubCategory))][2] == prod.GlobalID;
+}
+
+//A function to help with message displaying regarding patents.
+//It sets the message title, the message, and sometimes a helpful tip depending on the failure.
+function PatentMessageDisplay(theMessage)
+{
+	//Sets the main message.
+	$("#PatentText").text(theMessage);
+	
+	//Sets the type of message.
+	if (theMessage.indexOf("successfully") > -1){
+		$("#PatentTitle").text("SUCCESS!");
+	}
+	else{
+		$("#PatentTitle").text("FAILURE!");
+	}
+	
+	//Sets and reveals a tip if applicable.
+	if (theMessage.indexOf("successfully") > -1){
+		$("#PatentTip").text("Now you earn revenue off of other players with the same type of product!");
+		$("#PatentTip").show();
+	}
+	else if (theMessage.indexOf("impressive") > -1){
+		$("#PatentTip").text("Try further building the product's Idea, Design, or Build strength. Having a great and well-thought idea is key to a good innovation.");
+		$("#PatentTip").show();
+	}
+	else if (theMessage.indexOf("already") > -1){
+		$("#PatentTip").text("Try innovating with a different type of product instead!");
+		$("#PatentTip").show();
+	}
+	else{
+		$("#PatentTip").hide();
+	}
 }
 
 //A function that helps handle the payment of royalties to players who own patents
@@ -538,7 +606,7 @@ function payRoyaltiesHelper(product, patentTracker)
 {
 	//Initializes a return value variable and an index variable.
 	var patentOwnerID = -1;
-	var index = patentTracker.Categories.indexOf(product.Category);
+	var index = patentTracker.Categories.indexOf(product.SubCategory);
 	
 	//If another player owns that patent, set the return value to their ID
 	if (product.Owner.GlobalID == patentTracker.Records[index][1])

@@ -2,11 +2,40 @@
 
 <html>
 	<head>
+		<script src="//www.parsecdn.com/js/parse-1.2.18.min.js"></script>
 		<script src="../js/jquery.js"></script>
 		<script src="../js/shared.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
-
+<script>
+		Parse.initialize("xjUxyY8bghFGuSnM3ptEZkV3BiWOlD3VhkRLt4kz", "iZCS2S7ZuWn9keMoooLaHMlB7HMXpcqD1M60JVjp");
+		
+		var user = new Parse.User();
+		user.set("username", "my name");
+		user.set("password", "my pass");
+		user.set("email", "email@example.com");
+  
+		// other fields can be set just like with Parse.Object
+		user.set("phone", "650-555-0000");
+  
+		user.signUp(null, {
+		  success: function(user) {
+		    // Hooray! Let them use the app now.
+		  },
+		  error: function(user, error) {
+		    // Show the error message somewhere and let the user try again.
+		    alert("Error: " + error.code + " " + error.message);
+		  }
+		});
+		
+		var TestObject = Parse.Object.extend("TestObject");
+		var testObject = new TestObject();
+		testObject.save({foo: "bar"}).then(function(object) {
+		  alert("yay! it worked");
+		});
+		</script>
 		<script>
+		
+		
 			var tabNumber;
 			var TABCOUNT = 4;
 			function Initialize()

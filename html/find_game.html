@@ -6,6 +6,8 @@
 		<link rel="stylesheet" type="text/css" href="../css/Shared.css"></link>
 		<script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.2.16.min.js"></script>
 
+		<script src="http://cdn.pubnub.com/pubnub.min.js"></script>
+
 		<script>
 			function Initialize()
 			{
@@ -38,36 +40,48 @@
 		</script>
 
 		<script>
-		
+
+
 			// Parse business 
 		    Parse.initialize("xjUxyY8bghFGuSnM3ptEZkV3BiWOlD3VhkRLt4kz", "iZCS2S7ZuWn9keMoooLaHMlB7HMXpcqD1M60JVjp");
-		    var ParseGame = Parse.Object.extend("Game");
-			var query = new Parse.Query(ParseGame);
-			query.each(
-				function (result) {
-					addGameToList(result);
-				},
-				{
-			  success: function() {
-			  },
+		    updateGameList();
 
-			  error: function(error) {
-			    // error is an instance of Parse.Error.
-			  }
+			// PubNub business 
+			var pubnub = PUBNUB.init({
+				publish_key: 'pub-c-d3ce4b6d-4960-4db3-a8be-29709342456b',
+				subscribe_key: 'sub-c-52dd673e-b2ba-11e3-aab4-02ee2ddab7fe'
 			});
+			pubnub.subscribe({
+				channel: 'gameList',
+				message: function(message){
+					if("newGame" in message){
+						updateGameList();
+					}
+				}
+			});	
 
-			function addGameToList(game){
-				var name = game.get("name");
-				var host = game.get("host");
-				var newGameElement = $("<tr>", {class: "game-row"});
-				var newNameElement = $("<td>").html(name);
-				var newHostElement = $("<td>").html(host);
+			function updateGameList() {
+			    var ParseGame = Parse.Object.extend("Game");
+				var query = new Parse.Query(ParseGame);
 
-				var gameListElement = $("#game-list");
+				query.find({
+				  success: function(results) {
+					var gameListElement = $("#game-list").remove(".game-row");
 
-				$(newGameElement).append(newNameElement, newHostElement);
-				$(gameListElement).append(newGameElement);
-				alert($(gameListElement).children());
+				  	results.forEach(function(game){
+						var name = game.get("name");
+						var host = game.get("host");
+						var newGameElement = $("<tr>", {class: "game-row"});
+						var newNameElement = $("<td>").html(name);
+						var newHostElement = $("<td>").html(host);
+						$(newGameElement).append(newNameElement, newHostElement).appendTo(gameListElement);
+				  	});
+				  },
+
+				  error: function(error) {
+				    // error is an instance of Parse.Error.
+				  }
+				});
 			}
 
 		</script>

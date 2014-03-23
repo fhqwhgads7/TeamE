@@ -17,13 +17,8 @@
 			
 			function Initialize()
 			{
-				//The commented code does not function properly yet.
-				//When something screws up during runtime, other functions just stop.
-				//So I had to comment them out to allow the game board to rotate, which it does.
-				GlobalInitialize(true);
+				GlobalInitialize();
 				GameInitialize();
-				//var Game=JSON.parse(localStorage.MainGame);
-				//alert(Game.Name);
 				setInterval("RotateThink();",50);
 				pickATip();
 			}
@@ -37,7 +32,6 @@
 				if(RotateDir!=0){
 					Rotation+=RotateDir;
 					RotateDir%=360;
-					//if((RotateDir>=360)||(RotateDir<=-360)){RotateDir=0;}
 					document.getElementById("GameBoardCircle").style.webkitTransform="rotate("+Rotation.toString()+"deg)";
 					document.getElementById("GameBoardCircle").style.MozTransform="rotate("+Rotation.toString()+"deg)";
 					var Prods=document.getElementsByClassName("ProductDisplayItem");
@@ -91,6 +85,15 @@
 			function EndCurrentTurn(){
 				CycleTurn();
 			}
+			function TryToPatentProduct(){
+				$("#PopupOverlay").show();
+				$("#PatentDialog").show();
+				PatentMessageDisplay(TryToBuyPatent(CurrentlySelectedProduct, TheGame));
+			}
+			function ClosePatentDialog(){
+				$("#PatentDialog").hide();
+				$("#PopupOverlay").hide();
+			}
 			function TryToQuitGame(){
 				$("#PopupOverlay").show();
 				$("#QuitDialog").show();
@@ -143,13 +146,13 @@
 				border-color:gray;
 				background-color:rgba(0,0,0,.8);
 			}
-			#CashAlert{
+			.CashAlert{
 				font-family:arial;
 				font-size:30px;
 				font-weight:400;
 				position:absolute;
 				top:9%;
-				left:20%;
+				left:17%;
 				color:red;
 				text-shadow:-1px -1px 2px #FFFFFF,1px 1px 1px #000000,3px 3px 5px #000000;
 				transition:top 2.2s ease-in,left 2.2s ease-in,opacity 2s ease-in;
@@ -190,7 +193,7 @@
 				</marquee>
 				
 					<div class="PlayerBox" id="CurPlyBox" style="border-color:grey;width:25%;left:2%;top:4%;">
-						<div class="StandardText" id="CurPlyName" style="font-size:25px;left:10%;top:5%;">nil</div>
+						<div class="StandardText" id="CurPlyName" style="font-size:16px;left:10%;top:5%;">nil</div>
 						<div class="StandardText" style="font-size:18px;left:10%;top:35%;color:rgb(160,160,160)">$<span id="CurPlyMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
 						<div class="StandardText" style="font-size:10px;left:12%;top:62%;color:rgb(160,160,160);font-size:10px">Products <span id="CurPlyProds" style="color:white">nil</span></div>
 						<div class="StandardText" style="font-size:10px;left:54%;top:62%;color:rgb(160,160,160);font-size:10px">Developers <span id="CurPlyDevs" style="color:white">nil</span></div>
@@ -201,29 +204,29 @@
 					<div id="GameBoard">
 						<div id="GameBoardCenter"></div>
 						<div id="GameBoardCircle"></div>
-						<button class="Standard Compact" id="TurnBoardCCWButton" style="top:24%;left:4%;width:2%;height:7%;padding:.2em 1.6em" onmousedown="RotateBegin(-1)" onmouseup="RotateEnd()" onmouseout="RotateEnd()"><b><</b></button>
-						<button class="Standard Compact" id="TurnBoardCWButton" style="top:24%;left:19%;width:2%;height:7%;padding:.2em 1.6em" onmousedown="RotateBegin(1)" onmouseup="RotateEnd()" onmouseout="RotateEnd()"><b>></b></button>
+						<button class="Standard Compact" id="TurnBoardCCWButton" style="top:24%;left:4%;width:2%;height:7%;padding:.2em 1.6em" onmousedown="RotateBegin(-1)" onmouseup="RotateEnd()" onmouseout="RotateEnd()" onmouseover="noSound()" onclick="noSound()"><b><</b></button>
+						<button class="Standard Compact" id="TurnBoardCWButton" style="top:24%;left:19%;width:2%;height:7%;padding:.2em 1.6em" onmousedown="RotateBegin(1)" onmouseup="RotateEnd()" onmouseout="RotateEnd()" onmouseover="noSound()" onclick="noSound()"><b>></b></button>
 					</div>
 					<div id="ProductWindow" class="PlayerBox" style="overflow:hidden;display:none">
-						<div class="StandardText" style="left:10%;top:2%;color:white;font-size:14px;text-align:center"><span id="ProdDisplayName">nil</span><sup style="font-size:10px;color:rgb(120,120,120)">&reg;</sup></div>
-						<div class="StandardText" style="left:10%;top:14%;font-size:11px;text-align:left"><span style="color:rgb(120,120,120)">By </span><span id="ProdOwnerDisplayName">nil</span><sup style="color:rgb(120,120,120)">&trade;</sup></div>
-						<div class="StandardText" style="left:6%;top:27%;font-size:10px"><span style="color:rgb(120,120,120)">Category </span><span id="DisplayCAT">0</span></div>
-						<div class="StandardText" style="left:6%;top:34%;font-size:8px"><span style="color:rgb(120,120,120)">Subcategory </span><span id="DisplaySUBCAT">0</span></div>
-						<div class="StandardText" style="left:6%;top:39%;font-size:10px"><span style="color:rgb(120,120,120)">Idea Strength </span><span id="DisplayPIS">0</span></div>
-						<div class="StandardText" style="left:6%;top:45%;font-size:10px"><span style="color:rgb(120,120,120)">Design Strength </span><span id="DisplayPDS">0</span></div>
-						<div class="StandardText" style="left:6%;top:51%;font-size:10px"><span style="color:rgb(120,120,120)">Build Strength </span><span id="DisplayPBS">0</span></div>
-						<div class="StandardText" style="text-overflow:hidden;left:6%;top:58%;font-size:8px"><span style="color:rgb(120,120,120)">Phase </span><span id="DisplayPPhase">nil</span></div>
-						<div class="StandardText" style="left:6%;top:63%;font-size:10px"><span style="color:rgb(120,120,120)">PFID </span><span id="DisplayPFID">0</span></div>
-						<button class="Standard Compact" id="CurProdAdvanceButton" style="top:82%;left:6%;height:15%;width:42%;" onclick="TryToAdvanceProduct();" disabled>Progress</button>
-						<button class="Standard Compact" id="CurProdRevertButton" style="top:82%;left:52%;height:15%;width:42%;" onclick="TryToRevertProduct();" disabled>Regress</button>
-						<button class="Standard Compact" id="CurProdPatentButton" style="top:66%;left:52%;height:15%;width:42%;visibility:hidden" onclick="TryToPatentProduct();" disabled>Patent</button>
+						<div class="StandardText" style="left:6%;top:4%;color:white;font-size:14px;text-align:center"><span id="ProdDisplayName">nil</span><sup style="font-size:10px;color:rgb(120,120,120)">&reg;</sup></div>
+						<div class="StandardText" style="left:6%;top:16%;font-size:11px;text-align:left"><span style="color:rgb(120,120,120)">By </span><span id="ProdOwnerDisplayName">nil</span><sup style="color:rgb(120,120,120)">&trade;</sup></div>
+						<div class="StandardText" style="left:6%;top:29%;font-size:10px"><span style="color:rgb(120,120,120)">Category </span><span id="DisplayCAT">0</span></div>
+						<div class="StandardText" style="left:6%;top:36%;font-size:8px"><span style="color:rgb(120,120,120)">Subcategory </span><span id="DisplaySUBCAT">0</span></div>
+						<div class="StandardText" style="left:6%;top:41%;font-size:10px"><span style="color:rgb(120,120,120)">Idea Strength </span><span id="DisplayPIS">0</span></div>
+						<div class="StandardText" style="left:6%;top:47%;font-size:10px"><span style="color:rgb(120,120,120)">Design Strength </span><span id="DisplayPDS">0</span></div>
+						<div class="StandardText" style="left:6%;top:53%;font-size:10px"><span style="color:rgb(120,120,120)">Build Strength </span><span id="DisplayPBS">0</span></div>
+						<div class="StandardText" style="text-overflow:hidden;left:6%;top:58%;font-size:8px;visibility:hidden"><span style="color:rgb(120,120,120)">Phase </span><span id="DisplayPPhase">nil</span></div>
+						<div class="StandardText" style="left:6%;top:63%;font-size:10px;visibility:hidden"><span style="color:rgb(120,120,120)">PFID </span><span id="DisplayPFID">0</span></div>
+						<button class="Standard Compact" id="CurProdAdvanceButton" style="top:66%;left:6%;height:15%;width:42%;" onmouseover="noSound()" onclick="TryToAdvanceProduct(); noSound();" disabled>Progress</button>
+						<button class="Standard Compact" id="CurProdRevertButton" style="top:66%;left:52%;height:15%;width:42%;" onmouseover="noSound()" onclick="TryToRevertProduct(); noSound();" disabled>Regress</button>
+						<button class="Standard Compact" id="CurProdPatentButton" style="top:82%;left:52%;height:15%;width:42%;" onmouseover="noSound()" onclick="TryToPatentProduct(); noSound();" disabled>Patent</button>
 					</div>
 					<button id="new-product-button" class="Standard Compact" style="top:80%;left:3%;width:10%;height:8%;"onclick="displayNewProductDialog()">New<br>Product</button>
 					<button id="employee_button" class="Standard Compact" style="top:80%;left:13%;width:11%;height:8%;" onclick="displayEmployeeDialog()">Manage<br>Employees</button>
 					<button class="Standard Compact" style="top:88%;left:3%;width:10%;height:8%;" onclick="ShowAllPlayers()">Show Players</button>
-					<button class="Standard Compact" style="top:88%;left:13%;width:11%;height:8%;" onclick="EndCurrentTurn()">End Turn</button>
+					<button class="Standard Compact" style="top:88%;left:13%;width:11%;height:8%;" onclick="EndCurrentTurn(); noSound()">End Turn</button>
 					
-					<button class="Standard Compact" style="bottom:4%;left:90%;width:8%;height:5%;" onclick="TryToQuitGame()">Quit</button>
+					<button class="Standard Compact" style="top:90%;left:90%;width:8%;height:5%;" onclick="TryToQuitGame()">Quit</button>
 
 					<div class="PopupOverlay" id="PopupOverlay">
 						<div class="Popup" id="new-product-dialog">
@@ -238,24 +241,24 @@
 								<!-- dynamic -->
 							</select>
 							<button class="Standard" style="left:10%;top:75%" onclick="hideNewProductDialog()">Cancel</button>
-							<button class="Standard" style="left:51%;top:75%" onclick="createNewProduct()">Create</button>
+							<button class="Standard" style="left:51%;top:75%" onclick="createNewProduct(); noSound()">Create</button>
 						</div>
 						<div class="Popup" id="employee-dialog">
 							<div class="StandardText" style="margin:0px;width:100%;top:5%">Manage Employees</div>
 							<div class="StandardText" style="top:22%;left:14.5%;width:10%;font-size:12px">Designers</div>
-							<button class="Standard" style="top:27%;left:10%;width:10%" onclick="EmployeeChange('des',1)"><b>+</b></button>
+							<button class="Standard" style="top:27%;left:10%;width:10%" onclick="EmployeeChange('des',1); playSound(GameSounds.PageDoneLoading)" onmouseover="noSound()"><b>+</b></button>
 							<div class="StandardText" style="top:44%;left:18%" id="EmpPopupDes">0</div>
-							<button class="Standard" style="top:57%;left:10%;width:10%" onclick="EmployeeChange('des',-1)"><b>-</b></button>
+							<button class="Standard" style="top:57%;left:10%;width:10%" onclick="EmployeeChange('des',-1); playSound(GameSounds.PageDoneLoading)" onmouseover="noSound()"><b>-</b></button>
 						
 							<div class="StandardText" style="top:22%;left:43.25%;font-size:12px">Developers</div>
-							<button class="Standard" style="top:27%;left:40%;width:10%" onclick="EmployeeChange('dev',1)"><b>+</b></button>
+							<button class="Standard" style="top:27%;left:40%;width:10%" onclick="EmployeeChange('dev',1); playSound(GameSounds.PageDoneLoading)" onmouseover="noSound()"><b>+</b></button>
 							<div class="StandardText" style="top:44%;left:48%" id="EmpPopupDev">0</div>
-							<button class="Standard" style="top:57%;left:40%;width:10%" onclick="EmployeeChange('dev',-1)"><b>-</b></button>
+							<button class="Standard" style="top:57%;left:40%;width:10%" onclick="EmployeeChange('dev',-1); playSound(GameSounds.PageDoneLoading)" onmouseover="noSound()"><b>-</b></button>
 							
 							<div class="StandardText" style="top:22%;left:75.75%;font-size:12px">Testers</div>
-							<button class="Standard" style="top:27%;left:70%;width:10%" onclick="EmployeeChange('tes',1)"><b>+</b></button>
+							<button class="Standard" style="top:27%;left:70%;width:10%" onclick="EmployeeChange('tes',1); playSound(GameSounds.PageDoneLoading)" onmouseover="noSound()"><b>+</b></button>
 							<div class="StandardText" style="top:44%;left:78%" id="EmpPopupTes">0</div>
-							<button class="Standard" style="top:57%;left:70%;width:10%" onclick="EmployeeChange('tes',-1)"><b>-</b></button>
+							<button class="Standard" style="top:57%;left:70%;width:10%" onclick="EmployeeChange('tes',-1); playSound(GameSounds.PageDoneLoading)" onmouseover="noSound()"><b>-</b></button>
 							
 							<button class="Standard" style="top:80%;left:10%;width:80%" onclick="hideEmployeeDialog()">Done</button>
 						</div>
@@ -299,6 +302,12 @@
 							</div>
 							<button class="Standard" id="ScoreboardClose" onclick="HideScoreboard()" style="top:87%;left:10%;width:80%;height:10%">Done</button>
 						</div>
+						<div class="Popup" id="PatentDialog">
+							<div class="StandardText" id="PatentTitle" style="font-size:50px;margin:0px;width:100%;top:6%">ERROR!</div>
+							<div class="StandardText" id="PatentText" style="font-size:25px;margin:0px;width:100%;top:28%">Something got borked in your code!</div>
+							<div class="StandardText" id="PatentTip" style="font-size:10px;margin-left:10%;width:80%;top:63%">Have you tried a code review?</div>
+							<button class="Standard" style="left:14%;top:75%;width:72%" onclick="ClosePatentDialog()">Continue</button>
+						</div>
 						<div class="Popup" id="QuitDialog">
 							<div class="StandardText" style="margin:0px;width:100%;top:10%">Are You Sure?</div>
 							<button class="Standard" style="left:14%;top:35%;width:72%" onclick="QuitGame(true)">Save and Quit</button>
@@ -306,7 +315,12 @@
 							<button class="Standard" style="left:14%;top:75%;width:72%" onclick="CloseQuitDialog()">Cancel</button>
 						</div>
 					</div>
-					<span id="CashAlert">0</span>
+					<span id="CashOne" class="CashAlert">0</span>
+					<span id="CashTwo" class="CashAlert">0</span>
+					<span id="CashThree" class="CashAlert">0</span>
+					<span id="CashFour" class="CashAlert">0</span>
+					<span id="CashFive" class="CashAlert">0</span>
+					<span id="CashSix" class="CashAlert">0</span>
 				</div>
 			</div>
 			<div id="RoundAnnouncer">ROUND<br>1</div>

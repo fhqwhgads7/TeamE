@@ -45,12 +45,27 @@
 				SwitchToPage("new_game_options.html");
 			}
 			function CreateGame(){
-				SaveData();
-				SwitchToPage("game_board.html");
+				if (SaveData()){
+					SwitchToPage("game_board.html");
+				}
+				else {
+					for(var i=1;i<=6;i++){
+						var Num=NumberNameTable[i];
+						if(($("#Player"+Num+"Type option:selected").text()=="Player") && !($("#Player"+Num+"Name").val())) {
+							NameFieldFlash(Num);
+						}
+					}
+					playSound(GameSounds.Wrong_Med);
+				}
+			}
+			function NameFieldFlash(Num){
+				$("#Player"+Num+"Name").css("background-color", "red");
+				setTimeout(function(){ $("#Player"+Num+"Name").css("background-color", "white"); },100);
 			}
 			function SaveData(){
+				var returnBoolean = true;
 				var Plys=new Object();
-				for(var i=1;i<=6;i++){ // for loops for the win
+				for(var i=1;i<=6;i++){
 					var Num=NumberNameTable[i];
 					if($("#Player"+Num+"Name").val()){
 						Plys["Ply"+Num]=new Object();
@@ -58,9 +73,13 @@
 						Plys["Ply"+Num].Type=$("#Player"+Num+"Type option:selected").text();
 						Plys["Ply"+Num].Color=$("#Player"+Num+"Color option:selected").text();
 					}
+					else if (returnBoolean && ($("#Player"+Num+"Type option:selected").text()=="Player")){
+						returnBoolean = false;
+					}
 				}
 				TheBrandNewGame.Players=Plys;
 				localStorage.setItem("TheBrandNewGame",JSON.stringify(TheBrandNewGame));
+				return returnBoolean
 			}
 		</script>
 		<style>
@@ -87,7 +106,7 @@
 				<div class="StandardText" id="StartNewGameTitle" style="font-size:40px;margin:10px;width:800px;top:7%;">New Game: Players</div> 
 				<div class="PlayerBox" id="PlayerOneBox" style="border-color:red;left:13%;top:22%;">
 					<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business One</div>
-					<textarea id="PlayerOneName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
+					<textarea maxlength=10 id="PlayerOneName" class="OneColumn" placeholder="Business/Player Name" style="position:absolute;overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
 					<select class="TwoColumnFirst" id="PlayerOneType" style="top:70%;">
 						<option selected="selected">Player</option>
 						<option>Computer</option>
@@ -98,7 +117,7 @@
 				</div>
 				<div class="PlayerBox" id="PlayerTwoBox" style="border-color:blue;right:13%;top:22%;">
 					<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business Two</div>
-					<textarea id="PlayerTwoName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
+					<textarea maxlength=10 id="PlayerTwoName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
 					<select class="TwoColumnFirst" id="PlayerTwoType" style="top:70%;">
 						<option>Player</option>
 						<option selected="selected">Computer</option>
@@ -109,7 +128,7 @@
 				</div>
 				<div class="PlayerBox" id="PlayerThreeBox" style="border-color:green;left:13%;top:42%;">
 					<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business Three</div>
-					<textarea id="PlayerThreeName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
+					<textarea maxlength=10 id="PlayerThreeName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
 					<select class="TwoColumnFirst" id="PlayerThreeType" style="top:70%;">
 						<option>Player</option>
 						<option selected="selected">Computer</option>
@@ -120,7 +139,7 @@
 				</div>
 				<div class="PlayerBox" id="PlayerFourBox" style="border-color:yellow;right:13%;top:42%;">
 					<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business Four</div>
-					<textarea id="PlayerFourName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
+					<textarea maxlength=10 id="PlayerFourName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
 					<select class="TwoColumnFirst" id="PlayerFourType" style="top:70%;">
 						<option>Player</option>
 						<option selected="selected">Computer</option>
@@ -131,7 +150,7 @@
 				</div>
 				<div class="PlayerBox" id="PlayerFiveBox" style="border-color:black;left:13%;top:62%;">
 					<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business Five</div>
-					<textarea id="PlayerFiveName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
+					<textarea maxlength=10 id="PlayerFiveName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
 					<select class="TwoColumnFirst" id="PlayerFiveType" style="top:70%;">
 						<option>Player</option>
 						<option selected="selected">Computer</option>
@@ -142,7 +161,7 @@
 				</div>
 				<div class="PlayerBox" id="PlayerSixBox" style="border-color:white;right:13%;top:62%;">
 					<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business Six</div>
-					<textarea id="PlayerSixName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
+					<textarea maxlength=10 id="PlayerSixName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
 					<select class="TwoColumnFirst" id="PlayerSixType" style="top:70%;">
 						<option>Player</option>
 						<option selected="selected">Computer</option>

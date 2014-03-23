@@ -31,14 +31,19 @@ function GlobalInitialize(){
 		},333);
 	}
 	$(":button.Standard").mouseenter( function(){
-		if ((this.getAttribute('id') != "TurnBoardCCWButton")&&(this.getAttribute('id') != "TurnBoardCWButton"))
+		if (this.getAttribute("onmouseover") == null)
+			playSound(GameSounds.ButtonHover);
+		else if (((this.getAttribute("onmouseover")).toString().indexOf("playSound") <= -1) && ((this.getAttribute("onmouseover")).toString().indexOf("noSound") <= -1))
 			playSound(GameSounds.ButtonHover);
 	});
 	$(":button.Standard").click( function(){
-		if ((this.getAttribute('id') != "TurnBoardCCWButton")&&(this.getAttribute('id') != "TurnBoardCWButton"))
+		if (this.getAttribute("onclick") == null)
+			playSound(GameSounds.ButtonSelect);
+		else if (((this.getAttribute("onclick")).toString().indexOf("playSound") <= -1) && ((this.getAttribute("onclick")).toString().indexOf("noSound") <= -1))
 			playSound(GameSounds.ButtonSelect);
 	});
 } 
+function noSound(){}
 function GameObject(name){
 	this.Name=name;
 	this.LoadGame=function(id){
@@ -94,7 +99,9 @@ var GameSounds={
 	NextRound: '../sounds/sfx/nextround.wav',
 	Message: '../sounds/sfx/message.wav',
 	Event: '../sounds/sfx/event.wav',
-	Wrong: '../sounds/sfx/wrong.wav',
+	Wrong_Low: '../sounds/sfx/wrong_1.wav',
+	Wrong_Med: '../sounds/sfx/wrong_2.wav',
+	Wrong_BAD: '../sounds/sfx/wrong_3.wav',
 	GameOver: '../sounds/sfx/gameover.wav',
 	MinorFail: '../sounds/sfx/minor_fail.wav'
 }
@@ -187,6 +194,7 @@ function Product(player,name,category,sub,color){
 	newProduct.DesignStrength=0;
 	newProduct.BuildStrength=0;
 	newProduct.Phase="nil";
+	newProduct.isANewProduct=true; //This is for patenting-related reasons.
 	if(player != null){
 		player.Products.push(newProduct);
 		newProduct.Number=player.Products.length-1;

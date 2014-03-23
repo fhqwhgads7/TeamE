@@ -4,6 +4,7 @@
 		<script src="../js/jquery.js"></script>
 		<script src="../js/shared.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/Shared.css"></link>
+		<script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.2.16.min.js"></script>
 
 		<script>
 			function Initialize()
@@ -34,6 +35,41 @@
 			}
 			
 		
+		</script>
+
+		<script>
+		
+			// Parse business 
+		    Parse.initialize("xjUxyY8bghFGuSnM3ptEZkV3BiWOlD3VhkRLt4kz", "iZCS2S7ZuWn9keMoooLaHMlB7HMXpcqD1M60JVjp");
+		    var ParseGame = Parse.Object.extend("Game");
+			var query = new Parse.Query(ParseGame);
+			query.each(
+				function (result) {
+					addGameToList(result);
+				},
+				{
+			  success: function() {
+			  },
+
+			  error: function(error) {
+			    // error is an instance of Parse.Error.
+			  }
+			});
+
+			function addGameToList(game){
+				var name = game.get("name");
+				var host = game.get("host");
+				var newGameElement = $("<tr>", {class: "game-row"});
+				var newNameElement = $("<td>").html(name);
+				var newHostElement = $("<td>").html(host);
+
+				var gameListElement = $("#game-list");
+
+				$(newGameElement).append(newNameElement, newHostElement);
+				$(gameListElement).append(newGameElement);
+				alert($(gameListElement).children());
+			}
+
 		</script>
 		
 		<style>
@@ -144,10 +180,6 @@
 						<tr>
 							<th>Name</th>
 							<th>Host</th>
-						</tr>
-						<tr class="game-row">
-							<td></td>
-							<td></td>
 						</tr>
 					</table>
 				</div>

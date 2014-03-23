@@ -103,17 +103,23 @@
 				position:absolute;
 				width:100px;
 			}
-			ol {
+			div#game-list-container {
 				color: white;
 				list-style: none;
 			}
-			li {
-				padding: 0.5em;
+			table {
+				margin: 0 auto;
 			}
-			li:hover {
+
+			td,th {
+				padding: 0.5em;
+				width: 0;
+			}
+			tr.game-row:hover {
 				cursor: pointer;
 				background: grey;
 			}
+
 			div.alert {
 				display: none;
 				position: absolute;
@@ -133,11 +139,18 @@
 		<div id="ContentContainer">
 			<div class="StandardText" id="MainTitle" style="margin:0;width:800px;top:7%">Find Online Game</div>
 			<div class="OptionsBox" id="OptionsBox" style="left:20%;top:20%;">
-				<ol id="game-list">
-					<li><span class="game-title">Game 1</span> (2014-02-03 17:54)</li>
-					<li><span class="game-title">Game 2</span> (2014-02-04 03:16)</li>
-					<li><span class="game-title">Game 3</span> (2014-02-04 03:16)</li>
-				</ol>
+				<div id="game-list-container">
+					<table id="game-list">
+						<tr>
+							<th>Name</th>
+							<th>Host</th>
+						</tr>
+						<tr class="game-row">
+							<td></td>
+							<td></td>
+						</tr>
+					</table>
+				</div>
 			</div>
 
 		<div class="alert" id="load-alert">

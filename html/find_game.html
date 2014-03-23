@@ -74,6 +74,20 @@
 						var newGameElement = $("<tr>", {class: "game-row"});
 						var newNameElement = $("<td>").html(name);
 						var newHostElement = $("<td>").html(host);
+
+						$(newGameElement).dblclick(function(){
+							players = game.get("players");
+							game.add("players", "New Player");
+							game.save(null, {
+								success: function() {
+									alert("Join was successful");
+								},
+								error: function(error) {
+									alert("Unable to join");
+								}
+							})
+						});
+						
 						$(newGameElement).append(newNameElement, newHostElement).appendTo(gameListElement);
 				  	});
 				  },

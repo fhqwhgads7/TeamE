@@ -643,7 +643,7 @@ function doIPayRoyalties(product, patentTracker)
 	var index = patentTracker.Categories.indexOf(product.SubCategory);
 	
 	//If another player owns that patent, set the return value to their ID
-	if (product.Owner.GlobalID != patentTracker.Records[index][1])
+	if ((product.Owner.GlobalID != patentTracker.Records[index][1]) && patentTracker.Records[index][1] != null)
 	{
 		patentOwnerID = patentTracker.Records[index][1];
 	}

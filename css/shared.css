@@ -92,6 +92,13 @@ div.StandardText{
 	color:white;
 	text-shadow:0px 0px 1px rgba(0,0,0,1);
 }
+div.StandardText p{
+	font-family:"Arial";
+	font-size:14px;
+	font-weight:900;
+	text-align:center;
+	color:white;
+}
 div.FancyText{
 	position:absolute;
 	font-family:"Georgia";

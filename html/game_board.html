@@ -146,13 +146,13 @@
 				border-color:gray;
 				background-color:rgba(0,0,0,.8);
 			}
-			#CashAlert{
+			.CashAlert{
 				font-family:arial;
 				font-size:30px;
 				font-weight:400;
 				position:absolute;
 				top:9%;
-				left:20%;
+				left:17%;
 				color:red;
 				text-shadow:-1px -1px 2px #FFFFFF,1px 1px 1px #000000,3px 3px 5px #000000;
 				transition:top 2.2s ease-in,left 2.2s ease-in,opacity 2s ease-in;
@@ -224,7 +224,7 @@
 					<button id="new-product-button" class="Standard Compact" style="top:80%;left:3%;width:10%;height:8%;"onclick="displayNewProductDialog()">New<br>Product</button>
 					<button id="employee_button" class="Standard Compact" style="top:80%;left:13%;width:11%;height:8%;" onclick="displayEmployeeDialog()">Manage<br>Employees</button>
 					<button class="Standard Compact" style="top:88%;left:3%;width:10%;height:8%;" onclick="ShowAllPlayers()">Show Players</button>
-					<button class="Standard Compact" style="top:88%;left:13%;width:11%;height:8%;" onclick="EndCurrentTurn()">End Turn</button>
+					<button class="Standard Compact" style="top:88%;left:13%;width:11%;height:8%;" onclick="EndCurrentTurn(); noSound()">End Turn</button>
 					
 					<button class="Standard Compact" style="top:90%;left:90%;width:8%;height:5%;" onclick="TryToQuitGame()">Quit</button>
 
@@ -315,7 +315,12 @@
 							<button class="Standard" style="left:14%;top:75%;width:72%" onclick="CloseQuitDialog()">Cancel</button>
 						</div>
 					</div>
-					<span id="CashAlert">0</span>
+					<span id="CashOne" class="CashAlert">0</span>
+					<span id="CashTwo" class="CashAlert">0</span>
+					<span id="CashThree" class="CashAlert">0</span>
+					<span id="CashFour" class="CashAlert">0</span>
+					<span id="CashFive" class="CashAlert">0</span>
+					<span id="CashSix" class="CashAlert">0</span>
 				</div>
 			</div>
 			<div id="RoundAnnouncer">ROUND<br>1</div>

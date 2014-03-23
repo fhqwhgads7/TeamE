@@ -49,7 +49,7 @@ var ProductCategories={
 	Transportation:["Space","Air","Land","Sea"],
 	Hardware:["Desktop","Laptop","Peripheral","Printer"],
 	Software:["Communication","Office Program","Video Game","Web Application"],
-	Houseware:["Cleaning","Furniture","Kitchen","Barbeque"],
+	Houseware:["Cleaning","Furniture","Kitchen","Barbecue"],
 	Other:["School","Shoes","Musical","Key Holder"]
 }
 function GameInitialize(){
@@ -190,8 +190,19 @@ function UpdateCurProdDisplay(id){
 		$("#ProductWindow").show();
 		$("#ProductWindow").css("border-color",Prod.Owner.Color);
 		if(Prod.OwnerNumber==TheGame.CurrentPlayerNum){
-			$("#CurProdAdvanceButton").prop("disabled",false);
-			$("#CurProdRevertButton").prop("disabled",false);
+			var CurPhase=CurrentlySelectedProduct.Phase;
+			if (CurPhase == ProductPhases.Maintenance){
+				$("#CurProdAdvanceButton").prop("disabled",true);
+			}
+			else{
+				$("#CurProdAdvanceButton").prop("disabled",false);
+			}
+			if (CurPhase == ProductPhases.Idea){
+				$("#CurProdRevertButton").prop("disabled",true);
+			}
+			else{
+				$("#CurProdRevertButton").prop("disabled",false);
+			}
 			if (TheGame.PatentTracker){
 				if (isThisCategoryPatented(Prod, TheGame) && isThisProductPatented(Prod, TheGame)){
 					$("#CurProdPatentButton").text("Patented!");
@@ -292,9 +303,10 @@ function TryToRevertProduct(){
 function VisualCashAlert(){
 	var Ply=TheGame.CurrentPlayer;
 	var Amt=Ply.Money-Ply.LastDisplayedMoney;
+	var theNumber = NumberNameTable[TheGame.CurrentPlayerNum+1];
 	if(!ShowCashAlert){return;}
 	if(Amt==0){return;}
-	var Elem=$("#CashAlert");
+	var Elem=$("#Cash"+theNumber);
 	var Str="";
 	var Col="";
 	if(Amt<0){
@@ -307,22 +319,22 @@ function VisualCashAlert(){
 		playSound(GameSounds.GainMoney);
 	}
 	Str=Str+Amt.toString().replace("-","");
-	ResetCashDisplayPos();
+	ResetCashDisplayPos(theNumber);
 	Elem.html(Str);
 	Elem.css("color",Col);
 	Elem.css("visibility","visible");
-	Elem.css("transition","top 2.2s ease-in,left 2.2s ease-in,opacity 2s ease-in");
-	Elem.css("top","5%");
-	Elem.css("left","40%");
+	Elem.css("transition","top 1s ease-in,opacity 1s ease-in");
+	Elem.css("top","4%");
 	Elem.css("opacity","0");
-	setTimeout(ResetCashDisplayPos,2200);
+	setTimeout(function(){
+		ResetCashDisplayPos(theNumber);
+	},1000);
 	Ply.LastDisplayedMoney=Ply.Money;
 }
-function ResetCashDisplayPos(){
-	var Elem=$("#CashAlert");
+function ResetCashDisplayPos(num){
+	var Elem=$("#Cash"+num);
 	Elem.css("transition","none");
 	Elem.css("top","9%");
-	Elem.css("left","20%");
 	Elem.css("opacity","1");
 	Elem.css("visibility","hidden");
 }
@@ -352,12 +364,13 @@ function CycleTurn(){
 		$("#CurProdAdvanceButton").prop("disabled",true);
 		$("#CurProdRevertButton").prop("disabled",true);
 		$("#ProductWindow").hide();
-		if(CurrentlySelectedProduct!=null){
-			UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayElemID);
-		}
+		//if(CurrentlySelectedProduct!=null){
+		//	UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayElemID);
+		//}
 		if(WillGo){
 			DisplayNewRoundEvent();
 		}else{
+			CurrentlySelectedProduct=null;
 			playSound(GameSounds.NextTurn);
 			UpdatePlayerDisplay();
 		}
@@ -367,39 +380,42 @@ function CycleTurn(){
 }
 function DisplayNewRoundEvent(){
 	var Num=TheGame.CurrentRound+1;
-	if(Num>TheGame.MaxRounds){
-		FinishGame();
-		return;
-	}
-	var Elem=document.getElementById("MainBoard");
-	Elem.style.transition="left .75s ease-out";
-	Elem.style.left="800px";
-	Elem=document.getElementById("RoundAnnouncer");
-	Elem.innerHTML="ROUND<br>"+Num;
-	Elem.style.transition="top .9s ease-out";
-	Elem.style.top="100px";
-	playSound(GameSounds.NextRound);
-	setTimeout(function(){
+	$('.Standard').attr("disabled", true);
+	if(Num<=TheGame.Settings.NumberOfRounds){
 		var Elem=document.getElementById("MainBoard");
-		Elem.style.transition="none";
-		Elem.style.left="-800px";
+		Elem.style.transition="left .75s ease-out";
+		Elem.style.left="800px";
+		Elem=document.getElementById("RoundAnnouncer");
+		Elem.innerHTML="ROUND<br>"+Num;
+		Elem.style.transition="top .9s ease-out";
+		Elem.style.top="100px";
+		playSound(GameSounds.NextRound);
 		setTimeout(function(){
 			var Elem=document.getElementById("MainBoard");
-			Elem.style.transition="left .65s ease-out";
-			Elem.style.left="0px";
-			Elem=document.getElementById("RoundAnnouncer");
-			Elem.style.transition="top .5s ease-out";
-			Elem.style.top="600px";
+			Elem.style.transition="none";
+			Elem.style.left="-800px";
 			setTimeout(function(){
 				var Elem=document.getElementById("MainBoard");
-				Elem.style.transition="none";
+				Elem.style.transition="left .65s ease-out";
+				Elem.style.left="0px";
 				Elem=document.getElementById("RoundAnnouncer");
-				Elem.style.transition="none";
-				Elem.style.top="-600px";
-				NewRoundCalc();
-			},650);
-		},750);
-	},650);
+				Elem.style.transition="top .5s ease-out";
+				Elem.style.top="600px";
+				setTimeout(function(){
+					var Elem=document.getElementById("MainBoard");
+					Elem.style.transition="none";
+					Elem=document.getElementById("RoundAnnouncer");
+					Elem.style.transition="none";
+					Elem.style.top="-600px";
+					$('.Standard').attr("disabled", false);
+					NewRoundCalc();
+				},650);
+			},750);
+		},650);
+	}
+	else{
+		FinishGame();
+	}
 }
 function NewRoundCalc(){
 	for(var i=0;i<TheGame.Players.length;i++){
@@ -438,7 +454,17 @@ function NewRoundCalc(){
 			for(var j=0;j<Ply.Products.length;j++){
 				var Prod=Ply.Products[j];
 				if(Prod.Phase==ProductPhases.Maintenance){
-					Net=Net+(Prod.IdeaStrength^2)*(Prod.DesignStrength^1.1)*(Prod.BuildStrength^1.1)*4;
+					var earnings = (Prod.IdeaStrength^2)*(Prod.DesignStrength^1.1)*(Prod.BuildStrength^1.1)*4;
+					if (TheGame.PatentTracker){
+						patentOwnerID = doIPayRoyalties(Prod, TheGame.PatentTracker);
+						if (patentOwnerID != -1)
+						{
+							cashOwed = Math.round(earnings/10);
+							earnings -= cashOwed;
+							TheGame.Players[patentOwnerID].Money += cashOwed;
+						}
+					}
+					Net+=earnings;
 				}
 			}
 		}
@@ -449,9 +475,10 @@ function NewRoundCalc(){
 	//document.getElementById("RoundNumberDisplay").innerHTML=TheGame.CurrentRound.toString();
 	//if(Math.random()<EVENT_CHANCE){RandomEvent();}
 	UpdatePlayerDisplay();
-	if(CurrentlySelectedProduct!=null){
-		UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
-	}
+	//if(CurrentlySelectedProduct!=null){
+	//	UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
+	//}
+	CurrentlySelectedProduct=null;
 }
 function Appear(){
 	$("#MainBoard").show();
@@ -522,7 +549,7 @@ function TryToBuyPatent(product, game)
 		if (patentOwner == game.CurrentPlayer.GlobalID)
 			patentMessage = "You've already purchased a patent for this type of product!";
 		else
-			patentMessage = "Player " + (patentOwner+1).toString() + ": " + game.Players[patentOwner].name + " already has the patent for this product category!";
+			patentMessage = "Player " + (patentOwner+1).toString() + ": " + game.Players[patentOwner].Name + " already has the patent for " + product.SubCategory + " products!";
 	}
 	else if (!inPatentableCategory)
 	{
@@ -547,7 +574,7 @@ function TryToBuyPatent(product, game)
 		game.PatentTracker.Records[categoryIndex][2] = product.GlobalID;
 		game.PatentTracker.numPatents++;
 		UpdatePlayerDisplay();
-		UpdateCurProdDisplay(product.GlobalID);
+		UpdateCurProdDisplay(product.DisplayItemID);
 	}
 	
 	//Returns the function completion message.
@@ -569,8 +596,11 @@ function isThisProductPatented(prod, game)
 //It sets the message title, the message, and sometimes a helpful tip depending on the failure.
 function PatentMessageDisplay(theMessage)
 {
+	UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
+	
 	//Sets the main message.
 	$("#PatentText").text(theMessage);
+	var theSound = GameSounds.Event;
 	
 	//Sets the type of message.
 	if (theMessage.indexOf("successfully") > -1){
@@ -578,6 +608,7 @@ function PatentMessageDisplay(theMessage)
 	}
 	else{
 		$("#PatentTitle").text("FAILURE!");
+		theSound = GameSounds.Wrong_BAD;
 	}
 	
 	//Sets and reveals a tip if applicable.
@@ -596,23 +627,29 @@ function PatentMessageDisplay(theMessage)
 	else{
 		$("#PatentTip").hide();
 	}
+	playSound(theSound);
 }
 
 //A function that helps handle the payment of royalties to players who own patents
 //It takes in a product and checks if that type of product has been patented by someone besides the owner of said product
 //It returns -1 if no royalties need to be paid
 
-function payRoyaltiesHelper(product, patentTracker)
+function doIPayRoyalties(product, patentTracker)
 {
 	//Initializes a return value variable and an index variable.
 	var patentOwnerID = -1;
 	var index = patentTracker.Categories.indexOf(product.SubCategory);
 	
 	//If another player owns that patent, set the return value to their ID
-	if (product.Owner.GlobalID == patentTracker.Records[index][1])
+	if (product.Owner.GlobalID != patentTracker.Records[index][1])
 	{
 		patentOwnerID = patentTracker.Records[index][1];
 	}
 	
 	return patentOwnerID;
+}
+
+//This function didn't exist apparently.
+function FinishGame(){
+	SwitchToPage("gameover.html");
 }

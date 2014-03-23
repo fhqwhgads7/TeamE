@@ -213,7 +213,11 @@ function UpdateCurProdDisplay(id){
 					$("#CurProdPatentButton").prop("disabled",false);
 				}
 			}
-		}else{
+			else{
+				$("#CurProdPatentButton").hide();
+			}
+		}
+		else{
 			$("#CurProdAdvanceButton").prop("disabled",true);
 			$("#CurProdRevertButton").prop("disabled",true);
 			$("#CurProdPatentButton").prop("disabled",true);
@@ -364,13 +368,12 @@ function CycleTurn(){
 		$("#CurProdAdvanceButton").prop("disabled",true);
 		$("#CurProdRevertButton").prop("disabled",true);
 		$("#ProductWindow").hide();
-		//if(CurrentlySelectedProduct!=null){
-		//	UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayElemID);
-		//}
+		if(CurrentlySelectedProduct!=null){
+			UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayElemID);
+		}
 		if(WillGo){
 			DisplayNewRoundEvent();
 		}else{
-			CurrentlySelectedProduct=null;
 			playSound(GameSounds.NextTurn);
 			UpdatePlayerDisplay();
 		}
@@ -475,10 +478,9 @@ function NewRoundCalc(){
 	//document.getElementById("RoundNumberDisplay").innerHTML=TheGame.CurrentRound.toString();
 	//if(Math.random()<EVENT_CHANCE){RandomEvent();}
 	UpdatePlayerDisplay();
-	//if(CurrentlySelectedProduct!=null){
-	//	UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
-	//}
-	CurrentlySelectedProduct=null;
+	if(CurrentlySelectedProduct!=null){
+		UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
+	}
 }
 function Appear(){
 	$("#MainBoard").show();

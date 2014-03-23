@@ -1,0 +1,38 @@
+<html>
+<head>
+
+<title>Store game object test</title>
+
+	<script src = "http://code.jquery.com/jquery-2.1.0.min.js"></script>
+
+	<script>
+	
+	var newGame=new Object();
+	
+	
+	function load(){
+	
+		/*var storedValue = localStorage.getItem('text');
+		if(storedValue){
+			document.getElementById('textfield').value = storedValue;
+		}*/
+		
+		if(localStorage.info){
+			console.log(JSON.parse(localStorage.info));
+			newGame = JSON.parse(localStorage.info);
+			alert("Game object was parsed from the local storage");
+		}
+	}
+	
+	</script>
+
+
+</head>
+
+<body onload = "load()">
+Enter some of the properties of the game:
+<br>
+<input type = "button" value="3. Load Game Object from local storage" onclick="load()"/>
+
+</body>
+</html>

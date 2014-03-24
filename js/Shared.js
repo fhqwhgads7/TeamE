@@ -249,6 +249,7 @@ function Game(id){
 	newGame.CurrentPlayer=null;
 	newGame.CurrentPlayerNum=0;
 	newGame.CurrentRound=0;
+	newGame.PatentTracker=null;
 	newGame.Settings={
 		Difficulty:null,
 		CPUIntelligence:null,

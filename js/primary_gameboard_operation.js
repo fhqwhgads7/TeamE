@@ -4,6 +4,8 @@ var Rotation=0;
 var CurrentlySelectedProduct;
 var ShowCashAlert=false;
 var EVENT_CHANCE=0.5;
+var BOARD_WIDTH=800; //used until we can dynamically grab the main background's width
+
 var BaseCosts={
 	HireDev:20,
 	HireQA:15,
@@ -63,10 +65,20 @@ function GameInitialize(){
 	}
 	UpdatePlayerDisplay();
 	PopulateNewProdCategories();
-	//setInterval("TipThink();",10);
+	setInterval("TipThink();",10);
 	setTimeout(DisplayNewRoundEvent,1);
 	$("#MainBoard").hide();
 	setTimeout(Appear,750);
+}
+function TipThink(){
+	var Elem=document.getElementById("TipSpan");
+	var Pos=parseInt(Elem.style.left.replace("px",""),10);
+	var NewPos=Pos-1;
+	if(NewPos<=-Elem.innerHTML.length*15){
+		NewPos=BOARD_WIDTH+1;
+		Elem.innerHTML=Tips[Math.floor((Math.random()*Tips.length))];
+	}
+	Elem.style.left=(NewPos).toString()+"px";
 }
 function TransferGameStartupInfo(from,to){
 	for(var i=1;i<=6;i++){

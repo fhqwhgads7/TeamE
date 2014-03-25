@@ -12,13 +12,13 @@
 		master key: lOqdFFVjQViO7PCp7EtH86i8DXSTrH6SedXny4Rr
 -----------------------------------------------------------------------------*/
 function GlobalInitialize(){
-	Background(new Date().getHours());
+	
 	$("#ContentContainer").children().attr("disabled",true);
 	setTimeout(function(){
 		$("#ContentContainer").children().attr("disabled",false);
 	},250);
 	setTimeout(function(){
-		$("#ContentContainer").css("top","10px");
+		$("#ContentContainer").css("top","0px");
 		$("#ContentContainer").css("opacity","1.0");
 	},1);
 	if (document.URL.indexOf("game_board.html") < 0)
@@ -125,7 +125,7 @@ function playSound(sound){
 	theSound.volume = 0.5;
 	theSound.play();
 }
-function Background(x){
+function getTimeOfDay(x){
 	timeOfDay = "";
     if(x>=5 && x<9)
 	{
@@ -141,6 +141,11 @@ function Background(x){
 	{
         $("#MainBackground").css("background-image", 'url(../images/background_afternoon_1.jpg)');
 		timeOfDay = "Afternoon";
+    }
+    else if(x>=19 && x<22)
+	{
+        $("#MainBackground").css("background-image", 'url(../images/background_evening_1.jpg)');
+		timeOfDay = "Evening";
     }
     else
 	{

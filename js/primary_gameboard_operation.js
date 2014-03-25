@@ -392,6 +392,9 @@ function CycleTurn(){
 	}else{
 		DisplayNewRoundEvent();
 	}
+	setTimeout(function(){
+		TheGame.CurrentPlayer.TurnInit();
+	},1250)
 }
 function DisplayNewRoundEvent(){
 	var Num=TheGame.CurrentRound+1;

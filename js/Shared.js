@@ -257,6 +257,10 @@ function Player(game,name,type,color){
 	newPlayer.toString = function () {
 		return newPlayer.ClassName+" "+newPlayer.GlobalID+": "+newPlayer.Name+", "+newPlayer.Type+", "+newPlayer.Color;
 	}
+	newPlayer.TurnInit=function(){
+		if(newPlayer.Type=="Player"){return;}
+		VirtualIntelligenceThink(newPlayer);
+	}
 	return newPlayer;
 }
 function Game(id){

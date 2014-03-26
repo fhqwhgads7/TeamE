@@ -11,6 +11,14 @@
 		REST API key: C1GSXmeSV6oVWvLjZ3rA1j5Ey4RsmnMHHxlFQTip
 		master key: lOqdFFVjQViO7PCp7EtH86i8DXSTrH6SedXny4Rr
 -----------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------
+	pubnub.COM
+	email: ryan.lane@asu.edu
+	password: Reinforcements1!
+	our data: 
+		subscribe key: sub-c-52dd673e-b2ba-11e3-aab4-02ee2ddab7fe
+		publish key: pub-c-d3ce4b6d-4960-4db3-a8be-29709342456b
+-----------------------------------------------------------------------------*/
 function GlobalInitialize(){
 	
 	$("#ContentContainer").children().attr("disabled",true);

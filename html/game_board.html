@@ -97,6 +97,15 @@
 				$("#DetailsDialog").hide();
 				$("#PopupOverlay").hide();
 			}
+			function ShowRemoveDialog(){
+				$("#RemoveDialog").show();
+				$("#PopupOverlay").show();
+				playSound(GameSounds.Message);
+			}
+			function CloseRemoveDialog(){
+				$("#RemoveDialog").hide();
+				$("#PopupOverlay").hide();
+			}
 			function TryToQuitGame(){
 				$("#PopupOverlay").show();
 				$("#QuitDialog").show();
@@ -361,6 +370,11 @@
 								<div class="StandardText" style="right:6%;top:57%;font-size:15px;text-align:right" id="DetailsPBS">(To be completed)</div>
 								
 							<button class="Standard" style="left:20%;top:80%;width:60%" onclick="CloseDetailsDialog()">OK</button>
+						</div>
+						<div class="Popup" id="RemoveDialog">
+							<div id="RemoveMessage" class="StandardText" style="margin:0px;width:100%;top:10%">Are you sure you want to remove this product from the gameboard?</div>
+							<button class="Standard" style="left:10%;top:75%;width:30%" onclick="CloseRemoveDialog()">Cancel</button>
+							<button class="Standard" style="right:10%;top:75%;width:30%" onclick="removeProduct(CurrentlySelectedProduct); CloseRemoveDialog(); noSound()">Remove</button>
 						</div>
 						<div class="Popup" id="QuitDialog">
 							<div class="StandardText" style="margin:0px;width:100%;top:10%">Are You Sure?</div>

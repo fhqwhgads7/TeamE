@@ -174,6 +174,7 @@ function removeProduct(prod){
 	CurrentlySelectedProduct.Owner.NumProducts--;
 	CurrentlySelectedProduct = null;
 	UpdatePlayerDisplay();
+	playSound(GameSounds.LoseMoney);
 }
 function UpdateProductDisplayPosition(prod){
 	var AlreadyThere=-2;
@@ -328,11 +329,11 @@ function TryToAdvanceProduct(){
 }
 function TryToRevertProduct(){
 	var CurPhase=CurrentlySelectedProduct.Phase;
-	var removed = false;
+	var removeCheck = false;
 	if(CurPhase!=ProductPhases.Idea){playSound(GameSounds.MinorFail);}
 	if(CurPhase==ProductPhases.Idea){
-		removeProduct(CurrentlySelectedProduct);//playSound(GameSounds.Wrong_Low);
-		removed = true;
+		ShowRemoveDialog();//playSound(GameSounds.Wrong_Low);
+		removeCheck = true;
 	}else if(CurPhase==ProductPhases.Design){
 		CurrentlySelectedProduct.Phase=ProductPhases.Idea;
 		CurrentlySelectedProduct.DesignStrength=0;
@@ -354,7 +355,7 @@ function TryToRevertProduct(){
 	}else if(CurPhase==ProductPhases.Maintenance){
 		CurrentlySelectedProduct.Phase=ProductPhases.PostDepTesting;
 	}
-	if (!removed){
+	if (!removeCheck){
 		UpdateProductDisplayPosition(CurrentlySelectedProduct);
 		UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
 		UpdatePlayerDisplay();

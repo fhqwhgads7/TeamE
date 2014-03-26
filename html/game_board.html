@@ -20,7 +20,6 @@
 				GlobalInitialize();
 				GameInitialize();
 				setInterval("RotateThink();",50);
-				pickATip();
 			}
 			function RotateBegin(dir){
 				RotateDir=dir*5;
@@ -44,11 +43,6 @@
 						}
 					}
 				}
-			}
-			function pickATip()
-			{
-				document.getElementById("GameAdvice").innerHTML = 
-				theTips[ Math.floor( Math.random() * theTips.length ) ];
 			}
 			function displayNewProductDialog() {
 				$("#PopupOverlay").show();
@@ -92,6 +86,15 @@
 			}
 			function ClosePatentDialog(){
 				$("#PatentDialog").hide();
+				$("#PopupOverlay").hide();
+			}
+			function ShowProductStats(){
+				$("#DetailsDialog").show();
+				PopulateDetails(CurrentlySelectedProduct.DisplayItemID);
+				$("#PopupOverlay").show();
+			}
+			function CloseDetailsDialog(){
+				$("#DetailsDialog").hide();
 				$("#PopupOverlay").hide();
 			}
 			function TryToQuitGame(){
@@ -193,12 +196,21 @@
 				</marquee>-->
 				
 					<div class="PlayerBox" id="CurPlyBox" style="border-color:grey;width:25%;left:2%;top:4%;">
-						<div class="StandardText" id="CurPlyName" style="font-size:16px;left:10%;top:5%;">nil</div>
-						<div class="StandardText" style="font-size:18px;left:10%;top:35%;color:rgb(160,160,160)">$<span id="CurPlyMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
-						<div class="StandardText" style="font-size:10px;left:12%;top:62%;color:rgb(160,160,160);font-size:10px">Products <span id="CurPlyProds" style="color:white">nil</span></div>
-						<div class="StandardText" style="font-size:10px;left:54%;top:62%;color:rgb(160,160,160);font-size:10px">Developers <span id="CurPlyDevs" style="color:white">nil</span></div>
-						<div class="StandardText" style="font-size:10px;left:12%;top:77%;color:rgb(160,160,160);font-size:10px">Designers <span id="CurPlyDsgns" style="color:white">nil</span></div>
-						<div class="StandardText" style="font-size:10px;left:54%;top:77%;color:rgb(160,160,160);font-size:10px">Testers <span id="CurPlyTsts" style="color:white">nil</span></div>
+						<div class="StandardText" id="CurPlyName" style="font-size:16px;left:8%;top:5%;">nil</div>
+						<div class="StandardText" style="font-size:18px;left:8%;top:35%;color:rgb(160,160,160)">$<span id="CurPlyMoney" style="color:white">nil</span><sup style="font-size:8px">.00</sup></div>
+						
+						<div class="StandardText" style="font-size:10px;left:8%;top:62%;color:rgb(160,160,160);font-size:10px;text-align:left">Products:</div>
+						<div id="CurPlyProds" class="StandardText" style="color:white;font-size:10px;left:42%;top:62%;font-size:10px;text-align:right">nil</div>
+						
+						<div class="StandardText" style="font-size:10px;left:50%;top:62%;color:rgb(160,160,160);font-size:10px;text-align:left">Developers:</div>
+						<div id="CurPlyDevs" class="StandardText" style="color:white;font-size:10px;right:8%;top:62%;font-size:10px;text-align:right">nil</div>
+						
+						<div class="StandardText" style="font-size:10px;left:8%;top:77%;color:rgb(160,160,160);font-size:10px;text-align:left">Designers:</div>
+						<div id="CurPlyDsgns" class="StandardText" style="color:white;font-size:10px;left:42%;top:77%;font-size:10px;text-align:right">nil</div>
+						
+						<div class="StandardText" style="font-size:10px;left:50%;top:77%;color:rgb(160,160,160);font-size:10px;text-align:left">Testers:</div>
+						<div id="CurPlyTsts" class="StandardText" style="color:white;font-size:10px;right:8%;top:77%;font-size:10px;text-align:right">nil</div>
+					
 					</div>
 
 					<div id="GameBoard">
@@ -208,17 +220,23 @@
 						<button class="Standard Compact" id="TurnBoardCWButton" style="top:24%;left:19%;width:2%;height:7%;padding:.2em 1.6em" onmousedown="RotateBegin(1)" onmouseup="RotateEnd()" onmouseout="RotateEnd()" onmouseover="noSound()" onclick="noSound()"><b>></b></button>
 					</div>
 					<div id="ProductWindow" class="PlayerBox" style="overflow:hidden;display:none">
-						<div class="StandardText" style="left:6%;top:4%;color:white;font-size:14px;text-align:center"><span id="ProdDisplayName">nil</span><sup style="font-size:10px;color:rgb(120,120,120)">&reg;</sup></div>
-						<div class="StandardText" style="left:6%;top:16%;font-size:11px;text-align:left"><span style="color:rgb(120,120,120)">By </span><span id="ProdOwnerDisplayName">nil</span><sup style="color:rgb(120,120,120)">&trade;</sup></div>
-						<div class="StandardText" style="left:6%;top:29%;font-size:10px"><span style="color:rgb(120,120,120)">Category </span><span id="DisplayCAT">0</span></div>
-						<div class="StandardText" style="left:6%;top:36%;font-size:8px"><span style="color:rgb(120,120,120)">Subcategory </span><span id="DisplaySUBCAT">0</span></div>
-						<div class="StandardText" style="left:6%;top:41%;font-size:10px"><span style="color:rgb(120,120,120)">Idea Strength </span><span id="DisplayPIS">0</span></div>
-						<div class="StandardText" style="left:6%;top:47%;font-size:10px"><span style="color:rgb(120,120,120)">Design Strength </span><span id="DisplayPDS">0</span></div>
-						<div class="StandardText" style="left:6%;top:53%;font-size:10px"><span style="color:rgb(120,120,120)">Build Strength </span><span id="DisplayPBS">0</span></div>
+						<div class="StandardText" style="margin:0px;width:100%;top:4%;color:white;font-size:14px;"><span id="ProdDisplayName">nil</span><sup style="font-size:10px;color:rgb(120,120,120)">&reg;</sup></div>
+						<div class="StandardText" style="left:7%;top:21%;font-size:11px;text-align:left"><span style="color:rgb(120,120,120)">By </span><span id="ProdOwnerDisplayName">nil</span><sup style="color:rgb(120,120,120)">&trade;</sup></div>
+						
+								<div class="StandardText" style="left:7%;top:32%;font-size:11px;color:rgb(120,120,120)">Category:</div>
+								<div class="StandardText" style="left:21%;top:37%;font-size:11px" id="DisplayCAT">Borked</div>
+								
+								<div class="StandardText" style="left:7%;top:42%;font-size:11px;color:rgb(120,120,120)">Subcategory:</div>
+								<div class="StandardText" style="left:21%;top:47%;font-size:11px" id="DisplaySUBCAT">Borked</div>
+								
+								<div class="StandardText" style="left:7%;top:52%;font-size:11px;color:rgb(120,120,120)">Product Rating:</div>
+								<div class="StandardText" style="left:21%;top:57%;font-size:11px" id="DisplayOVLS">Borked</div>
+						
 						<div class="StandardText" style="text-overflow:hidden;left:6%;top:58%;font-size:8px;visibility:hidden"><span style="color:rgb(120,120,120)">Phase </span><span id="DisplayPPhase">nil</span></div>
 						<div class="StandardText" style="left:6%;top:63%;font-size:10px;visibility:hidden"><span style="color:rgb(120,120,120)">PFID </span><span id="DisplayPFID">0</span></div>
 						<button class="Standard Compact" id="CurProdAdvanceButton" style="top:66%;left:6%;height:15%;width:42%;" onmouseover="noSound()" onclick="TryToAdvanceProduct(); noSound();" disabled>Progress</button>
 						<button class="Standard Compact" id="CurProdRevertButton" style="top:66%;left:52%;height:15%;width:42%;" onmouseover="noSound()" onclick="TryToRevertProduct(); noSound();" disabled>Regress</button>
+						<button class="Standard Compact" id="CurProdDetailsButton" style="top:82%;left:6%;height:15%;width:42%;" onmouseover="noSound()" onclick="ShowProductStats();" disabled>Details</button>
 						<button class="Standard Compact" id="CurProdPatentButton" style="top:82%;left:52%;height:15%;width:42%;" onmouseover="noSound()" onclick="TryToPatentProduct(); noSound();" disabled>Patent</button>
 					</div>
 					<button id="new-product-button" class="Standard Compact" style="top:80%;left:3%;width:10%;height:8%;"onclick="displayNewProductDialog()">New<br>Product</button>
@@ -265,40 +283,52 @@
 						<div class="Popup" id="Scoreboard" style="left:10%;top:10%;width:80%;height:80%">
 							<div class="StandardText" id="ScoreboardTitle" style="left:10%;top:5%;width:80%;height:80%">Scoreboard</div>
 							<div class="PlayerBox" id="PlyOneScbdBox" style="display:none;border-color:red;left:13%;top:19%;">
-								<div class="StandardText" id="PlyOneScbdName" style="left:14%;top:5%;font-size:16px">nil</div>
-								<div class="StandardText" style="left:14%;top:35%;color:rgb(120,120,120);font-size:14px">$<span id="PlyOneScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
-								<div class="StandardText" style="left:14%;top:70%;color:rgb(120,120,120);font-size:10px">Products <span id="PlyOneScbdProds" style="color:white">nil</span></div>
-								<div class="StandardText" style="left:55%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlyOneScbdEmps" style="color:white">nil</span></div>
+								<div class="StandardText" id="PlyOneScbdName" style="margin:0px;width:100%;top:5%;font-size:16px">nil</div>
+								<div class="StandardText" style="left:8%;top:35%;color:rgb(120,120,120);font-size:14px">$<span id="PlyOneScbdMoney" style="color:white">nil</span><sup style="font-size:8px">.00</sup></div>
+								<div class="StandardText" style="font-size:10px;left:8%;top:70%;color:rgb(120,120,120);font-size:10px;text-align:left">Products:</div>
+								<div id="PlyOneScbdProds" class="StandardText" style="color:white;font-size:10px;left:42%;top:70%;font-size:10px;text-align:right">nil</div>
+								<div class="StandardText" style="font-size:10px;left:50%;top:70%;color:rgb(120,120,120);font-size:10px;text-align:left">Employees:</div>
+								<div id="PlyOneScbdEmps" class="StandardText" style="color:white;font-size:10px;right:8%;top:70%;font-size:10px;text-align:right">nil</div>
 							</div>
 							<div class="PlayerBox" id="PlyTwoScbdBox" style="display:none;border-color:red;left:55%;top:19%;">
-								<div class="StandardText" id="PlyTwoScbdName" style="left:14%;top:5%;font-size:16px">nil</div>
-								<div class="StandardText" style="left:14%;top:35%;color:rgb(120,120,120);font-size:14px">$<span id="PlyTwoScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
-								<div class="StandardText" style="left:14%;top:70%;color:rgb(120,120,120);font-size:10px">Products <span id="PlyTwoScbdProds" style="color:white">nil</span></div>
-								<div class="StandardText" style="left:55%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlyTwoScbdEmps" style="color:white">nil</span></div>
+								<div class="StandardText" id="PlyTwoScbdName" style="margin:0px;width:100%;top:5%;font-size:16px">nil</div>
+								<div class="StandardText" style="left:8%;top:35%;color:rgb(120,120,120);font-size:14px">$<span id="PlyTwoScbdMoney" style="color:white">nil</span><sup style="font-size:8px">.00</sup></div>
+								<div class="StandardText" style="font-size:10px;left:8%;top:70%;color:rgb(120,120,120);font-size:10px;text-align:left">Products:</div>
+								<div id="PlyTwoScbdProds" class="StandardText" style="color:white;font-size:10px;left:42%;top:70%;font-size:10px;text-align:right">nil</div>
+								<div class="StandardText" style="font-size:10px;left:50%;top:70%;color:rgb(120,120,120);font-size:10px;text-align:left">Employees:</div>
+								<div id="PlyTwoScbdEmps" class="StandardText" style="color:white;font-size:10px;right:8%;top:70%;font-size:10px;text-align:right">nil</div>
 							</div>
 							<div class="PlayerBox" id="PlyThreeScbdBox" style="display:none;border-color:red;left:13%;top:41%;">
-								<div class="StandardText" id="PlyThreeScbdName" style="left:14%;top:5%;font-size:16px">nil</div>
-								<div class="StandardText" style="left:14%;top:35%;color:rgb(120,120,120);font-size:14px">$<span id="PlyThreeScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
-								<div class="StandardText" style="left:14%;top:70%;color:rgb(120,120,120);font-size:10px">Products <span id="PlyThreeScbdProds" style="color:white">nil</span></div>
-								<div class="StandardText" style="left:55%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlyThreeScbdEmps" style="color:white">nil</span></div>
+								<div class="StandardText" id="PlyThreeScbdName" style="margin:0px;width:100%;top:5%;font-size:16px">nil</div>
+								<div class="StandardText" style="left:8%;top:35%;color:rgb(120,120,120);font-size:14px">$<span id="PlyThreeScbdMoney" style="color:white">nil</span><sup style="font-size:8px">.00</sup></div>
+								<div class="StandardText" style="font-size:10px;left:8%;top:70%;color:rgb(120,120,120);font-size:10px;text-align:left">Products:</div>
+								<div id="PlyThreeScbdProds" class="StandardText" style="color:white;font-size:10px;left:42%;top:70%;font-size:10px;text-align:right">nil</div>
+								<div class="StandardText" style="font-size:10px;left:50%;top:70%;color:rgb(120,120,120);font-size:10px;text-align:left">Employees:</div>
+								<div id="PlyThreeScbdEmps" class="StandardText" style="color:white;font-size:10px;right:8%;top:70%;font-size:10px;text-align:right">nil</div>
 							</div>
-							<div class="PlayerBox" id="PlyFourScbdBox" style="display:none;border-color:red;left:55%;top:41%;">
-								<div class="StandardText" id="PlyFourScbdName" style="left:14%;top:5%;font-size:16px">nil</div>
-								<div class="StandardText" style="left:14%;top:35%;color:rgb(120,120,120);font-size:14px">$<span id="PlyFourScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
-								<div class="StandardText" style="left:14%;top:70%;color:rgb(120,120,120);font-size:10px">Products <span id="PlyFourScbdProds" style="color:white">nil</span></div>
-								<div class="StandardText" style="left:55%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlyFourScbdEmps" style="color:white">nil</span></div>
+							<div class="PlayerBox" id="PlyFourScbdBox" style="display:none;border-color:red;left:55%;top:41%;">	
+								<div class="StandardText" id="PlyFourScbdName" style="margin:0px;width:100%;top:5%;font-size:16px">nil</div>
+								<div class="StandardText" style="left:8%;top:35%;color:rgb(120,120,120);font-size:14px">$<span id="PlyFourScbdMoney" style="color:white">nil</span><sup style="font-size:8px">.00</sup></div>
+								<div class="StandardText" style="font-size:10px;left:8%;top:70%;color:rgb(120,120,120);font-size:10px;text-align:left">Products:</div>
+								<div id="PlyFourScbdProds" class="StandardText" style="color:white;font-size:10px;left:42%;top:70%;font-size:10px;text-align:right">nil</div>
+								<div class="StandardText" style="font-size:10px;left:50%;top:70%;color:rgb(120,120,120);font-size:10px;text-align:left">Employees:</div>
+								<div id="PlyFourScbdEmps" class="StandardText" style="color:white;font-size:10px;right:8%;top:70%;font-size:10px;text-align:right">nil</div>
 							</div>
 							<div class="PlayerBox" id="PlyFiveScbdBox" style="display:none;border-color:red;left:13%;top:63%;">
-								<div class="StandardText" id="PlyFiveScbdName" style="left:14%;top:5%;font-size:16px">nil</div>
-								<div class="StandardText" style="left:14%;top:35%;color:rgb(120,120,120);font-size:14px">$<span id="PlyFiveScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
-								<div class="StandardText" style="left:14%;top:70%;color:rgb(120,120,120);font-size:10px">Products <span id="PlyFiveScbdProds" style="color:white">nil</span></div>
-								<div class="StandardText" style="left:55%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlyFiveScbdEmps" style="color:white">nil</span></div>
+								<div class="StandardText" id="PlyFiveScbdName" style="margin:0px;width:100%;top:5%;font-size:16px">nil</div>
+								<div class="StandardText" style="left:8%;top:35%;color:rgb(120,120,120);font-size:14px">$<span id="PlyFiveScbdMoney" style="color:white">nil</span><sup style="font-size:8px">.00</sup></div>
+								<div class="StandardText" style="font-size:10px;left:8%;top:70%;color:rgb(120,120,120);font-size:10px;text-align:left">Products:</div>
+								<div id="PlyFiveScbdProds" class="StandardText" style="color:white;font-size:10px;left:42%;top:70%;font-size:10px;text-align:right">nil</div>
+								<div class="StandardText" style="font-size:10px;left:50%;top:70%;color:rgb(120,120,120);font-size:10px;text-align:left">Employees:</div>
+								<div id="PlyFiveScbdEmps" class="StandardText" style="color:white;font-size:10px;right:8%;top:70%;font-size:10px;text-align:right">nil</div>
 							</div>
 							<div class="PlayerBox" id="PlySixScbdBox" style="display:none;border-color:red;left:55%;top:63%;">
-								<div class="StandardText" id="PlySixScbdName" style="left:14%;top:5%;font-size:16px">nil</div>
-								<div class="StandardText" style="left:14%;top:35%;color:rgb(120,120,120);font-size:14px">$<span id="PlySixScbdMoney" style="color:white">nil</span><sup style="font-size:10px">.00</sup></div>
-								<div class="StandardText" style="left:14%;top:70%;color:rgb(120,120,120);font-size:10px">Products <span id="PlySixScbdProds" style="color:white">nil</span></div>
-								<div class="StandardText" style="left:55%;top:70%;color:rgb(120,120,120);font-size:10px">Employees <span id="PlySixScbdEmps" style="color:white">nil</span></div>
+								<div class="StandardText" id="PlySixScbdName" style="margin:0px;width:100%;top:5%;font-size:16px">nil</div>
+								<div class="StandardText" style="left:8%;top:35%;color:rgb(120,120,120);font-size:14px">$<span id="PlySixScbdMoney" style="color:white">nil</span><sup style="font-size:8px">.00</sup></div>
+								<div class="StandardText" style="font-size:10px;left:8%;top:70%;color:rgb(120,120,120);font-size:10px;text-align:left">Products:</div>
+								<div id="PlySixScbdProds" class="StandardText" style="color:white;font-size:10px;left:42%;top:70%;font-size:10px;text-align:right">nil</div>
+								<div class="StandardText" style="font-size:10px;left:50%;top:70%;color:rgb(120,120,120);font-size:10px;text-align:left">Employees:</div>
+								<div id="PlySixScbdEmps" class="StandardText" style="color:white;font-size:10px;right:8%;top:70%;font-size:10px;text-align:right">nil</div>	
 							</div>
 							<button class="Standard" id="ScoreboardClose" onclick="HideScoreboard()" style="top:87%;left:10%;width:80%;height:10%">Done</button>
 						</div>
@@ -307,6 +337,30 @@
 							<div class="StandardText" id="PatentText" style="font-size:25px;margin:0px;width:100%;top:28%">Something got borked in your code!</div>
 							<div class="StandardText" id="PatentTip" style="font-size:10px;margin-left:10%;width:80%;top:63%">Have you tried a code review?</div>
 							<button class="Standard" style="left:14%;top:75%;width:72%" onclick="ClosePatentDialog()">Continue</button>
+						</div>
+						<div class="Popup" id="DetailsDialog" style="top:15%;height:70%;width:55%;left:22.5%">
+							<div class="StandardText" id="DetailsTitle" style="font-size:40px;margin:0px;width:100%;top:3%">Product Details</div>
+							<div class="StandardText" style="font-size:25px;margin:0px;width:100%;top:15%"><span style="color:rgb(200,200,200)" id="DetailsProd">nil</span><sup style="font-size:15px;color:rgb(120,120,120)"> &reg;</sup></div>
+							
+								<div class="StandardText" style="left:6%;top:27%;font-size:15px;color:rgb(120,120,120)">Category:</div>
+								<div class="StandardText" style="right:6%;top:27%;font-size:15px;text-align:right" id="DetailsCAT">Borked</div>
+								
+								<div class="StandardText" style="left:6%;top:33%;font-size:15px;color:rgb(120,120,120)">Subcategory:</div>
+								<div class="StandardText" style="right:6%;top:33%;font-size:15px;text-align:right" id="DetailsSUBCAT">Borked</div>
+								
+								<div class="StandardText" style="left:6%;top:39%;font-size:15px;color:rgb(120,120,120)">Idea Strength:</div>
+								<div class="StandardText" style="right:6%;top:39%;font-size:15px;text-align:right" id="DetailsPIS">Borked</div>
+								
+								<div class="StandardText" style="left:6%;top:45%;font-size:15px;color:rgb(120,120,120)">Design Strength:</div>
+								<div class="StandardText" style="right:6%;top:45%;font-size:15px;text-align:right" id="DetailsPDS">Borked</div>
+								
+								<div class="StandardText" style="left:6%;top:51%;font-size:15px;color:rgb(120,120,120)">Build Strength:</div>
+								<div class="StandardText" style="right:6%;top:51%;font-size:15px;text-align:right" id="DetailsPBS">Baked</div>
+								
+								<div class="StandardText" style="left:6%;top:57%;font-size:15px;color:rgb(120,120,120)">Chance of Success:</div>
+								<div class="StandardText" style="right:6%;top:57%;font-size:15px;text-align:right" id="DetailsPBS">(To be completed)</div>
+								
+							<button class="Standard" style="left:20%;top:80%;width:60%" onclick="CloseDetailsDialog()">OK</button>
 						</div>
 						<div class="Popup" id="QuitDialog">
 							<div class="StandardText" style="margin:0px;width:100%;top:10%">Are You Sure?</div>

@@ -202,6 +202,7 @@ function UpdateCurProdDisplay(id){
 		$("#ProductWindow").show();
 		$("#ProductWindow").css("border-color",Prod.Owner.Color);
 		if(Prod.OwnerNumber==TheGame.CurrentPlayerNum){
+			$("#CurProdDetailsButton").prop("disabled",false);
 			var CurPhase=CurrentlySelectedProduct.Phase;
 			if (CurPhase == ProductPhases.Maintenance){
 				$("#CurProdAdvanceButton").prop("disabled",true);
@@ -232,17 +233,44 @@ function UpdateCurProdDisplay(id){
 		else{
 			$("#CurProdAdvanceButton").prop("disabled",true);
 			$("#CurProdRevertButton").prop("disabled",true);
+			$("#CurProdDetailsButton").prop("disabled",true);
 			$("#CurProdPatentButton").prop("disabled",true);
 		}
 		document.getElementById("ProdDisplayName").innerHTML=Prod.Name;
 		document.getElementById("ProdOwnerDisplayName").innerHTML=Prod.Owner.Name;
 		document.getElementById("DisplayCAT").innerHTML=Prod.Category;
 		document.getElementById("DisplaySUBCAT").innerHTML=Prod.SubCategory;
-		document.getElementById("DisplayPIS").innerHTML=Prod.IdeaStrength.toString();
-		document.getElementById("DisplayPDS").innerHTML=Prod.DesignStrength.toString();
-		document.getElementById("DisplayPBS").innerHTML=Prod.BuildStrength.toString();
-		document.getElementById("DisplayPPhase").innerHTML=Prod.Phase;
-		document.getElementById("DisplayPFID").innerHTML=Prod.Number.toString();
+		var productScore = ((Prod.IdeaStrength^2)*(Prod.DesignStrength^1.1)*(Prod.BuildStrength^1.1)*4);
+		var rating = productScore.toString();//"";
+
+		/* A series of statements to later put a product's strength into words.
+		if (productScore >= 8000)
+			rating = "Excellent!";
+		else if (productScore >= 3000)
+			rating = "Exceptional";
+		else if (productScore >= 1000)
+			rating = "Strong";
+		else if (productScore >= 500)
+			rating = "Subpar";
+		else
+			rating = "Developing";
+		*/
+		
+		document.getElementById("DisplayOVLS").innerHTML=rating;
+	}
+}
+function PopulateDetails(id){
+	if(id){
+		var Prod=GetProdFromDispElemID(id);
+		CurrentlySelectedProduct=Prod;
+		$("#DetailsDialog").css("border-color",Prod.Owner.Color);
+		
+		$("#DetailsProd").text(Prod.Name);
+		$("#DetailsCAT").text(Prod.Category);
+		$("#DetailsSUBCAT").text(Prod.SubCategory);
+		$("#DetailsPIS").text(Prod.IdeaStrength.toString());
+		$("#DetailsPDS").text(Prod.DesignStrength.toString());
+		$("#DetailsPBS").text(Prod.BuildStrength.toString());
 	}
 }
 function GetProdFromDispElemID(id){
@@ -683,5 +711,6 @@ function FinishGame(){
 	}
 	
 	localStorage.setItem("FinalResults",JSON.stringify(Plyr));
+	//Maybe a more fancy transition can go in here later.
 	SwitchToPage("gameover.html");
 }

@@ -34,7 +34,6 @@ test("Game options and values properly stored", function(){
 });
 */
 
-
 test("patenting functions work properly", function(){
 	
 	var testGame = new Game("2947");

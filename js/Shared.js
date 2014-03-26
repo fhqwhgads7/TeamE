@@ -214,6 +214,7 @@ function Product(player,name,category,sub,color){
 	newProduct.DesignStrength=0;
 	newProduct.BuildStrength=0;
 	newProduct.Phase="nil";
+	newProduct.justStarted=true;
 	newProduct.isANewProduct=true; //This is for patenting-related reasons.
 	if(player != null){
 		player.Products.push(newProduct);

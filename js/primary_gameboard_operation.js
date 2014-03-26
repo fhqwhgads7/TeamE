@@ -128,6 +128,7 @@ function SelectProductCategory(){
 }
 function createNewProduct(){
 	var nam=$("#NewProdName").val();
+	$("#new-product-button").attr("disabled",true);
 	if (nam){
 		var prod=Product(TheGame.CurrentPlayer,nam,$("#NewProductCategory option:selected").val(),$("#NewProductSubCategory option:selected").val(),TheGame.CurrentPlayer.Color);
 		prod.Phase="Idea";
@@ -162,6 +163,17 @@ function CreateProductDisplay(prod){
 	UpdateProductDisplayPosition(prod);
 	UpdatePlayerDisplay();
 	UpdateCurProdDisplay(ProdElem.id);
+}
+//Takes in the product's GlobalID and removes that product
+function removeProduct(prod){
+	$("#ProductWindow").hide();
+	$("div").remove("#ProductDisplayItem_"+prod.GlobalID);
+	if (prod.justStarted)
+		$("#new-product-button").attr("disabled",false);
+	CurrentlySelectedProduct.Owner.Products.splice(prod.GlobalID, 1);
+	CurrentlySelectedProduct.Owner.NumProducts--;
+	CurrentlySelectedProduct = null;
+	UpdatePlayerDisplay();
 }
 function UpdateProductDisplayPosition(prod){
 	var AlreadyThere=-2;
@@ -211,10 +223,10 @@ function UpdateCurProdDisplay(id){
 				$("#CurProdAdvanceButton").prop("disabled",false);
 			}
 			if (CurPhase == ProductPhases.Idea){
-				$("#CurProdRevertButton").prop("disabled",true);
+				$("#CurProdRevertButton").text("Remove");
 			}
 			else{
-				$("#CurProdRevertButton").prop("disabled",false);
+				$("#CurProdRevertButton").text("Regress");
 			}
 			if (TheGame.PatentTracker){
 				if (isThisCategoryPatented(Prod, TheGame) && isThisProductPatented(Prod, TheGame)){
@@ -316,9 +328,11 @@ function TryToAdvanceProduct(){
 }
 function TryToRevertProduct(){
 	var CurPhase=CurrentlySelectedProduct.Phase;
+	var removed = false;
 	if(CurPhase!=ProductPhases.Idea){playSound(GameSounds.MinorFail);}
 	if(CurPhase==ProductPhases.Idea){
-		playSound(GameSounds.Wrong_Low);
+		removeProduct(CurrentlySelectedProduct);//playSound(GameSounds.Wrong_Low);
+		removed = true;
 	}else if(CurPhase==ProductPhases.Design){
 		CurrentlySelectedProduct.Phase=ProductPhases.Idea;
 		CurrentlySelectedProduct.DesignStrength=0;
@@ -340,9 +354,11 @@ function TryToRevertProduct(){
 	}else if(CurPhase==ProductPhases.Maintenance){
 		CurrentlySelectedProduct.Phase=ProductPhases.PostDepTesting;
 	}
-	UpdateProductDisplayPosition(CurrentlySelectedProduct);
-	UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
-	UpdatePlayerDisplay();
+	if (!removed){
+		UpdateProductDisplayPosition(CurrentlySelectedProduct);
+		UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
+		UpdatePlayerDisplay();
+	}
 }
 function VisualCashAlert(){
 	var Ply=TheGame.CurrentPlayer;
@@ -396,6 +412,7 @@ function PopulateScoreboard(){
 	}
 }
 function CycleTurn(){
+	$("#new-product-button").attr("disabled",false);
 	if(TheGame.NumPlayers>1){
 		var WillGo=false;
 		var NewPlyNum=TheGame.CurrentPlayerNum+1;
@@ -469,6 +486,9 @@ function NewRoundCalc(){
 		if(Ply.NumProducts>0){
 			for(var j=0;j<Ply.Products.length;j++){
 				var Prod=Ply.Products[j];
+				if(Prod.justStarted){
+					Prod.justStarted = false;
+				}
 				if(Prod.Phase==ProductPhases.Idea){
 					Prod.IdeaStrength=Prod.IdeaStrength+1;
 				}else if(Prod.Phase==ProductPhases.Design){

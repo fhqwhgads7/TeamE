@@ -171,7 +171,7 @@ function removeProduct(prod){
 	if (prod.justStarted)
 		$("#new-product-button").attr("disabled",false);
 	CurrentlySelectedProduct.Owner.Products.splice(prod.GlobalID, 1);
-	CurrentlySelectedProduct.Owner.NumProducts--;
+	TheGame.CurrentPlayer.NumProducts--;
 	CurrentlySelectedProduct = null;
 	UpdatePlayerDisplay();
 	playSound(GameSounds.LoseMoney);

@@ -4,14 +4,13 @@
 
 		<script src="../js/jquery.js"></script>
 		<script src="../js/shared.js"></script>
-		<script src="../js/primary_gameboard_operation.js"></script>
 		<script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
 		<script>
 		function Initialize()
 		{
 			GlobalInitialize();
-			PopulateScoreboard();
+			PopulateFinalScores();
 		}
 		
 		function GoToMenu(){
@@ -19,6 +18,25 @@
 		}
 		function GoToNewGame(){
 			SwitchToPage("new_game_options.html");
+		}
+		function PopulateFinalScores(){
+			$(".PlayerBox").hide();
+			var ThePlayers;
+			
+			if(localStorage.getItem("FinalResults")){
+				ThePlayers=JSON.parse(localStorage.getItem("FinalResults"));
+				for(PlyNum in ThePlayers){
+					var Ply=ThePlayers[PlyNum];
+					var Str="";
+					if(PlyNum==0){Str="PlyOne";}else if(PlyNum==1){Str="PlyTwo";}else if(PlyNum==2){Str="PlyThree";}else if(PlyNum==3){Str="PlyFour";}else if(PlyNum==4){Str="PlyFive";}else if(PlyNum==5){Str="PlySix";}
+					$("#"+Str+"ScbdBox").show();
+					$("#"+Str+"ScbdBox").css("border-color",Ply.Color);
+					$("#"+Str+"ScbdName").html(Ply.Name);
+					$("#"+Str+"ScbdMoney").html(Ply.Money);
+					$("#"+Str+"ScbdProds").html(Ply.NumProducts);
+					$("#"+Str+"ScbdEmps").html(Ply.NumEmployees);
+				}
+			}
 		}
 		</script>
 		

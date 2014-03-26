@@ -666,7 +666,22 @@ function doIPayRoyalties(product, patentTracker)
 	return patentOwnerID;
 }
 
-//This function didn't exist apparently.
+//Function that ends the game.
 function FinishGame(){
+	var Plyr = new Object();
+	
+	for(PlyNum in TheGame.Players){
+		var Ply=TheGame.Players[PlyNum];
+					
+		Plyr[PlyNum]=new Object();
+		Plyr[PlyNum].Name=Ply.Name;
+		Plyr[PlyNum].Money=Ply.Money;
+		Plyr[PlyNum].Color=Ply.Color;
+		Plyr[PlyNum].NumProducts=Ply.NumProducts;
+		Plyr[PlyNum].NumEmployees=(Ply.NumQA+Ply.NumDevs+Ply.NumCreative);
+		
+	}
+	
+	localStorage.setItem("FinalResults",JSON.stringify(Plyr));
 	SwitchToPage("gameover.html");
 }

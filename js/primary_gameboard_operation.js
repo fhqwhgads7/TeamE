@@ -71,6 +71,33 @@ var ProductCategories={
 	Houseware:["Cleaning","Furniture","Kitchen","Barbecue"],
 	Other:["School","Shoes","Musical","Key Holder"]
 }
+//The attributes are, in order: Volatility multiplier (Index 0), Prototype Cost multiplier (Index 1), and Idea Strength increase multiplier (Index 2)
+var SubCategoryAttributes={
+	"Hydroelectric":[1,1,1],
+	"Solar":[1,0.8,0.8],
+	"Fossil Fuel":[1.1,0.9,1.1],
+	"Wind":[0.7,0.8,0.6],
+	"Space":[3,2,2],
+	"Air":[2.5,1.5,2],
+	"Land":[1.6,1.5,1.5],
+	"Sea":[1.8,1.7,1.7],
+	"Desktop":[0.5,0.7,0.3],
+	"Laptop":[1,0.5,0.3],
+	"Peripheral":[1.3,0.7,1],
+	"Printer":[0.4,0.8,0.7],
+	"Communication":[0.6,0.4,0.8],
+	"Office Program":[0.3,0.1,0.3],
+	"Video Game":[0.8,0.3,1.2],
+	"Web Application":[0.5,0.2,0.8],
+	"Cleaning":[1.2,0.9,1.3],
+	"Furniture":[0.4,0.7,0.5],
+	"Kitchen":[1.2,0.9,0.3],
+	"Barbecue":[1.1,0.5,0.6],
+	"School":[0.5,0.6,1],
+	"Shoes":[0.3,0.9,0.4],
+	"Musical":[0.2,0.4,0.6],
+	"Key Holder":[0.1,0.2,0.2]
+};
 function GameInitialize(){
 	var GameCreationInfo=JSON.parse(localStorage.getItem("TheBrandNewGame"));
 	TheGame=new Game("2947");
@@ -330,7 +357,7 @@ function TryToAdvanceProduct(){
 	}else if(CurPhase==ProductPhases.Design){
 		CurrentlySelectedProduct.Phase=ProductPhases.Prototype;
 	}else if(CurPhase==ProductPhases.Prototype){
-		TheGame.CurrentPlayer.Money=TheGame.CurrentPlayer.Money-BaseCosts.Prototype;
+		TheGame.CurrentPlayer.Money=TheGame.CurrentPlayer.Money-BaseCosts.Prototype*SubCategoryAttributes[CurrentlySelectedProduct.SubCategory][1];;
 		CurrentlySelectedProduct.Phase=ProductPhases.PrototypeTesting;
 	}else if(CurPhase==ProductPhases.PrototypeTesting){
 		CurrentlySelectedProduct.Phase=ProductPhases.Development;
@@ -540,7 +567,7 @@ function NewRoundCalc(){
 					}
 				}
 				if(Prod.Phase==ProductPhases.Idea){
-					Prod.IdeaStrength=Prod.IdeaStrength+Math.ceil(6.0/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.IdeaStrength=Prod.IdeaStrength+Math.ceil(SubCategoryAttributes[Prod.SubCategory][2]*6.0/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.Design){
 					Prod.DesignStrength=Prod.DesignStrength+Math.ceil(2*Ply.NumCreative/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.Prototype){
@@ -799,7 +826,7 @@ function getMonetaryValue(prod){
 
 //Function that checks if a product "breaks" while in Maintenance mode. Returns an integer indicating how badly it broke.
 function DoesItBreak(prod){
-	return prod.Volatility - Math.random();
+	return (prod.Volatility - Math.random())*SubCategoryAttributes[prod.SubCategory][0];
 }
 
 //Below is the list of functions that run during each player's turn cycle.

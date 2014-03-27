@@ -221,8 +221,14 @@ function Product(player,name,category,sub,color){
 	newProduct.IdeaStrength=0;
 	newProduct.DesignStrength=0;
 	newProduct.BuildStrength=0;
+	newProduct.TestingStrength=0
+	newProduct.Volatility=1; //The chance of the product breaking (1=100%)
 	newProduct.Phase="nil";
+	newProduct.turnsInSamePhase=0;
+	newProduct.PhaseAtStartOfTurn="nil";
 	newProduct.justStarted=true;
+	newProduct.hasPrototype=false;
+	newProduct.readyToDeploy=false;
 	newProduct.isANewProduct=true; //This is for patenting-related reasons.
 	if(player != null){
 		player.Products.push(newProduct);

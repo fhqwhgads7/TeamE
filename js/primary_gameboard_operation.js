@@ -219,7 +219,7 @@ function UpdateCurProdDisplay(id){
 			$("#CurProdDetailsButton").prop("disabled",false);
 			$("#CurProdRevertButton").prop("disabled",false);
 			var CurPhase=CurrentlySelectedProduct.Phase;
-			if (CurPhase == ProductPhases.Maintenance){
+			if ((CurPhase == ProductPhases.Maintenance) || ((CurPhase == ProductPhases.Prototype && !(Prod.hasPrototype))||(CurPhase == ProductPhases.Deployment && !(Prod.readyToDeploy)))){
 				$("#CurProdAdvanceButton").prop("disabled",true);
 			}
 			else{
@@ -286,6 +286,16 @@ function PopulateDetails(id){
 		$("#DetailsPIS").text(Prod.IdeaStrength.toString());
 		$("#DetailsPDS").text(Prod.DesignStrength.toString());
 		$("#DetailsPBS").text(Prod.BuildStrength.toString());
+		$("#DetailsTSS").text(Prod.TestingStrength.toString());
+		$("#DetailsCOS").text(Math.ceil((1-Prod.Volatility)*100).toString()+"%");
+		if (Prod.hasPrototype)
+			$("#DetailsHPT").text("Yes");
+		else
+			$("#DetailsHPT").text("No");
+		if (Prod.readyToDeploy)
+			$("#DetailsDPR").text("Yes");
+		else
+			$("#DetailsDPR").text("No");
 	}
 }
 function GetProdFromDispElemID(id){
@@ -496,28 +506,42 @@ function NewRoundCalc(){
 		if(Ply.NumProducts>0){
 			for(var j=0;j<Ply.Products.length;j++){
 				var Prod=Ply.Products[j];
+				if (Prod.Phase != Prod.PhaseAtStartOfTurn){
+					Prod.turnsInSamePhase=0;
+				}
+				Prod.PhaseAtStartOfTurn = Prod.Phase;
+				Prod.turnsInSamePhase++;
 				if(Prod.justStarted){
 					Prod.justStarted = false;
 				}
+				var numOnSameSpot = 0;
+				for (k = 0; k<Ply.Products.length; k++){
+					if (Prod.Phase == Ply.Products[k].Phase){
+						numOnSameSpot++;
+					}
+				}
 				if(Prod.Phase==ProductPhases.Idea){
-					Prod.IdeaStrength=Prod.IdeaStrength+1;
+					Prod.IdeaStrength=Prod.IdeaStrength+Math.ceil(6.0/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.Design){
-					Prod.DesignStrength=Prod.DesignStrength+Ply.NumCreative;
+					Prod.DesignStrength=Prod.DesignStrength+Math.ceil(2*Ply.NumCreative/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.Prototype){
-					//derp
+					Prod.hasPrototype=true;
 				}else if(Prod.Phase==ProductPhases.PrototypeTesting){
-					Prod.DesignStrength=Prod.DesignStrength+Math.ceil(Ply.NumQA*.6);
+					Prod.DesignStrength=Prod.DesignStrength+Math.ceil(Ply.NumQA*1.2/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.TestingStrength+=(Prod.DesignStrength*Ply.NumQA/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.Development){
-					Prod.BuildStrength=Prod.BuildStrength+Ply.NumDevs;
+					Prod.BuildStrength=Prod.BuildStrength+Math.ceil(2*Ply.NumDevs/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.PreDepTesting){
-					Prod.BuildStrength=Prod.BuildStrength+Math.ceil(Ply.NumQA*.6);
+					Prod.BuildStrength=Prod.BuildStrength+Math.ceil(Ply.NumQA*1.2/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.TestingStrength+=(Prod.BuildStrength*Ply.NumQA/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.Deployment){
-					//derp
+					Prod.readyToDeploy=true;
 				}else if(Prod.Phase==ProductPhases.PostDepTesting){
-					//derp
+					Prod.TestingStrength+=(0.5*(Prod.DesignStrength+Prod.BuildStrength)*Ply.NumQA/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.Maintenance){
 					//derp
 				}
+				Prod.Volatility = (10+2*Prod.TestingStrength)/(10+5*Prod.TestingStrength);
 			}
 		}
 	}

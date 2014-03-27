@@ -43,8 +43,25 @@ var PhasePositions={
 	PostDeploymentTesting:[190,50],
 	Maintenance:[260,260]
 }
+//Format is: Name, Decision AreaOfEffect, Scale, Type, Value
+//Name is a self-explanatory string
+//Decision is a boolean that determines whether the player has to make a choice between two options for that kind of event
+//AreaOfEffect is a string that determines whether to display to all players or one random player
+//Scale is an integer rating between -10 and 10, -10 being the most negative and 10 being the most positive
+//Type is a string that labels what kind of event it is
+//Value is the parameter necessary for that type of event to execute properly
+//Picture is a string for the suffix of the picture file name to be used. Ex. "cash" for event_cash.png Pics themselves should be 250*250 pngs.
 var RandomEvents=[
-	["Tax break!","AllPlayers","CashChange",750]
+	["Tax break!",false,"AllPlayers",2,"CashChange",750,"cash"],
+	["Catastrophe!",true,"OnePlayer",-5,"AssetDestruction",2,"disaster"], //Picks two products, and you either pay to save them or lose them
+	["Stock Market Plummets!",false,"AllPlayers",-3,"PayoutRateChange_All",0.5,"stockcrash"],
+	["Video Game craze!",false,"AllPlayers",3,"PayoutRateChange_Video Game",1.5,"controller"],
+	["Cyber-security Attack!",true,"AllPlayers",-5,"CategoryShutdown_Software",2,"cyberattack"],
+	["All airlines grounded!",false,"AllPlayers",-4,"SubcategoryShutdown_Air",1,"airport"],
+	["Alternative Energy",false,"AllPlayers",1,"PayoutRateChange_Solar",1.1,"solarpanel"],
+	["Recession!",false,"AllPlayers",-9,"PayoutRateChange_All",0.1,"recession"],
+	["Going green!",false,"AllPlayers",-1,"PayoutRateChange_Printer",0.7,"tree"],
+	["Grant!",true,"OnePlayer",10,"CashChange",100000,"cash"]
 ]
 var ProductCategories={
 	Energy:["Hydroelectric","Solar","Fossil Fuel","Wind"],

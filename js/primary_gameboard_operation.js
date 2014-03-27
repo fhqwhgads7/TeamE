@@ -128,13 +128,13 @@ function SelectProductCategory(){
 }
 function createNewProduct(){
 	var nam=$("#NewProdName").val();
-	$("#new-product-button").attr("disabled",true);
 	if (nam){
 		var prod=Product(TheGame.CurrentPlayer,nam,$("#NewProductCategory option:selected").val(),$("#NewProductSubCategory option:selected").val(),TheGame.CurrentPlayer.Color);
 		prod.Phase="Idea";
 		CreateProductDisplay(prod);
 		hideNewProductDialog();
 		playSound(GameSounds.ProductPlacement);
+		$("#new-product-button").attr("disabled",true);
 	}
 	else {
 		$("#NewProdName").css("background-color", "red");
@@ -154,6 +154,7 @@ function CreateProductDisplay(prod){
 	ProdElem.style.backgroundImage="url('../images/ProductIcons/"+prod.Category.toLowerCase()+"_"+prod.SubCategory.toLowerCase()+".png')";
 	ProdElem.style.left="0px";
 	ProdElem.style.top="0px";
+	ProdElem.style.zIndex="2";
 	ProdElem.style.borderStyle="outset";
 	ProdElem.style.borderColor=PlayerColors[prod.Color];
 	ProdElem.style.backgroundColor=prod.Color;
@@ -170,8 +171,8 @@ function removeProduct(prod){
 	$("div").remove("#ProductDisplayItem_"+prod.GlobalID);
 	if (prod.justStarted)
 		$("#new-product-button").attr("disabled",false);
-	CurrentlySelectedProduct.Owner.Products.splice(prod.GlobalID, 1);
-	TheGame.CurrentPlayer.NumProducts--;
+	CurrentlySelectedProduct.Owner.Products.splice(prod.Number, 1);
+	TheGame.Players[TheGame.CurrentPlayerNum].NumProducts--;
 	CurrentlySelectedProduct = null;
 	UpdatePlayerDisplay();
 	playSound(GameSounds.LoseMoney);
@@ -216,6 +217,7 @@ function UpdateCurProdDisplay(id){
 		$("#ProductWindow").css("border-color",Prod.Owner.Color);
 		if(Prod.OwnerNumber==TheGame.CurrentPlayerNum){
 			$("#CurProdDetailsButton").prop("disabled",false);
+			$("#CurProdRevertButton").prop("disabled",false);
 			var CurPhase=CurrentlySelectedProduct.Phase;
 			if (CurPhase == ProductPhases.Maintenance){
 				$("#CurProdAdvanceButton").prop("disabled",true);
@@ -414,6 +416,7 @@ function PopulateScoreboard(){
 }
 function CycleTurn(){
 	$("#new-product-button").attr("disabled",false);
+	$(".ProductDisplayItem").css("z-index",1);
 	if(TheGame.NumPlayers>1){
 		var WillGo=false;
 		var NewPlyNum=TheGame.CurrentPlayerNum+1;
@@ -423,9 +426,12 @@ function CycleTurn(){
 		}
 		TheGame.CurrentPlayerNum=NewPlyNum;
 		TheGame.CurrentPlayer=TheGame.Players[TheGame.CurrentPlayerNum];
+		$('.Standard').attr("disabled", TheGame.CurrentPlayer.Type=="Computer");
+		for (i=0; i<TheGame.CurrentPlayer.Products.length; i++){
+			$("#ProductDisplayItem_" + TheGame.CurrentPlayer.Products[i].GlobalID).css("z-index",2);
+		}
 		$("#CurProdAdvanceButton").prop("disabled",true);
 		$("#CurProdRevertButton").prop("disabled",true);
-		$("#ProductWindow").hide();
 		if(CurrentlySelectedProduct!=null){
 			UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayElemID);
 		}
@@ -433,6 +439,7 @@ function CycleTurn(){
 			DisplayNewRoundEvent();
 		}else{
 			playSound(GameSounds.NextTurn);
+			$("#ProductWindow").hide();
 			UpdatePlayerDisplay();
 		}
 	}else{
@@ -465,6 +472,8 @@ function DisplayNewRoundEvent(){
 				Elem=document.getElementById("RoundAnnouncer");
 				Elem.style.transition="top .5s ease-out";
 				Elem.style.top="600px";
+				$("#ProductWindow").hide();
+				CurrentlySelectedProduct=null;
 				setTimeout(function(){
 					var Elem=document.getElementById("MainBoard");
 					Elem.style.transition="none";

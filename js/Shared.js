@@ -266,6 +266,16 @@ function Player(game,name,type,color){
 	newPlayer.toString = function () {
 		return newPlayer.ClassName+" "+newPlayer.GlobalID+": "+newPlayer.Name+", "+newPlayer.Type+", "+newPlayer.Color;
 	}
+	if(newPlayer.Type=="Computer"){
+		newPlayer.VIMemory=new Object();
+		newPlayer.VIMemory.Products=new Array();
+		newPlayer.VIMemory.Money=2000;
+		newPlayer.VIMemory.Name=name;
+		newPlayer.VIMemory.Color=color;
+		newPlayer.VIMemory.NumDevs=0;
+		newPlayer.VIMemory.NumQA=0;
+		newPlayer.VIMemory.NumCreative=0;
+	}
 	newPlayer.TurnInit=function(){
 		if(newPlayer.Type=="Player"){return;}
 		VirtualIntelligenceThink(newPlayer);

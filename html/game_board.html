@@ -7,6 +7,7 @@
 		-->
 		<script src="../js/jquery.js"></script>
 		<script src="../js/shared.js"></script>
+		<script src="../js/virtual_intelligence.js"></script>
 		<script src="../js/primary_gameboard_operation.js"></script>
 		<script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
@@ -251,7 +252,7 @@
 					<button id="new-product-button" class="Standard Compact" style="top:80%;left:3%;width:10%;height:8%;"onclick="displayNewProductDialog()">New<br>Product</button>
 					<button id="employee_button" class="Standard Compact" style="top:80%;left:13%;width:11%;height:8%;" onclick="displayEmployeeDialog()">Manage<br>Employees</button>
 					<button class="Standard Compact" style="top:88%;left:3%;width:10%;height:8%;" onclick="ShowAllPlayers()">Show Players</button>
-					<button class="Standard Compact" style="top:88%;left:13%;width:11%;height:8%;" onclick="EndCurrentTurn(); noSound()">End Turn</button>
+					<button id="EndTurnBtn" class="Standard Compact" style="top:88%;left:13%;width:11%;height:8%;" onclick="EndCurrentTurn(); noSound()">End Turn</button>
 					
 					<button class="Standard Compact" style="top:90%;left:90%;width:8%;height:5%;" onclick="TryToQuitGame()">Quit</button>
 
@@ -268,7 +269,7 @@
 								<!-- dynamic -->
 							</select>
 							<button class="Standard" style="left:10%;top:75%" onclick="hideNewProductDialog()">Cancel</button>
-							<button class="Standard" style="left:51%;top:75%" onclick="createNewProduct(); noSound()">Create</button>
+							<button id="CreateNewProdConfirm" class="Standard" style="left:51%;top:75%" onclick="createNewProduct(); noSound()">Create</button>
 						</div>
 						<div class="Popup" id="employee-dialog">
 							<div class="StandardText" style="margin:0px;width:100%;top:5%">Manage Employees</div>
@@ -393,6 +394,7 @@
 				</div>
 			</div>
 			<div id="RoundAnnouncer">ROUND<br>1</div>
-		</div>	
+		</div>
+		<div id="ControlLock" style="position:fixed;left:0px;top:0px;width:1000px;height:1000px;display:none"></div>
 	</body>
 </html>

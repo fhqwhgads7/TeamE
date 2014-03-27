@@ -210,6 +210,12 @@ function MakeBGM(){
 			//nowPlaying.pause();
 		});	
 }
+
+//Backgrounds are "Menu", "InGame", "TimeRunningOut", and "GameOver"
+function changeCurrentBGM(theSong){
+	localStorage.setItem("CurrentBGM", theSong);
+}
+
 //-- CLASS DEFINITIONS --//
 function Product(player,name,category,sub,color){
 	var newProduct=new Object();

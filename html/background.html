@@ -9,11 +9,12 @@
 	
 	<script>
 		var currentTime;
+		var currentBGM;
 		
 		function Initialize()
 		{
 			currentTime = getTimeOfDay(new Date().getHours());
-			$("#OverBackground").css('background-image',$("#MainBackground").css('background-image')); 
+			$("#OverBackground").css('background-image',$("#MainBackground").css('background-image'));
 			setInterval(backgroundThink,1000);
 		}
 		function backgroundThink()
@@ -24,9 +25,18 @@
 				currentTime = nextTime;
 			}
 		}
-		function bgmThink()
+		function BGMThink()
 		{
-			var doNothing = 0;
+			var nextBGM = localStorage.getItem("CurrentBGM");
+			if (!nextBGM)
+			{
+				changeCurrentBGM("Menu");
+				currentBGM = localStorage.getItem("CurrentBGM");
+			}
+			else if (currentBGM != nextBGM)
+			{
+				currentBGM = nextBGM;
+			}
 		}
 		function fadeToNextBackground()
 		{

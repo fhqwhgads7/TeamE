@@ -272,8 +272,8 @@ function UpdateCurProdDisplay(id){
 		document.getElementById("ProdOwnerDisplayName").innerHTML=Prod.Owner.Name;
 		document.getElementById("DisplayCAT").innerHTML=Prod.Category;
 		document.getElementById("DisplaySUBCAT").innerHTML=Prod.SubCategory;
-		var productScore = ((Prod.IdeaStrength^2)*(Prod.DesignStrength^1.1)*(Prod.BuildStrength^1.1)*4);
-		var rating = productScore.toString();//"";
+		var productScore = getMonetaryValue(Prod);
+		var rating = productScore.toString();
 
 		/* A series of statements to later put a product's strength into words.
 		if (productScore >= 8000)
@@ -480,6 +480,8 @@ function DisplayNewRoundEvent(){
 	var Num=TheGame.CurrentRound+1;
 	$('.Standard').attr("disabled", true);
 	if(Num<=TheGame.Settings.NumberOfRounds){
+		if (TheGame.Settings.NumberOfRounds-Num <= 5)
+			changeCurrentBGM("TimeRunningOut");
 		var Elem=document.getElementById("MainBoard");
 		Elem.style.transition="left .75s ease-out";
 		Elem.style.left="800px";
@@ -554,11 +556,15 @@ function NewRoundCalc(){
 				}else if(Prod.Phase==ProductPhases.Deployment){
 					Prod.readyToDeploy=true;
 				}else if(Prod.Phase==ProductPhases.PostDepTesting){
-					Prod.TestingStrength+=(0.5*(Prod.DesignStrength+Prod.BuildStrength)*Ply.NumQA/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.TestingStrength+=Math.ceil(0.5*(Prod.DesignStrength+Prod.BuildStrength)*Ply.NumQA/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.Maintenance){
-					//derp
+					var Broken = DoesItBreak(Prod);
+					if (Broken>0){
+						Ply.Money=Ply.Money-Math.ceil(2*Broken*getMonetaryValue(Prod));
+						Prod.TestingStrength+=(Prod.DesignStrength+Prod.BuildStrength);
+					}
 				}
-				Prod.Volatility = (10+2*Prod.TestingStrength)/(10+5*Prod.TestingStrength);
+				Prod.Volatility = 1/(1+.3*Prod.TestingStrength);
 			}
 		}
 	}
@@ -571,7 +577,7 @@ function NewRoundCalc(){
 			for(var j=0;j<Ply.Products.length;j++){
 				var Prod=Ply.Products[j];
 				if(Prod.Phase==ProductPhases.Maintenance){
-					var earnings = (Prod.IdeaStrength^2)*(Prod.DesignStrength^1.1)*(Prod.BuildStrength^1.1)*4;
+					var earnings = getMonetaryValue(Prod);
 					if (TheGame.PatentTracker){
 						patentOwnerID = doIPayRoyalties(Prod, TheGame.PatentTracker);
 						if (patentOwnerID != -1)
@@ -652,7 +658,7 @@ function TryToBuyPatent(product, game)
 	//Patent must be statutory, or the type of product must be able to be patented. Currently, it holds true for all categories.
 	var preMaintenance = product.isANewProduct;
 	//Product can't already be on the market.
-	var wellBuiltEnough = ((product.IdeaStrength^2)*(product.DesignStrength^1.1)*(product.BuildStrength^1.1)*4) >= 1000;
+	var wellBuiltEnough = getMonetaryValue(product) >= 1000;
 	//It has to be a well developed product.
 	var hasTheMoney = (game.CurrentPlayer.Money >= cost);
 	//Player needs the money for the patent.
@@ -785,3 +791,15 @@ function FinishGame(){
 	//Maybe a more fancy transition can go in here later.
 	SwitchToPage("gameover.html");
 }
+
+//Function that determines a product's worth
+function getMonetaryValue(prod){
+	return ((prod.IdeaStrength^2)*(prod.DesignStrength^1.1)*(prod.BuildStrength^1.1)*4);
+}
+
+//Function that checks if a product "breaks" while in Maintenance mode. Returns an integer indicating how badly it broke.
+function DoesItBreak(prod){
+	return prod.Volatility - Math.random();
+}
+
+//Below is the list of functions that run during each player's turn cycle.

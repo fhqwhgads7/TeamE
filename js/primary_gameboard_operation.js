@@ -371,7 +371,7 @@ function PopulateDetails(id){
 		$("#DetailsPDS").text(Prod.DesignStrength.toString());
 		$("#DetailsPBS").text(Prod.BuildStrength.toString());
 		$("#DetailsTSS").text(Prod.TestingStrength.toString());
-		$("#DetailsCOS").text(Math.ceil((1-Prod.Volatility)*100).toString()+"%");
+		$("#DetailsCOS").text((Math.round((1-Prod.Volatility)*100)).toString()+"%");
 		if (Prod.hasPrototype)
 			$("#DetailsHPT").text("Yes");
 		else
@@ -644,7 +644,7 @@ function NewRoundCalc(){
 			for(var j=0;j<Ply.Products.length;j++){
 				var Prod=Ply.Products[j];
 				if(Prod.Phase==ProductPhases.Maintenance && (SubCategoryAttributes[Prod.SubCategory][4] <= 0)){
-					var earnings = getMonetaryValue(Prod)*SubCategoryAttributes[Prod.SubCategory][4]*TotalPayoutRate;
+					var earnings = getMonetaryValue(Prod)*SubCategoryAttributes[Prod.SubCategory][3]*TotalPayoutRate;
 					if (TheGame.PatentTracker){
 						patentOwnerID = doIPayRoyalties(Prod, TheGame.PatentTracker);
 						if (patentOwnerID != -1)
@@ -878,17 +878,19 @@ function RandomEventSelector(){
 		difficultyOffset = 5;
 	else if (TheGame.Settings.Difficulty=="Hard")
 		difficultyOffset = -2
-	else
+	else if (TheGame.Settings.Difficulty=="Lunatic")
 		difficultyOffset = -5;
-	for (j = 0; j < 5*(Math.log(TheGame.CurrentRound+5)/Math.log(10)); j++)
+	for (j = 0; j < (Math.log(TheGame.CurrentRound+5)/Math.log(10)); j++)
+	{
 		var theValue = Math.floor(Math.random()*11-5) + difficultyOffset;
 		for (i=0; i < RandomEvents.length; i++){
-			if (theValue == RandomEvents[i][8])
-				if (RandomEvents[i][8] > 0) {
+			if (theValue == RandomEvents[i][3])
+				if ((RandomEvents[i][7] > 0) && (IterateThroughThese.indexOf(RandomEvents[i]) < 0)) {
 					IterateThroughThese.push(RandomEvents[i]);
-					RandomEvents[i][8]--;
+					RandomEvents[i][7]--;
 				}
 		}
+	}
 	RandomEventsToIterate = IterateThroughThese;
 }
 
@@ -898,18 +900,6 @@ function RandomEventSelector(){
 function RandomEventIterator(){
 	if (RandomEventsToIterate.length > 0)
 	{
-		/*
-		["Tax break!","The IRS is in a good mood!","AllPlayers",2,"CashChange",750,"cash"],
-		["Catastrophe!","A major storm has stricken your area!","OnePlayer",-5,"AssetDestruction",2,"disaster"],
-		["Stock Market Plummets!","People are scared to buy new things!","AllPlayers",-3,"PayoutRateChange_All",0.5,"stockcrash"],
-		["Video Game craze!","A new study was released showing positive effects of gaming!","AllPlayers",3,"PayoutRateChange_Video Game",1.5,"controller"],
-		["Cyber-security Attack!","Could Anonymous be at it again?","AllPlayers",-5,"CategoryShutdown_Software",2,"cyberattack"],
-		["All airlines grounded!","Authorities swear this is just protocol.","AllPlayers",-4,"SubCategoryShutdown_Air",1,"airport"],
-		["Alternative Energy!","Yet another push for alternative energy sources is picking up steam.","AllPlayers",1,"PayoutRateChange_Solar",1.1,"solarpanel"],
-		["Recession!","The economy looks to be in bad shape right now.","AllPlayers",-9,"PayoutRateChange_All",0.1,"recession"],
-		["Going green!","Whether it's for the trees or against these devices...","AllPlayers",-1,"PayoutRateChange_Printer",0.7,"tree"],
-		["Grant!","Someone with high authority seems to like what you are doing.","OnePlayer",10,"CashChange",100000,"cash"]
-		*/
 		playSound(GameSounds.Event);
 		var Event=RandomEventsToIterate[0];
 		var Msg=Event[0];
@@ -940,7 +930,7 @@ function RandomEventIterator(){
 			if (Value < 1)
 				Desc+="Revenue is reduced to " + Math.round(Value*100) + "%";
 			else
-				Desc+="Revenue rises by " + Math.round(Value*100) + "%";
+				Desc+="Revenue is " + Math.round((Value-1.0)*100) + "% more than normal";
 			if (Action.indexOf("_All") > -1) {
 				Desc+=" all around!";
 				TotalPayoutRate = Value;
@@ -1030,3 +1020,6 @@ function DoesItBreak(prod){
 }
 
 //Below is the list of functions that run during each player's turn cycle.
+//Warning for product being in same spot for too long
+//Reduction of employees due to low revenue based on a certain product's spot
+//Product is so horribly broken

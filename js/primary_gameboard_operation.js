@@ -266,18 +266,45 @@ function UpdateProductDisplayPosition(prod){
 	},1);	
 }
 function EmployeeChange(type,num){
-	var ply=TheGame.CurrentPlayer;
-	if(type=="des"){
-		if((ply.NumCreative==0)&&(num<0)){return;}
-		ply.NumCreative=ply.NumCreative+num;
+	
+	var designers = parseInt($("#EmpPopupDes").text());
+	var developers = parseInt($("#EmpPopupDev").text());
+	var testers = parseInt($("#EmpPopupTes").text());
+	
+	if (type=="des"){
+		if (num+designers>=0)
+			$("#EmpPopupDes").text((num+designers).toString());
 	}else if(type=="dev"){
-		if((ply.NumDevs==0)&&(num<0)){return;}
-		ply.NumDevs=ply.NumDevs+num;
+		if (num+developers>=0)
+			$("#EmpPopupDev").text((num+developers).toString());
 	}else if(type=="tes"){
-		if((ply.NumQA==0)&&(num<0)){return;}
-		ply.NumQA=ply.NumQA+num;
+		if (num+testers>=0)
+			$("#EmpPopupTes").text((num+testers).toString());	
 	}
-	UpdateEmpPopupDisplays();
+}
+function InitiateEmpPopupDisplays(){
+	var ply=TheGame.CurrentPlayer;
+	$("#EmpPopupDev").text(ply.NumDevs.toString());
+	$("#EmpPopupDes").text(ply.NumCreative.toString());
+	$("#EmpPopupTes").text(ply.NumQA.toString());
+}
+function HireTheEmployees(){
+	var ply = TheGame.CurrentPlayer;
+	var designers = parseInt($("#EmpPopupDes").text());
+	var developers = parseInt($("#EmpPopupDev").text());
+	var testers = parseInt($("#EmpPopupTes").text());
+	
+	if (designers > ply.NumCreative)
+		ply.Money-=(designers-ply.NumCreative)*BaseCosts.HireCreative;
+	if (developers > ply.NumDevs)
+		ply.Money-=(developers-ply.NumDevs)*BaseCosts.HireDev;
+	if (testers > ply.NumQA)
+		ply.Money-=(testers-ply.NumQA)*BaseCosts.HireQA;
+		
+	ply.NumCreative=designers;
+	ply.NumDevs=developers;
+	ply.NumQA=testers;
+	
 	UpdatePlayerDisplay();
 }
 function UpdateCurProdDisplay(id){

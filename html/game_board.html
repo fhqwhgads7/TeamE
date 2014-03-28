@@ -56,19 +56,14 @@
 				$("#PopupOverlay").hide();
 			}
 			function displayEmployeeDialog() {
-				UpdateEmpPopupDisplays();
+				InitiateEmpPopupDisplays();
 				$("#PopupOverlay").show();
 				$("#employee-dialog").show();
 			}
 			function hideEmployeeDialog() {
 				$("#employee-dialog").hide();
 				$("#PopupOverlay").hide();
-			}
-			function UpdateEmpPopupDisplays(){
-				var ply=TheGame.CurrentPlayer;
-				$("#EmpPopupDev").html(ply.NumDevs.toString());
-				$("#EmpPopupDes").html(ply.NumCreative.toString());
-				$("#EmpPopupTes").html(ply.NumQA.toString());
+				HireTheEmployees();
 			}
 			function ShowAllPlayers(){
 				$("#PopupOverlay").show();

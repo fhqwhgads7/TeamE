@@ -60,7 +60,7 @@ var RandomEvents=[
 	["Catastrophe!","A major storm has stricken your area!","OnePlayer",-5,"AssetDestruction",2,"disaster",2],
 	["Stock Market Plummets!","People are scared to buy new things!","AllPlayers",-3,"PayoutRateChange_All",0.5,"stockcrash",3],
 	["Video Game craze!","A new study was released showing positive effects of gaming!","AllPlayers",3,"PayoutRateChange_Video Game",1.5,"controller",2],
-	["Cyber-security Attack!","Could Anonymous be at it again?","AllPlayers",-5,"CategoryShutdown_Software",2,"cyberattack",5],
+	["Cyber-security Attack!","Could Anonymous be at it again?","AllPlayers",-6,"CategoryShutdown_Software",2,"cyberattack",5],
 	["All airlines grounded!","Authorities swear this is just protocol.","AllPlayers",-4,"SubCategoryShutdown_Air",1,"airport",2],
 	["Alternative Energy!","Yet another push for alternative energy sources is picking up steam.","AllPlayers",1,"PayoutRateChange_Solar",1.1,"solarpanel",4],
 	["Recession!","The economy looks to be in bad shape right now.","AllPlayers",-9,"PayoutRateChange_All",0.1,"recession",1],
@@ -235,7 +235,7 @@ function removeProduct(prod){
 //Takes a series of products and removes them in succession
 function removeMultipleProducts(HitList) {
 	ProductsBeingRemoved=true;
-	if (HitList.length > 0) {
+	if (HitList.length > 1) {
 		removeProduct(HitList[0]);
 		HitList.splice(0,1);
 		(function(){
@@ -967,7 +967,8 @@ function RandomEventIterator(){
 					var numProd = 0;
 					var tries = 0;
 					if (Target[i].Products.length > 0) {
-						for (i = 0; (numProd<Value && numProd<Target.Products.length && (tries<2*Value)); i=(i%(Target.Products.length))+1) {
+						for (i = 0; (numProd<Value && numProd<Target.Products.length && (tries<2*Value)); i++) {
+							i=(i%(Target.Products.length));
 							if (i == 0)
 								tries++;
 							if ((Math.random()*2*tries)>1.5){

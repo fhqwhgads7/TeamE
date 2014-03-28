@@ -644,7 +644,7 @@ function NewRoundCalc(){
 			for(var j=0;j<Ply.Products.length;j++){
 				var Prod=Ply.Products[j];
 				if(Prod.Phase==ProductPhases.Maintenance && (SubCategoryAttributes[Prod.SubCategory][4] <= 0)){
-					var earnings = getMonetaryValue(Prod)*SubCategoryAttributes[Prod.SubCategory][3]*TotalPayoutRate;
+					var earnings = Math.round(getMonetaryValue(Prod)*SubCategoryAttributes[Prod.SubCategory][3]*TotalPayoutRate);
 					if (TheGame.PatentTracker){
 						patentOwnerID = doIPayRoyalties(Prod, TheGame.PatentTracker);
 						if (patentOwnerID != -1)

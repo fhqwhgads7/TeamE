@@ -48,6 +48,7 @@
 			}
 			function displayNewProductDialog() {
 				$("#PopupOverlay").show();
+				$("#NewProdName").val("");
 				$("#new-product-dialog").show();		
 			}
 			function hideNewProductDialog() {
@@ -100,13 +101,24 @@
 				$("#PopupOverlay").hide();
 			}
 			function ShowRemoveDialog(){
-				$("#RemoveDialog").show();
-				$("#PopupOverlay").show();
-				playSound(GameSounds.Message);
+				if (!ProductsBeingRemoved) {
+					$("#RemoveDialog").show();
+					$("#PopupOverlay").show();
+					playSound(GameSounds.Message);
+				}
 			}
 			function CloseRemoveDialog(){
 				$("#RemoveDialog").hide();
 				$("#PopupOverlay").hide();
+			}
+			function ShowEventDialog(){
+				$("#EventDialog").show();
+				$("#PopupOverlay").show();
+			}
+			function CloseEventDialog(){
+				$("#EventDialog").hide();
+				$("#PopupOverlay").hide();
+				RandomEventIterator();
 			}
 			function TryToQuitGame(){
 				$("#PopupOverlay").show();
@@ -240,7 +252,7 @@
 								<div class="StandardText" style="left:7%;top:42%;font-size:11px;color:rgb(120,120,120)">Subcategory:</div>
 								<div class="StandardText" style="left:21%;top:47%;font-size:11px" id="DisplaySUBCAT">Borked</div>
 								
-								<div class="StandardText" style="left:7%;top:52%;font-size:11px;color:rgb(120,120,120)">Product Rating:</div>
+								<div class="StandardText" style="left:7%;top:52%;font-size:11px;color:rgb(120,120,120)">Predicted Revenue:</div>
 								<div class="StandardText" style="left:21%;top:57%;font-size:11px" id="DisplayOVLS">Borked</div>
 						
 						<div class="StandardText" style="text-overflow:hidden;left:6%;top:58%;font-size:8px;visibility:hidden"><span style="color:rgb(120,120,120)">Phase </span><span id="DisplayPPhase">nil</span></div>
@@ -392,6 +404,12 @@
 							<button class="Standard" style="left:14%;top:35%;width:72%" onclick="QuitGame(true)">Save and Quit</button>
 							<button class="Standard" style="left:14%;top:55%;width:72%" onclick="QuitGame(false)">Quit Without Saving</button>
 							<button class="Standard" style="left:14%;top:75%;width:72%" onclick="CloseQuitDialog()">Cancel</button>
+						</div>
+						<div class="Popup" id="EventDialog" style="top:10%;height:80%;width:60%;left:20%">
+							<div class="StandardText" id="EventTitle" style="font-size:35px;margin:0px;width:100%;top:3%;">Code is broken!</div>
+							<div class="StandardText" id="EventDesc" style="font-size:20px;margin:0px;width:100%;top:60%;">Something went wrong probably because of lack of quality code practices!</div>
+							<img id="EventImage" src="../images/events/event_cyberattack.png" style="position:absolute;left:29%;top:15%;width:200px;height:200px"></img>
+							<button class="Standard" onclick="CloseEventDialog()" style="left:20%;top:84%;width:60%">Continue</button>
 						</div>
 					</div>
 					<span id="CashOne" class="CashAlert">0</span>

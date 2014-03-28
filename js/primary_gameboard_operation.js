@@ -5,6 +5,9 @@ var CurrentlySelectedProduct;
 var ShowCashAlert=false;
 var EVENT_CHANCE=0.5;
 var BOARD_WIDTH=800; //used until we can dynamically grab the main background's width
+var TotalPayoutRate=1;
+var ProductsBeingRemoved;
+var RandomEventsToIterate;
 
 var BaseCosts={
 	HireDev:20,
@@ -43,25 +46,26 @@ var PhasePositions={
 	PostDeploymentTesting:[190,50],
 	Maintenance:[260,260]
 }
-//Format is: Name, Decision AreaOfEffect, Scale, Type, Value
+//Format is: Name, Initial Description, AreaOfEffect, Scale, Type, Value, Picture, and MaximumNumOccurrences
 //Name is a self-explanatory string
-//Decision is a boolean that determines whether the player has to make a choice between two options for that kind of event
+//Initial description is what goes at the beginning of the smaller text in the random event modal.
 //AreaOfEffect is a string that determines whether to display to all players or one random player
 //Scale is an integer rating between -10 and 10, -10 being the most negative and 10 being the most positive
 //Type is a string that labels what kind of event it is
 //Value is the parameter necessary for that type of event to execute properly
 //Picture is a string for the suffix of the picture file name to be used. Ex. "cash" for event_cash.png Pics themselves should be 250*250 pngs.
+//MaximumNumOccurrences is the number of times that event can be called per game.
 var RandomEvents=[
-	["Tax break!",false,"AllPlayers",2,"CashChange",750,"cash"],
-	["Catastrophe!",true,"OnePlayer",-5,"AssetDestruction",2,"disaster"], //Picks two products, and you either pay to save them or lose them
-	["Stock Market Plummets!",false,"AllPlayers",-3,"PayoutRateChange_All",0.5,"stockcrash"],
-	["Video Game craze!",false,"AllPlayers",3,"PayoutRateChange_Video Game",1.5,"controller"],
-	["Cyber-security Attack!",true,"AllPlayers",-5,"CategoryShutdown_Software",2,"cyberattack"],
-	["All airlines grounded!",false,"AllPlayers",-4,"SubcategoryShutdown_Air",1,"airport"],
-	["Alternative Energy",false,"AllPlayers",1,"PayoutRateChange_Solar",1.1,"solarpanel"],
-	["Recession!",false,"AllPlayers",-9,"PayoutRateChange_All",0.1,"recession"],
-	["Going green!",false,"AllPlayers",-1,"PayoutRateChange_Printer",0.7,"tree"],
-	["Grant!",true,"OnePlayer",10,"CashChange",100000,"cash"]
+	["Tax break!","The IRS is in a good mood!","AllPlayers",2,"CashChange",750,"cash",3],
+	["Catastrophe!","A major storm has stricken your area!","OnePlayer",-5,"AssetDestruction",2,"disaster",2],
+	["Stock Market Plummets!","People are scared to buy new things!","AllPlayers",-3,"PayoutRateChange_All",0.5,"stockcrash",3],
+	["Video Game craze!","A new study was released showing positive effects of gaming!","AllPlayers",3,"PayoutRateChange_Video Game",1.5,"controller",2],
+	["Cyber-security Attack!","Could Anonymous be at it again?","AllPlayers",-5,"CategoryShutdown_Software",2,"cyberattack",5],
+	["All airlines grounded!","Authorities swear this is just protocol.","AllPlayers",-4,"SubCategoryShutdown_Air",1,"airport",2],
+	["Alternative Energy!","Yet another push for alternative energy sources is picking up steam.","AllPlayers",1,"PayoutRateChange_Solar",1.1,"solarpanel",4],
+	["Recession!","The economy looks to be in bad shape right now.","AllPlayers",-9,"PayoutRateChange_All",0.1,"recession",1],
+	["Going green!","Whether it's for the trees or against these devices...","AllPlayers",-1,"PayoutRateChange_Printer",0.7,"tree",3],
+	["Grant!","Someone with high authority seems to like what you are doing.","OnePlayer",10,"CashChange",100000,"cash",1]
 ]
 var ProductCategories={
 	Energy:["Hydroelectric","Solar","Fossil Fuel","Wind"],
@@ -72,31 +76,32 @@ var ProductCategories={
 	Other:["School","Shoes","Musical","Key Holder"]
 }
 //The attributes are, in order: Volatility multiplier (Index 0), Prototype Cost multiplier (Index 1), and Idea Strength increase multiplier (Index 2)
+//Also include are Payout multipliers (Index 3) and TurnsShutdown (Index 4), for events
 var SubCategoryAttributes={
-	"Hydroelectric":[1,1,1],
-	"Solar":[1,0.8,0.8],
-	"Fossil Fuel":[1.1,0.9,1.1],
-	"Wind":[0.7,0.8,0.6],
-	"Space":[3,2,2],
-	"Air":[2.5,1.5,2],
-	"Land":[1.6,1.5,1.5],
-	"Sea":[1.8,1.7,1.7],
-	"Desktop":[0.5,0.7,0.3],
-	"Laptop":[1,0.5,0.3],
-	"Peripheral":[1.3,0.7,1],
-	"Printer":[0.4,0.8,0.7],
-	"Communication":[0.6,0.4,0.8],
-	"Office Program":[0.3,0.1,0.3],
-	"Video Game":[0.8,0.3,1.2],
-	"Web Application":[0.5,0.2,0.8],
-	"Cleaning":[1.2,0.9,1.3],
-	"Furniture":[0.4,0.7,0.5],
-	"Kitchen":[1.2,0.9,0.3],
-	"Barbecue":[1.1,0.5,0.6],
-	"School":[0.5,0.6,1],
-	"Shoes":[0.3,0.9,0.4],
-	"Musical":[0.2,0.4,0.6],
-	"Key Holder":[0.1,0.2,0.2]
+	"Hydroelectric":[1,1,1,1,0],
+	"Solar":[1,0.8,0.8,1,0],
+	"Fossil Fuel":[1.1,0.9,1.1,1,0],
+	"Wind":[0.7,0.8,0.6,1,0],
+	"Space":[3,2,2,1,0],
+	"Air":[2.5,1.5,2,1,0],
+	"Land":[1.6,1.5,1.5,1,0],
+	"Sea":[1.8,1.7,1.7,1,0],
+	"Desktop":[0.5,0.7,0.3,1,0],
+	"Laptop":[1,0.5,0.3,1,0],
+	"Peripheral":[1.3,0.7,1,1,0],
+	"Printer":[0.4,0.8,0.7,1,0],
+	"Communication":[0.6,0.4,0.8,1,0],
+	"Office Program":[0.3,0.1,0.3,1,0],
+	"Video Game":[0.8,0.3,1.2,1,0],
+	"Web Application":[0.5,0.2,0.8,1,0],
+	"Cleaning":[1.2,0.9,1.3,1,0],
+	"Furniture":[0.4,0.7,0.5,1,0],
+	"Kitchen":[1.2,0.9,0.3,1,0],
+	"Barbecue":[1.1,0.5,0.6,1,0],
+	"School":[0.5,0.6,1,1,0],
+	"Shoes":[0.3,0.9,0.4,1,0],
+	"Musical":[0.2,0.4,0.6,1,0],
+	"Key Holder":[0.1,0.2,0.2,1,0]
 };
 function GameInitialize(){
 	var GameCreationInfo=JSON.parse(localStorage.getItem("TheBrandNewGame"));
@@ -193,7 +198,12 @@ function CreateProductDisplay(prod){
 	var ProdElem=document.createElement("div");
 	ProdElem.id="ProductDisplayItem_"+prod.GlobalID;
 	prod.DisplayItemID=ProdElem.id;
-	ProdElem.addEventListener("click",function(){UpdateCurProdDisplay(ProdElem.id);});
+	ProdElem.addEventListener("click",function(){
+		if (prod!=CurrentlySelectedProduct){
+			playSound(GameSounds.Message);
+		}
+		UpdateCurProdDisplay(ProdElem.id);
+	});
 	ProdElem.className="ProductDisplayItem";
 	ProdElem.style.backgroundImage="url('../images/ProductIcons/"+prod.Category.toLowerCase()+"_"+prod.SubCategory.toLowerCase()+".png')";
 	ProdElem.style.left="0px";
@@ -212,15 +222,32 @@ function CreateProductDisplay(prod){
 //Takes in the product's GlobalID and removes that product
 function removeProduct(prod){
 	$("#ProductWindow").hide();
+	if (prod == CurrentlySelectedProduct)
+		CurrentlySelectedProduct = null;
 	$("div").remove("#ProductDisplayItem_"+prod.GlobalID);
 	if (prod.justStarted)
 		$("#new-product-button").attr("disabled",false);
-	CurrentlySelectedProduct.Owner.Products.splice(prod.Number, 1);
+	prod.Owner.Products.splice(prod.Number, 1);
 	TheGame.Players[TheGame.CurrentPlayerNum].NumProducts--;
-	CurrentlySelectedProduct = null;
 	UpdatePlayerDisplay();
 	playSound(GameSounds.LoseMoney);
 }
+//Takes a series of products and removes them in succession
+function removeMultipleProducts(HitList) {
+	ProductsBeingRemoved=true;
+	if (HitList.length > 0) {
+		removeProduct(HitList[0]);
+		HitList.splice(0,1);
+		(function(){
+			removeMultipleProducts(HitList);
+		}, 400);
+	}
+	else {
+		removeProduct(HitList[0]);
+		ProductsBeingRemoved=false;
+	}
+}
+
 function UpdateProductDisplayPosition(prod){
 	var AlreadyThere=-2;
 	for(Biz in TheGame.Players){
@@ -301,21 +328,7 @@ function UpdateCurProdDisplay(id){
 		document.getElementById("DisplaySUBCAT").innerHTML=Prod.SubCategory;
 		var productScore = getMonetaryValue(Prod);
 		var rating = productScore.toString();
-
-		/* A series of statements to later put a product's strength into words.
-		if (productScore >= 8000)
-			rating = "Excellent!";
-		else if (productScore >= 3000)
-			rating = "Exceptional";
-		else if (productScore >= 1000)
-			rating = "Strong";
-		else if (productScore >= 500)
-			rating = "Subpar";
-		else
-			rating = "Developing";
-		*/
-		
-		document.getElementById("DisplayOVLS").innerHTML=rating;
+		document.getElementById("DisplayOVLS").innerHTML="$"+rating.toString();
 	}
 }
 function PopulateDetails(id){
@@ -388,7 +401,7 @@ function TryToRevertProduct(){
 	var removeCheck = false;
 	if(CurPhase!=ProductPhases.Idea){playSound(GameSounds.MinorFail);}
 	if(CurPhase==ProductPhases.Idea){
-		ShowRemoveDialog();//playSound(GameSounds.Wrong_Low);
+		ShowRemoveDialog();
 		removeCheck = true;
 	}else if(CurPhase==ProductPhases.Design){
 		CurrentlySelectedProduct.Phase=ProductPhases.Idea;
@@ -591,7 +604,7 @@ function NewRoundCalc(){
 						Prod.TestingStrength+=(Prod.DesignStrength+Prod.BuildStrength);
 					}
 				}
-				Prod.Volatility = 1/(1+.3*Prod.TestingStrength);
+				Prod.Volatility = 1/(1+.1*Prod.TestingStrength);
 			}
 		}
 	}
@@ -603,8 +616,8 @@ function NewRoundCalc(){
 		}else{
 			for(var j=0;j<Ply.Products.length;j++){
 				var Prod=Ply.Products[j];
-				if(Prod.Phase==ProductPhases.Maintenance){
-					var earnings = getMonetaryValue(Prod);
+				if(Prod.Phase==ProductPhases.Maintenance && (SubCategoryAttributes[Prod.SubCategory][4] <= 0)){
+					var earnings = getMonetaryValue(Prod)*SubCategoryAttributes[Prod.SubCategory][4]*TotalPayoutRate;
 					if (TheGame.PatentTracker){
 						patentOwnerID = doIPayRoyalties(Prod, TheGame.PatentTracker);
 						if (patentOwnerID != -1)
@@ -621,12 +634,24 @@ function NewRoundCalc(){
 		Net=Net-((BaseCosts.PayDev*Ply.NumDevs)+(BaseCosts.PayQA*Ply.NumQA)+(BaseCosts.PayCreative*Ply.NumCreative));
 		Ply.Money=Ply.Money+Net;
 	}
+	DecrementCategoryChanges();
 	TheGame.CurrentRound=TheGame.CurrentRound+1;
 	//document.getElementById("RoundNumberDisplay").innerHTML=TheGame.CurrentRound.toString();
-	//if(Math.random()<EVENT_CHANCE){RandomEvent();}
+	RandomEventSelector();
+	RandomEventIterator();
 	UpdatePlayerDisplay();
 	if(CurrentlySelectedProduct!=null){
 		UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
+	}
+}
+function DecrementCategoryChanges(){
+	for (i = 0; i < SubCategoryAttributes.length; i++){
+		if (SubCategoryAttributes[3] == 0)
+			SubCategoryAttributes[3] = 0.1;
+		else
+			SubCategoryAttributes[3] -= 0.1*((SubCategoryAttributes[3]-1.0)/Math.abs(SubCategoryAttributes[3]-1.0));
+		if (SubCategoryAttributes[4] > 0)
+			SubCategoryAttributes[4]--;
 	}
 }
 function Appear(){
@@ -819,9 +844,157 @@ function FinishGame(){
 	SwitchToPage("gameover.html");
 }
 
+function RandomEventSelector(){
+	var IterateThroughThese = new Array();
+	var difficultyOffset = 2;
+	if (TheGame.Settings.Difficulty=="Easy")
+		difficultyOffset = 5;
+	else if (TheGame.Settings.Difficulty=="Hard")
+		difficultyOffset = -2
+	else
+		difficultyOffset = -5;
+	for (j = 0; j < 5*(Math.log(TheGame.CurrentRound+5)/Math.log(10)); j++)
+		var theValue = Math.floor(Math.random()*11-5) + difficultyOffset;
+		for (i=0; i < RandomEvents.length; i++){
+			if (theValue == RandomEvents[i][8])
+				if (RandomEvents[i][8] > 0) {
+					IterateThroughThese.push(RandomEvents[i]);
+					RandomEvents[i][8]--;
+				}
+		}
+	RandomEventsToIterate = IterateThroughThese;
+}
+
+//This function will iterate through each random event pulled by the game.
+//It will be called recursively.
+
+function RandomEventIterator(){
+	if (RandomEventsToIterate.length > 0)
+	{
+		/*
+		["Tax break!","The IRS is in a good mood!","AllPlayers",2,"CashChange",750,"cash"],
+		["Catastrophe!","A major storm has stricken your area!","OnePlayer",-5,"AssetDestruction",2,"disaster"],
+		["Stock Market Plummets!","People are scared to buy new things!","AllPlayers",-3,"PayoutRateChange_All",0.5,"stockcrash"],
+		["Video Game craze!","A new study was released showing positive effects of gaming!","AllPlayers",3,"PayoutRateChange_Video Game",1.5,"controller"],
+		["Cyber-security Attack!","Could Anonymous be at it again?","AllPlayers",-5,"CategoryShutdown_Software",2,"cyberattack"],
+		["All airlines grounded!","Authorities swear this is just protocol.","AllPlayers",-4,"SubCategoryShutdown_Air",1,"airport"],
+		["Alternative Energy!","Yet another push for alternative energy sources is picking up steam.","AllPlayers",1,"PayoutRateChange_Solar",1.1,"solarpanel"],
+		["Recession!","The economy looks to be in bad shape right now.","AllPlayers",-9,"PayoutRateChange_All",0.1,"recession"],
+		["Going green!","Whether it's for the trees or against these devices...","AllPlayers",-1,"PayoutRateChange_Printer",0.7,"tree"],
+		["Grant!","Someone with high authority seems to like what you are doing.","OnePlayer",10,"CashChange",100000,"cash"]
+		*/
+		playSound(GameSounds.Event);
+		var Event=RandomEventsToIterate[0];
+		var Msg=Event[0];
+		var Desc=Event[1]+" ";
+		var AreaOfEffect=Event[2];
+		var Action=Event[4];
+		var Value=Event[5];
+		var Target;
+		
+		if (AreaOfEffect="OnePlayer")
+			Target=TheGame.Players[Math.floor(Math.random()*TheGame.Players.length)];
+		else
+			Target=TheGame.Players;
+		
+		if (Action=="CashChange") {
+			if (Array.isArray(Target)) {
+				Desc+="All players receive $" + Value.toString() + "!";
+				for (i = 0; i < Target.length; i++) {
+					Target[i].Money+=Value;
+				}
+			}
+			else{
+				Desc+="Player " + (Target.Name) + " receives $" + Value.toString() + "!";
+				Target.Money+=Value;
+			}
+		}
+		else if (Action.indexOf("PayoutRateChange") > -1) {
+			if (Value < 1)
+				Desc+="Revenue is reduced to " + Math.round(Value*100) + "%";
+			else
+				Desc+="Revenue rises by " + Math.round(Value*100) + "%";
+			if (Action.indexOf("_All") > -1) {
+				Desc+=" all around!";
+				TotalPayoutRate = Value;
+			}
+			else {
+				var effectedSubCat = Action.substring(17,Action.length);
+				SubCategoryAttributes[effectedSubCat][3] = Value;
+				Desc+=" for all " + effectedSubCat + " products!";
+			}
+		}
+		else if (Action.indexOf("CategoryShutdown") > -1) {
+			Desc+="All ";
+			if (Action.indexOf("SubCategoryShutdown") > -1){
+				var effectedSubCat = Action.substring(20,Action.length);
+				SubCategoryAttributes[effectedSubCat][4] = Value;
+				Desc+=effectedSubCat + " products stop generating revenue for the next ";
+			}
+			else {
+				var effectedCat = Action.substring(17,Action.length);
+				for (i = 0; i < ProductCategories[effectedCat].length; i++){
+					SubCategoryAttributes[ProductCategories[effectedCat][i]][4] = Value;
+				}
+				Desc+=effectedCat + " products stop generating revenue for the next ";
+			}
+			if (Value > 1)
+				Desc+=Value.toString() + " turns!";
+			else
+				Desc+=" turn!"
+		}
+		else if (Action == "AssetDestruction") {
+			var toBeRemoved = new Array();
+			if (Array.isArray(Target)) {
+				for (i = 0; i < Target.length; i++) {
+					var numProd = 0;
+					var tries = 0;
+					if (Target[i].Products.length > 0) {
+						for (i = 0; (numProd<Value && numProd<Target.Products.length && (tries<2*Value)); i=(i%(Target.Products.length))+1) {
+							if (i == 0)
+								tries++;
+							if ((Math.random()*2*tries)>1.5){
+								numProd++;
+								toBeRemoved.push(Target.Products[i]);
+							}
+						}
+					}
+				}
+				Desc+="All players have lost up to " + Value.toString() + " products!";
+			}
+			else {
+				var numProd = 0;
+				var tries = 0;
+				if (Target.Products.length > 0) {
+					for (i = 0; (numProd<Value && numProd<Target.Products.length && (tries<2*Value)); i=(i%(Target.Products.length))+1) {
+						if (i == 0)
+							tries++;
+						if ((Math.random()*2*tries)>1.5){
+							numProd++;
+							toBeRemoved.push(Target.Products[i]);
+						}
+					}
+				}
+				if (numProd > 0)
+					Desc+="Player " + Target.Name + " has lost " + numProd.toString() + " products!";
+				else
+					Desc+="Player " + Target.Name + " luckily did not lose anything!"
+			}
+			if (toBeRemoved.length > 0)
+				removeMultipleProducts(toBeRemoved);
+		}
+		$("#EventTitle").text(Msg);
+		$("#EventDesc").text(Desc);
+		$("#EventImage").attr('src',"../images/events/event_" + Event[6] + ".png");
+		ShowEventDialog();
+		RandomEventsToIterate.splice(0,1);
+		UpdatePlayerDisplay()
+	}
+}
+
 //Function that determines a product's worth
 function getMonetaryValue(prod){
-	return ((prod.IdeaStrength^2)*(prod.DesignStrength^1.1)*(prod.BuildStrength^1.1)*4);
+	return Math.ceil(Math.pow(prod.IdeaStrength,2)*Math.pow(prod.DesignStrength,1.1)*Math.pow(prod.BuildStrength,1.1));
 }
 
 //Function that checks if a product "breaks" while in Maintenance mode. Returns an integer indicating how badly it broke.

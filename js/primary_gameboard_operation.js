@@ -137,7 +137,7 @@ function TransferGameStartupInfo(from,to){
 		}
 	}
 	to.Settings={}
-	to.Settings.Difficulty=from.Options.Difficulty;
+	to.Settings.Difficulty=from.Options.GameDifficulty;
 	to.Settings.CPUIntelligence=from.Options.CPUIntelligence;
 	to.Settings.PatentingEnabled=from.Options.PatentingEnabled;
 	to.Settings.NumberOfRounds=from.Options.NumberOfRounds;
@@ -874,11 +874,11 @@ function FinishGame(){
 function RandomEventSelector(){
 	var IterateThroughThese = new Array();
 	var difficultyOffset = 2;
-	if (TheGame.Settings.Difficulty=="Easy")
+	if (TheGame.Settings.Difficulty=="EASY")
 		difficultyOffset = 5;
-	else if (TheGame.Settings.Difficulty=="Hard")
+	else if (TheGame.Settings.Difficulty=="HARD")
 		difficultyOffset = -2
-	else if (TheGame.Settings.Difficulty=="Lunatic")
+	else if (TheGame.Settings.Difficulty=="LUNATIC")
 		difficultyOffset = -5;
 	for (j = 0; j < (Math.log(TheGame.CurrentRound+5)/Math.log(10)); j++)
 	{

@@ -21,8 +21,7 @@ var BaseCosts={
 	Deployment:370
 }
 var BasePayouts={
-	DayJobEachTurn:30,
-	TaxBreak:1000
+	DayJobEachTurn:30
 }
 var ProductPhases={
 	Idea:"Idea",
@@ -189,7 +188,7 @@ function createNewProduct(){
 		$("#NewProdName").css("background-color", "red");
 		setTimeout(function(){
 			$("#NewProdName").css("background-color", "white");
-		},100);
+		},200);
 		playSound(GameSounds.Wrong_Med);
 	}
 }
@@ -219,18 +218,22 @@ function CreateProductDisplay(prod){
 	UpdatePlayerDisplay();
 	UpdateCurProdDisplay(ProdElem.id);
 }
-//Takes in the product's GlobalID and removes that product
+//Removes the product passed through the parameter
 function removeProduct(prod){
-	$("#ProductWindow").hide();
-	if (prod == CurrentlySelectedProduct)
-		CurrentlySelectedProduct = null;
-	$("div").remove("#ProductDisplayItem_"+prod.GlobalID);
-	if (prod.justStarted)
-		$("#new-product-button").attr("disabled",false);
-	prod.Owner.Products.splice(prod.Number, 1);
-	TheGame.Players[TheGame.CurrentPlayerNum].NumProducts--;
-	UpdatePlayerDisplay();
-	playSound(GameSounds.LoseMoney);
+	if (prod) {
+		$("#ProductWindow").hide();
+		if (isThisProductPatented(prod, TheGame)
+			removePatentFromRecords(prod, TheGame);
+		if (prod == CurrentlySelectedProduct)
+			CurrentlySelectedProduct = null;
+		$("div").remove("#ProductDisplayItem_"+prod.GlobalID);
+		if (prod.justStarted)
+			$("#new-product-button").attr("disabled",false);
+		prod.Owner.Products.splice(prod.Number, 1);
+		TheGame.Players[TheGame.CurrentPlayerNum].NumProducts--;
+		UpdatePlayerDisplay();
+		playSound(GameSounds.LoseMoney);
+	}
 }
 //Takes a series of products and removes them in succession
 function removeMultipleProducts(HitList) {
@@ -521,9 +524,6 @@ function CycleTurn(){
 		TheGame.CurrentPlayerNum=NewPlyNum;
 		TheGame.CurrentPlayer=TheGame.Players[TheGame.CurrentPlayerNum];
 		$('.Standard').attr("disabled", TheGame.CurrentPlayer.Type=="Computer");
-		for (i=0; i<TheGame.CurrentPlayer.Products.length; i++){
-			$("#ProductDisplayItem_" + TheGame.CurrentPlayer.Products[i].GlobalID).css("z-index",2);
-		}
 		$("#CurProdAdvanceButton").prop("disabled",true);
 		$("#CurProdRevertButton").prop("disabled",true);
 		if(CurrentlySelectedProduct!=null){
@@ -532,6 +532,10 @@ function CycleTurn(){
 		if(WillGo){
 			DisplayNewRoundEvent();
 		}else{
+			TriggeredEventIterator(TheGame.CurrentPlayer.TriggeredEvents);
+			for (i=0; i<TheGame.CurrentPlayer.Products.length; i++){
+				$("#ProductDisplayItem_" + TheGame.CurrentPlayer.Products[i].GlobalID).css("z-index",2);
+			}
 			playSound(GameSounds.NextTurn);
 			$("#ProductWindow").hide();
 			UpdatePlayerDisplay();
@@ -568,6 +572,9 @@ function DisplayNewRoundEvent(){
 				Elem=document.getElementById("RoundAnnouncer");
 				Elem.style.transition="top .5s ease-out";
 				Elem.style.top="600px";
+				for (i=0; i<TheGame.CurrentPlayer.Products.length; i++){
+					$("#ProductDisplayItem_" + TheGame.CurrentPlayer.Products[i].GlobalID).css("z-index",2);
+				}
 				$("#ProductWindow").hide();
 				CurrentlySelectedProduct=null;
 				setTimeout(function(){
@@ -608,26 +615,34 @@ function NewRoundCalc(){
 				}
 				if(Prod.Phase==ProductPhases.Idea){
 					Prod.IdeaStrength=Prod.IdeaStrength+Math.ceil(SubCategoryAttributes[Prod.SubCategory][2]*6.0/(numOnSameSpot+Prod.turnsInSamePhase));
+					MoveItSoon(Ply, Prod);
 				}else if(Prod.Phase==ProductPhases.Design){
+					EmployeeReductionCheck("des", Ply, Prod);
 					Prod.DesignStrength=Prod.DesignStrength+Math.ceil(2*Ply.NumCreative/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.Prototype){
 					Prod.hasPrototype=true;
 				}else if(Prod.Phase==ProductPhases.PrototypeTesting){
+					EmployeeReductionCheck("tes", Ply, Prod);
 					Prod.DesignStrength=Prod.DesignStrength+Math.ceil(Ply.NumQA*1.2/(numOnSameSpot+Prod.turnsInSamePhase));
 					Prod.TestingStrength+=(Prod.DesignStrength*Ply.NumQA/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.Development){
+					EmployeeReductionCheck("dev", Ply, Prod);
 					Prod.BuildStrength=Prod.BuildStrength+Math.ceil(2*Ply.NumDevs/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.PreDepTesting){
+					EmployeeReductionCheck("tes", Ply, Prod);
 					Prod.BuildStrength=Prod.BuildStrength+Math.ceil(Ply.NumQA*1.2/(numOnSameSpot+Prod.turnsInSamePhase));
 					Prod.TestingStrength+=(Prod.BuildStrength*Ply.NumQA/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.Deployment){
 					Prod.readyToDeploy=true;
 				}else if(Prod.Phase==ProductPhases.PostDepTesting){
+					EmployeeReductionCheck("tes", Ply, Prod);
 					Prod.TestingStrength+=Math.ceil(0.5*(Prod.DesignStrength+Prod.BuildStrength)*Ply.NumQA/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.Maintenance){
 					var Broken = DoesItBreak(Prod);
 					if (Broken>0){
-						Ply.Money=Ply.Money-Math.ceil(2*Broken*getMonetaryValue(Prod));
+						var Damages = Math.ceil((BaseCosts.PostDepBugCost)+getMonetaryValue(Prod)*Broken);
+						Ply.Money=Ply.Money-Damages;
+						IsItSoBadItGetsRemoved(Ply, Prod, Damages);
 						Prod.TestingStrength+=(Prod.DesignStrength+Prod.BuildStrength);
 					}
 				}
@@ -639,7 +654,7 @@ function NewRoundCalc(){
 		var Ply=TheGame.Players[i];
 		var Net=0;
 		if(Ply.NumProducts<1){
-			Net=BasePayouts.DayJobEachTurn;
+			Net=BasePayouts.DayJobEachTurn*TotalPayoutRate;
 		}else{
 			for(var j=0;j<Ply.Products.length;j++){
 				var Prod=Ply.Products[j];
@@ -791,6 +806,12 @@ function isThisCategoryPatented(prod, game)
 function isThisProductPatented(prod, game)
 {
 	return game.PatentTracker.Records[(game.PatentTracker.Categories.indexOf(prod.SubCategory))][2] == prod.GlobalID;
+}
+//A function that removes a patent of a product category
+function removePatentFromRecords(product, game){
+	var categoryIndex = game.PatentTracker.Categories.indexOf(product.SubCategory);
+	game.PatentTracker.Records[categoryIndex][1] = null;
+	game.PatentTracker.Records[categoryIndex][2] = null;
 }
 
 //A function to help with message displaying regarding patents.
@@ -1007,8 +1028,10 @@ function RandomEventIterator(){
 		$("#EventImage").attr('src',"../images/events/event_" + Event[6] + ".png");
 		ShowEventDialog();
 		RandomEventsToIterate.splice(0,1);
-		UpdatePlayerDisplay()
+		UpdatePlayerDisplay();
 	}
+	else
+		TriggeredEventIterator(TheGame.CurrentPlayer.TriggeredEvents);
 }
 
 //Function that determines a product's worth
@@ -1023,6 +1046,69 @@ function DoesItBreak(prod){
 
 //Below is the list of functions that run during each player's turn cycle.
 //Warning for product being in same spot for too long
-//Reduction of employees due to low revenue based on a certain product's spot
+function MoveItSoon(Ply, prod){
+	if (prod.turnsInSamePhase >= 4){
+		Ply.TriggeredEvents.push(function(){
+			TriggeredEventDisplay("Your product " + prod.Name + " has been in the " + prod.Phase + " phase for a while. Consider moving it along.", GameSounds.Message, "longtime");
+		});
+	}
+}
+//Reduction of employees due to spending a LONG time on a product
+function EmployeeReductionCheck(employeeType, Ply, prod){
+	var numLost;
+	var messagePart;
+	if (prod.turnsInSamePhase >= 7){
+		numLost=Math.ceil(Math.random()*3);
+		if (employeeType=="des"){
+			if (numLost > Ply.NumCreative)
+				numLost = Ply.NumCreative;
+			Ply.NumCreative-=numLost;
+			messagePart = numLost.toString() + " of your designers just quit!";
+		}
+		else if (employeeType=="dev"){
+			if (numLost > Ply.NumDev)
+				numLost = Ply.NumDev;
+			Ply.NumDev-=numLost;
+			messagePart = numLost.toString() + " of your developers just quit!";
+		}
+		else if (employeeType=="tes"){
+			if (numLost > Ply.NumQA)
+				numLost = Ply.NumQA;
+			Ply.NumQA-=numLost;
+			messagePart = numLost.toString() + " of your testers just quit!";
+		}
+		if (numLost > 0)
+			Ply.TriggeredEvents.push(function(){
+				TriggeredEventDisplay("Your " + prod.Name + " has been in the same phase for too long! " + messagePart, GameSounds.Event, "employeeloss");
+				UpdatePlayerDisplay();
+			});
+		else
+			MoveItSoon(Ply, prod);
+	}
+	else
+		MoveItSoon(Ply, prod);
+}
 //Product is so horribly broken that it gets removed from the board
-//function SoBadItGetsRemoved(prod, )
+function IsItSoBadItGetsRemoved(Ply, Prod, AmountLost) {
+	if (Prod)
+		if ((AmountLost >= 1000) || (AmountLost >= getMonetaryValue(Prod))) {
+			Ply.TriggeredEvents.push(function(){
+				TriggeredEventDisplay("Your " + Prod.Name + " was just recalled due to a massive net loss! Try again with something new!", GameSounds.Event, "fail");
+				removeProduct(Prod);
+			});
+		}
+}
+//Displays the triggered event.
+function TriggeredEventDisplay(message, sound, picture) {
+	playSound(sound);
+	$("#TriggerDesc").text(message);
+	$("#TriggerImage").attr('src',"../images/events/event_" + picture + ".png");
+	ShowTriggerDialog();
+}
+//Iterates through triggered events recursively.
+function TriggeredEventIterator(TheTriggeredEvents){
+	if (TheTriggeredEvents.length > 0){
+		TheTriggeredEvents[0]();
+		TheTriggeredEvents.splice(0,1);
+	}
+}

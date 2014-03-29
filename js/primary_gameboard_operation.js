@@ -238,7 +238,7 @@ function removeMultipleProducts(HitList) {
 	if (HitList.length > 1) {
 		removeProduct(HitList[0]);
 		HitList.splice(0,1);
-		(function(){
+		setTimeout(function(){
 			removeMultipleProducts(HitList);
 		}, 400);
 	}
@@ -984,7 +984,8 @@ function RandomEventIterator(){
 				var numProd = 0;
 				var tries = 0;
 				if (Target.Products.length > 0) {
-					for (i = 0; (numProd<Value && numProd<Target.Products.length && (tries<2*Value)); i=(i%(Target.Products.length))+1) {
+					for (i = 0; (numProd<Value && numProd<Target.Products.length && (tries<2*Value)); i++) {
+						i=(i%(Target.Products.length));
 						if (i == 0)
 							tries++;
 						if ((Math.random()*2*tries)>1.5){
@@ -1023,4 +1024,5 @@ function DoesItBreak(prod){
 //Below is the list of functions that run during each player's turn cycle.
 //Warning for product being in same spot for too long
 //Reduction of employees due to low revenue based on a certain product's spot
-//Product is so horribly broken
+//Product is so horribly broken that it gets removed from the board
+//function SoBadItGetsRemoved(prod, )

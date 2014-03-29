@@ -222,7 +222,7 @@ function CreateProductDisplay(prod){
 function removeProduct(prod){
 	if (prod) {
 		$("#ProductWindow").hide();
-		if (isThisProductPatented(prod, TheGame)
+		if (isThisProductPatented(prod, TheGame))
 			removePatentFromRecords(prod, TheGame);
 		if (prod == CurrentlySelectedProduct)
 			CurrentlySelectedProduct = null;

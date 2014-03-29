@@ -5,6 +5,7 @@
 		<script src="../js/jquery.js"></script>
 		<script src="../js/shared.js"></script>
 		<script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+		<script src="../js/primary_gameboard_operation.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
 		<script>
 		function Initialize()
@@ -41,6 +42,14 @@
 				}
 			}
 		}
+		function PlayerStats(){
+			$("#PopupOverlay").show();
+			$("#Stats").show();
+		}
+		function HidePlayerStats(){
+			$("#Stats").hide();
+			$("#PopupOverlay").hide();
+		}		
 		</script>
 		
 		<style>
@@ -124,6 +133,24 @@
 	<div id="MainBackground">
 		<div id="MainBoard">
 			<div id="ContentContainer">
+			
+			
+			
+			
+			
+			
+			
+					<div class="PopupOverlay" id="PopupOverlay">
+						<div class="Popup" id="Stats" style="left:10%;top:10%;width:80%;height:80%">
+							<div class="StandardText" id="StatsTitle" style="left:10%;top:5%;width:80%;height:80%">Player Stats</div>
+                            <button class="Standard" id="ScoreboardClose" onclick="HidePlayerStats()" style="top:87%;left:10%;width:80%;height:10%">Done</button>
+
+                        </div>
+					</div>
+					
+					
+					
+			
 						<div class="StandardText" id="ScoreboardTitle" style="font-size:60px;margin:0;width:100%;top:5%">Game Over</div>
 							<div class="PlayerBox" id="PlyOneScbdBox" style="display:none;border-color:red;left:13%;top:19%;">
 								<div class="StandardText" id="PlyOneScbdName" style="margin:0px;width:100%;top:5%;font-size:20px">nil</div>
@@ -175,6 +202,7 @@
 							</div>
 						<button class="Standard" id="ToMenu" onclick="GoToMenu()" style="top:87%;left:15%">Main Menu</button>
 						<button class="Standard" id="ToNewGame" onclick="GoToNewGame()" style="top:87%;right:15%">New Game</button>
+						<button class="Standard Compact" style="top:10%;left:90%;width:8%;height:5%;" onclick="PlayerStats()">Player Stats</button>
 				</div>
 			</div>
 		</div>

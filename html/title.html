@@ -7,7 +7,7 @@
 		<script>
 			function Initialize(){
 				GlobalInitialize();
-				changeCurrentBGM("Menu");
+				changeCurrentBGM("MainMenu");
 				$("#ButtonSheetOne").children().attr('disabled', false);
 				$("#ButtonSheetOne").css("left","0%");
 				$("#ButtonSheetTwo").css("left","-100%");
@@ -47,7 +47,7 @@
 				SwitchToPage("howtoplay.html");
 			}
 			function SystemOptions(){
-				SwitchToPage("Settings.html");
+				SwitchToPage("AudioSettings.html");
 			}
 			function BackFromSP(){
 				$("#ButtonSheetOne").css("left","0%");
@@ -91,7 +91,7 @@
 				<div id="ButtonSheetOne" class="ButtonSheet" style="height:100%">
 					<button class="Standard"  style="left:30%;top:45%;width:40%" onclick="LocalGame()">Local Game</button>
 					<button class="Standard" style="left:30%;top:55%;width:40%" onclick="NetworkedGame()">Networked Game</button>
-					<button class="Standard" style="left:30%;top:65%;width:40%" onclick="SystemOptions()">Settings</button>
+					<button class="Standard" style="left:30%;top:65%;width:40%" onclick="SystemOptions()">Audio Settings</button>
 					<button class="Standard" style="left:30%;top:75%;width:40%" onclick="HowToPlay()">How to Play</button>
 				</div>
 				<div id="ButtonSheetTwo" class="ButtonSheet" style="left:-100%">

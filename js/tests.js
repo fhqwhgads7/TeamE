@@ -8,22 +8,16 @@ test("new Product can be instantiated", function() {
 
 test("background can actually change", function(){
 	
-	var timesOfDay0 = "Morning";
-	var timesOfDay1 = "Noon";
-	var timesOfDay2 = "Afternoon";
-	var timesOfDay3 = "Evening";
-	var timesOfDay4 = "Night";
-	
 	for (i = 5; i < 9; i++){
-		equal(timesOfDay0, getTimeOfDay(i), "Hour is " + i.toString() + " and should return Morning.");}
+		equal("Morning", getTimeOfDay(i), "Hour is " + i.toString() + " and should return Morning.");}
 	for (i = 9; i < 15; i++){
-		equal(timesOfDay1, getTimeOfDay(i), "Hour is " + i.toString() + " and should return Noon.");}
+		equal("Noon", getTimeOfDay(i), "Hour is " + i.toString() + " and should return Noon.");}
 	for (i = 15; i < 19; i++){
-		equal(timesOfDay2, getTimeOfDay(i), "Hour is " + i.toString() + " and should return Afternoon.");}
+		equal("Afternoon", getTimeOfDay(i), "Hour is " + i.toString() + " and should return Afternoon.");}
 	for (i = 19; i < 22; i++){
-		equal(timesOfDay3, getTimeOfDay(i), "Hour is " + i.toString() + " and should return Evening.");}
+		equal("Evening", getTimeOfDay(i), "Hour is " + i.toString() + " and should return Evening.");}
 	for (i = 22; (i < 5 || i >= 22); i=(i%24)+1){
-		equal(timesOfDay4, getTimeOfDay(i), "Hour is " + i.toString() + " and should return Night.");}
+		equal("Night", getTimeOfDay(i), "Hour is " + i.toString() + " and should return Night.");}
 });
 
 /*

@@ -129,8 +129,11 @@ var GameSounds={
 	MinorFail: '../sounds/sfx/minor_fail.wav'
 }
 function playSound(sound){
+	SFXVolume = parseInt(localStorage.getItem("SFXVolume"));
+	if (!SFXVolume)
+		SFXVolume = 50;
 	var theSound = new Audio(sound);
-	theSound.volume = 0.5;
+	theSound.volume = SFXVolume/100.0;
 	theSound.play();
 }
 function getTimeOfDay(x){
@@ -211,7 +214,7 @@ function MakeBGM(){
 		});	
 }
 
-//Backgrounds are "Menu", "InGame", "TimeRunningOut", and "GameOver"
+//Backgrounds are "MainMenu", "InGame", "TimeRunningOut", and "FinalScores"
 function changeCurrentBGM(theSong){
 	localStorage.setItem("CurrentBGM", theSong);
 }

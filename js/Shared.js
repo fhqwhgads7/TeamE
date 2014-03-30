@@ -291,7 +291,7 @@ function Player(game,name,type,color){
 	}
 	newPlayer.TurnInit=function(){
 		if(newPlayer.Type=="Player"){return;}
-		VirtualIntelligenceThink(newPlayer);
+		VI_Begin(newPlayer);
 	}
 	return newPlayer;
 }

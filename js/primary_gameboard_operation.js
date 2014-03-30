@@ -523,7 +523,7 @@ function CycleTurn(){
 		}
 		TheGame.CurrentPlayerNum=NewPlyNum;
 		TheGame.CurrentPlayer=TheGame.Players[TheGame.CurrentPlayerNum];
-		$('.Standard').attr("disabled", TheGame.CurrentPlayer.Type=="Computer");
+		//$('.Standard').attr("disabled", TheGame.CurrentPlayer.Type=="Computer");
 		$("#CurProdAdvanceButton").prop("disabled",true);
 		$("#CurProdRevertButton").prop("disabled",true);
 		if(CurrentlySelectedProduct!=null){

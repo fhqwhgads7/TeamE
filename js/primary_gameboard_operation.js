@@ -699,11 +699,18 @@ function DecrementCategoryChanges(){
 	for (i = 0; i < SubCategoryAttributes.length; i++){
 		if (SubCategoryAttributes[3] == 0)
 			SubCategoryAttributes[3] = 0.1;
-		else
-			SubCategoryAttributes[3] -= 0.1*((SubCategoryAttributes[3]-1.0)/Math.abs(SubCategoryAttributes[3]-1.0));
+		else{
+			if (SubCategoryAttributes[3] > 1)
+				SubCategoryAttributes[3] -= 0.1;
+			else if (SubCategoryAttributes[3] < 1)
+				SubCategoryAttributes[3] += 0.1;
 		if (SubCategoryAttributes[4] > 0)
 			SubCategoryAttributes[4]--;
 	}
+	if (TotalPayoutRate > 1)
+		TotalPayoutRate -= 0.1;
+	else if (TotalPayoutRate < 1)
+		TotalPayoutRate += 1;
 }
 function Appear(){
 	$("#MainBoard").show();

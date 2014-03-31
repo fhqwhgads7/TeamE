@@ -7,27 +7,17 @@
 		<script src="../js/shared.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
 <script>
-		Parse.initialize("xjUxyY8bghFGuSnM3ptEZkV3BiWOlD3VhkRLt4kz", "iZCS2S7ZuWn9keMoooLaHMlB7HMXpcqD1M60JVjp");
 		
-		var user = new Parse.User();
-		user.set("username", "my name");
-		user.set("password", "my pass");
-		user.set("email", "email@example.com");
   
 		// other fields can be set just like with Parse.Object
 		user.set("phone", "650-555-0000");
   
-		user.signUp(null, {
-		  success: function(user) {
-		    // Hooray! Let them use the app now.
-		  },
-		  error: function(user, error) {
-		    // Show the error message somewhere and let the user try again.
-		    //alert("Error: " + error.code + " " + error.message);
-		  }
-		});
+		
 		</script>
 		<script>
+		Parse.initialize("xjUxyY8bghFGuSnM3ptEZkV3BiWOlD3VhkRLt4kz", "iZCS2S7ZuWn9keMoooLaHMlB7HMXpcqD1M60JVjp");
+		
+		var user = new Parse.User();
 		
 		
 			var tabNumber;
@@ -56,24 +46,42 @@
 				SwitchToPage("load.html");
 			}
 			function HomePage(){
-				SwitchToPage("title.html")
+				SwitchToPage("title.html");
 			}
 			function SubmitRegistration(){
 				
 			    if ($("#Username").val().length < 6){
-					alert("Username needs to be 6 or more characters long")
+					alert("Username needs to be 6 or more characters long");
 				}
 				else if ($("#Password").val().length < 6){
-					alert("Password needs to be 6 or more characters long")	
-				else if ($("#Password").val() =! $("#reenterPassword").val()){
-						alert("Passwords do not match")
+					alert("Password needs to be 6 or more characters long");
 					}
-				
+				else if ($("#Password").val().length != $("#reenterPassword").val().length){
+						alert("Passwords do not match");
+					}
+					else {
 				var inputUsername = $("#Username").val();
 				var inputPassword = $("#Password").val();
+				var inputRepeatPassword = $("#reenterPassword")
 				var inputEmail = $("#Email").val();
 				
-				alert(inputUsername);
+				user.set("username", inputUsername);
+				user.set("password", inputPassword);
+				user.set("email", inputEmail);
+				
+				user.signUp(null, {
+				  success: function(user) {
+				    // Hooray! Let them use the app now.
+				  },
+				  error: function(user, error) {
+				    // Show the error message somewhere and let the user try again.
+				    //alert("Error: " + error.code + " " + error.message);
+				  }
+				});
+				
+				SwitchToPage("title.html")
+				alert("You have been successfully registered! ");
+			}
 			}
 		</script>
 		<style>
@@ -136,10 +144,10 @@
 				<div id="ButtonSheetOne" class="ButtonSheet" style="height:100%">
 					
 					<textarea id="Username" class="OneColumn" placeholder="Username" style="overflow:hidden;resize:none;top:40%;left:32%;height:5%;width:35%;"></textarea>
-					<textarea id="Password" class="OneColumn" placeholder="Password" style="overflow:hidden;resize:none;top:47%;left:32%;height:5%;width:35%;"></textarea>
-					<textarea id="reenterPassword" class="OneColumn" placeholder="Re-Enter Password" style="overflow:hidden;resize:none;top:54%;left:32%;height:5%;width:35%;"></textarea>
+					<textarea id="Password" input type="password" class="OneColumn" placeholder="Password" style="overflow:hidden;resize:none;top:47%;left:32%;height:5%;width:35%;"></textarea>
+					<textarea id="reenterPassword" input type="password" class="OneColumn" placeholder="Re-Enter Password" style="overflow:hidden;resize:none;top:54%;left:32%;height:5%;width:35%;"></textarea>
 					<textarea id="Email" class="OneColumn" placeholder="Email" style="overflow:hidden;resize:none;top:61%;left:32%;height:5%;width:35%;"></textarea>
-					<button class="Standard" style="left:30%;top:70%;width:40%" onclick="HomePage()">Submit</button>
+					<button class="Standard" style="left:30%;top:70%;width:40%" onclick="SubmitRegistration()">Submit</button>
 					<button class="Standard" onclick="GoBackToMainMenu()" style="left:34%;top:86%;width:32%">Main Menu</button>
 				</div>
 				

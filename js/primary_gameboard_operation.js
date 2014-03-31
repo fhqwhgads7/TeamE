@@ -45,26 +45,28 @@ var PhasePositions={
 	PostDeploymentTesting:[190,50],
 	Maintenance:[260,260]
 }
-//Format is: Name, Initial Description, AreaOfEffect, Scale, Type, Value, Picture, and MaximumNumOccurrences
-//Name is a self-explanatory string
-//Initial description is what goes at the beginning of the smaller text in the random event modal.
-//AreaOfEffect is a string that determines whether to display to all players or one random player
-//Scale is an integer rating between -10 and 10, -10 being the most negative and 10 being the most positive
-//Type is a string that labels what kind of event it is
-//Value is the parameter necessary for that type of event to execute properly
-//Picture is a string for the suffix of the picture file name to be used. Ex. "cash" for event_cash.png Pics themselves should be 250*250 pngs.
-//MaximumNumOccurrences is the number of times that event can be called per game.
+//Format is: Name, Initial Description, AreaOfEffect, Scale, Type, Value, Picture, Likeliness, and OccurrenceInterval (With a counter)
+//0  Name is a self-explanatory string
+//1  Initial description is what goes at the beginning of the smaller text in the random event modal.
+//2  AreaOfEffect is a string that determines whether to display to all players or one random player
+//3  Scale is an integer rating between -10 and 10, -10 being the most negative and 10 being the most positive
+//4  Type is a string that labels what kind of event it is
+//5  Value is the parameter necessary for that type of event to execute properly
+//6  Picture is a string for the suffix of the picture file name to be used. Ex. "cash" for event_cash.png Pics themselves should be 250*250 pngs.
+//7  Likeliness is self-explanatory, but it's a decimal between 0 and 1
+//8  OccurrenceInterval is the number of turns an event has to wait before occurring again
+//9  There's also a counter to help with that. It starts at 3 for all to delay their occurrence in the game.
 var RandomEvents=[
-	["Tax break!","The IRS is in a good mood!","AllPlayers",2,"CashChange",750,"cash",3],
-	["Catastrophe!","A major storm has stricken your area!","OnePlayer",-5,"AssetDestruction",2,"disaster",2],
-	["Stock Market Plummets!","People are scared to buy new things!","AllPlayers",-3,"PayoutRateChange_All",0.5,"stockcrash",3],
-	["Video Game craze!","A new study was released showing positive effects of gaming!","AllPlayers",3,"PayoutRateChange_Video Game",1.5,"controller",2],
-	["Cyber-security Attack!","Could Anonymous be at it again?","AllPlayers",-6,"CategoryShutdown_Software",2,"cyberattack",5],
-	["All airlines grounded!","Authorities swear this is just protocol.","AllPlayers",-4,"SubCategoryShutdown_Air",1,"airport",2],
-	["Alternative Energy!","Yet another push for alternative energy sources is picking up steam.","AllPlayers",1,"PayoutRateChange_Solar",1.1,"solarpanel",4],
-	["Recession!","The economy looks to be in bad shape right now.","AllPlayers",-9,"PayoutRateChange_All",0.1,"recession",1],
-	["Going green!","Whether it's for the trees or against these devices...","AllPlayers",-1,"PayoutRateChange_Printer",0.7,"tree",3],
-	["Grant!","Someone with high authority seems to like what you are doing.","OnePlayer",10,"CashChange",100000,"cash",1]
+	["Tax break!","The IRS is in a good mood!","AllPlayers",2,"CashChange",750,"cash", 0.45, 12, 3],
+	["Catastrophe!","A major storm has stricken your area!","OnePlayer",-5,"AssetDestruction",2,"disaster", 0.3, 6, 3],
+	["Stock Market Plummets!","People are scared to buy new things!","AllPlayers",-3,"PayoutRateChange_All",0.5,"stockcrash", 0.4, 10, 3],
+	["Video Game craze!","A new study was released showing positive effects of gaming!","AllPlayers",3,"PayoutRateChange_Video Game",1.5,"controller", 0.35, 15, 3],
+	["Cyber-security Attack!","Could Anonymous be at it again?","AllPlayers",-6,"CategoryShutdown_Software",2,"cyberattack", 0.1, 5, 3],
+	["All airlines grounded!","Authorities swear this is just protocol.","AllPlayers",-4,"SubCategoryShutdown_Air",1,"airport", 0.2, 20, 3],
+	["Alternative Energy!","Yet another push for alternative energy sources is picking up steam.","AllPlayers",1,"PayoutRateChange_Solar",1.1,"solarpanel", 0.7, 12, 3],
+	["Recession!","The economy looks to be in bad shape right now.","AllPlayers",-9,"PayoutRateChange_All",0.1,"recession", 0.1, 40, 3],
+	["Going green!","Whether it's for the trees or against these devices...","AllPlayers",-1,"PayoutRateChange_Printer",0.7,"tree", 0.8, 9, 3],
+	["Grant!","Someone with high authority seems to like what you are doing.","OnePlayer",10,"CashChange",100000,"cash", 0.2, 60, 3]
 ]
 var ProductCategories={
 	Energy:["Hydroelectric","Solar","Fossil Fuel","Wind"],
@@ -532,6 +534,10 @@ function CycleTurn(){
 		if(WillGo){
 			DisplayNewRoundEvent();
 		}else{
+			if (TheGame.CurrentPlayer.Type=="Computer")
+				$("#ControlLock").show();
+			else
+				$("#ControlLock").hide();
 			TriggeredEventIterator(TheGame.CurrentPlayer.TriggeredEvents);
 			for (i=0; i<TheGame.CurrentPlayer.Products.length; i++){
 				$("#ProductDisplayItem_" + TheGame.CurrentPlayer.Products[i].GlobalID).css("z-index",2);
@@ -678,7 +684,10 @@ function NewRoundCalc(){
 	}
 	DecrementCategoryChanges();
 	TheGame.CurrentRound=TheGame.CurrentRound+1;
-	//document.getElementById("RoundNumberDisplay").innerHTML=TheGame.CurrentRound.toString();
+	if (TheGame.CurrentPlayer.Type=="Computer")
+		$("#ControlLock").show();
+	else
+		$("#ControlLock").hide();
 	RandomEventSelector();
 	RandomEventIterator();
 	UpdatePlayerDisplay();
@@ -901,15 +910,20 @@ function RandomEventSelector(){
 		difficultyOffset = -2
 	else if (TheGame.Settings.Difficulty=="LUNATIC")
 		difficultyOffset = -5;
-	for (j = 0; j < (Math.log(TheGame.CurrentRound+5)/Math.log(10)); j++)
+	for (j = 0; j < (Math.log(TheGame.CurrentRound+6)/Math.log(10)); j++)
 	{
 		var theValue = Math.floor(Math.random()*11-5) + difficultyOffset;
 		for (i=0; i < RandomEvents.length; i++){
-			if (theValue == RandomEvents[i][3])
-				if ((RandomEvents[i][7] > 0) && (IterateThroughThese.indexOf(RandomEvents[i]) < 0)) {
-					IterateThroughThese.push(RandomEvents[i]);
-					RandomEvents[i][7]--;
+			if (RandomEvents[i][9] > 0)
+				RandomEvents[i][9]--;
+			if (theValue == RandomEvents[i][3]) {
+				if (IterateThroughThese.indexOf(RandomEvents[i]) < 0) {
+					if ((RandomEvents[i][9] <= 0) && (RandomEvents[i][7] >= Math.random())){
+						IterateThroughThese.push(RandomEvents[i]);
+						RandomEvents[i][9] = RandomEvents[i][8];
+					}
 				}
+			}
 		}
 	}
 	RandomEventsToIterate = IterateThroughThese;

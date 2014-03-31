@@ -293,8 +293,9 @@ function Player(game,name,type,color){
 		newPlayer.VIMemory.NumCreative=0;
 	}
 	newPlayer.TurnInit=function(){
-		if(newPlayer.Type=="Player"){return;}
-		VI_Begin(newPlayer);
+		if(newPlayer.Type=="Computer"){
+			VI_Begin(newPlayer);
+		}
 	}
 	return newPlayer;
 }

@@ -3,7 +3,6 @@ var self;
 var ActionQue=[];
 var VISpeed=0.5
 function VI_Begin(ply){
-	$("#ControlLock").show();
 	self=ply;
 	self.VIMemory.Money=parseInt($("#CurPlyMoney").text());
 	self.VIMemory.NumCreative=parseInt($("#CurPlyDsgns").text());

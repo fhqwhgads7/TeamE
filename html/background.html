@@ -10,12 +10,20 @@
 	<script>
 		var currentTime;
 		var currentBGM;
+		var TheBGM;
+		
+		var default_MainMenu = "../sounds/default_bgm/default_mainmenu";
+		var default_InGame = "../sounds/default_bgm/default_ingame";
+		var default_TimeRunningOut = "../sounds/default_bgm/default_timerunningout";
+		var default_FinalScores = "../sounds/default_bgm/default_finalscores";
 		
 		function Initialize()
 		{
 			currentTime = getTimeOfDay(new Date().getHours());
 			$("#OverBackground").css('background-image',$("#MainBackground").css('background-image'));
+			TheBGM = new Audio("../sounds/default_bgm/default_mainmenu.mp3");
 			setInterval(backgroundThink,1000);
+			setInterval(BGMThink,50);
 		}
 		function backgroundThink()
 		{
@@ -32,11 +40,19 @@
 			{
 				changeCurrentBGM("MainMenu");
 				currentBGM = localStorage.getItem("CurrentBGM");
+				playTheBGM(currentBGM);
 			}
 			else if (currentBGM != nextBGM)
 			{
 				currentBGM = nextBGM;
+				playTheBGM(currentBGM);
 			}
+			
+			BGMVolume = parseInt(localStorage.getItem("BGMVolume"));
+			if (!BGMVolume)
+				BGMVolume = 50;
+			TheBGM.volume = BGMVolume/100.0;
+			
 		}
 		function fadeToNextBackground()
 		{
@@ -45,6 +61,17 @@
 				$("#OverBackground").css('background-image',$("#MainBackground").css('background-image')); 
 				$("#OverBackground").css('opacity','100');
 			},2050);
+		}
+		
+		function playTheBGM(backgroundName){
+			TheBGM.pause();
+			var extension = ".mp3";
+			if (!(TheBGM.canPlayType('audio/mpeg'))){
+				extension = ".ogg";
+			}
+			TheBGM = new Audio("../sounds/default_bgm/default_" + backgroundName.toLowerCase() + extension);
+			TheBGM.loop = true;
+			TheBGM.play();
 		}
 		
 		function bgmPlayer(){

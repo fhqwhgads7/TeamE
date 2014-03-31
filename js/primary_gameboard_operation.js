@@ -711,6 +711,7 @@ function DecrementCategoryChanges(){
 		TotalPayoutRate -= 0.1;
 	else if (TotalPayoutRate < 1)
 		TotalPayoutRate += 1;
+	}
 }
 function Appear(){
 	$("#MainBoard").show();

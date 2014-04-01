@@ -156,6 +156,7 @@ function LoadGameInitialize(gameName){
 			changeCurrentBGM("TimeRunningOut");
 		$("#RoundNumberDisplay").text("ROUND " + TheGame.CurrentRound.toString());
 		setInterval("TipThink();",10);
+		setInterval("CanMakeProductThink();",10);
 		setTimeout(function(){
 			TheGame.CurrentPlayer.TurnInit();
 		},1250);

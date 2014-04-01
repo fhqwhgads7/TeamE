@@ -49,7 +49,8 @@
 				}
 			}
 			function SaveThink(){
-				SaveThisGame("LastSavedGame");
+				if (TheGame)
+					SaveThisGame("LastSavedGame");
 			}
 			function displayNewProductDialog() {
 				$("#PopupOverlay").show();

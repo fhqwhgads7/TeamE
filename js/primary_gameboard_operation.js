@@ -58,7 +58,7 @@ var PhasePositions={
 //9  There's also a counter to help with that. It starts at 3 for all to delay their occurrence in the game.
 var RandomEvents=[
 	["Tax break!","The IRS is in a good mood!","AllPlayers",2,"CashChange",750,"cash", 0.45, 12, 3],
-	["Catastrophe!","A major storm has stricken your area!","OnePlayer",-5,"AssetDestruction",2,"disaster", 0.3, 6, 3],
+	["Explosion!","A major accident has destroyed a great chunk of your area!","OnePlayer",-5,"AssetDestruction",2,"disaster", 0.3, 6, 3],
 	["Stock Market Plummets!","People are scared to buy new things!","AllPlayers",-3,"PayoutRateChange_All",0.5,"stockcrash", 0.4, 10, 3],
 	["Video Game craze!","A new study was released showing positive effects of gaming!","AllPlayers",3,"PayoutRateChange_Video Game",1.5,"controller", 0.35, 15, 3],
 	["Cyber-security Attack!","Could Anonymous be at it again?","AllPlayers",-6,"CategoryShutdown_Software",2,"cyberattack", 0.1, 5, 3],
@@ -194,6 +194,20 @@ function TransferGameStartupInfo(from,to){
 	to.Settings.CPUIntelligence=from.Options.CPUIntelligence;
 	to.Settings.PatentingEnabled=from.Options.PatentingEnabled;
 	to.Settings.NumberOfRounds=from.Options.NumberOfRounds;
+}
+function GetDifficultyConstant(difficulty){
+	var returnValue = 0;
+	
+	if (difficulty == "EASY")
+		returnValue = 1
+	else if (difficulty == "NORMAL")
+		returnValue = 2;
+	else if (difficulty == "HARD")
+		returnValue = 3;
+	else
+		returnValue = 4;
+	
+	return returnValue;
 }
 function UpdatePlayerDisplay(){
 	var OldCash=parseInt($("#CurPlyMoney").html());
@@ -738,6 +752,7 @@ function DisplayNewRoundEvent(){
 	}
 }
 function NewRoundCalc(){
+	RandomEventSelector();
 	for(var i=0;i<TheGame.Players.length;i++){
 		var Ply=TheGame.Players[i];
 		if(Ply.NumProducts>0){
@@ -798,12 +813,12 @@ function NewRoundCalc(){
 		var Ply=TheGame.Players[i];
 		var Net=0;
 		if(Ply.NumProducts<1){
-			Net=BasePayouts.DayJobEachTurn*TotalPayoutRate;
+			Net=Math.round(BasePayouts.DayJobEachTurn*TotalPayoutRate*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty))));
 		}else{
 			for(var j=0;j<Ply.Products.length;j++){
 				var Prod=Ply.Products[j];
 				if(Prod.Phase==ProductPhases.Maintenance && (SubCategoryAttributes[Prod.SubCategory][4] <= 0)){
-					var earnings = Math.round(getMonetaryValue(Prod)*SubCategoryAttributes[Prod.SubCategory][3]*TotalPayoutRate);
+					var earnings = Math.round(getMonetaryValue(Prod)*SubCategoryAttributes[Prod.SubCategory][3]*TotalPayoutRate*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty))));
 					if (TheGame.PatentTracker){
 						patentOwnerID = doIPayRoyalties(Prod, TheGame.PatentTracker);
 						if (patentOwnerID != -1)
@@ -820,15 +835,14 @@ function NewRoundCalc(){
 		Net=Net-((BaseCosts.PayDev*Ply.NumDevs)+(BaseCosts.PayQA*Ply.NumQA)+(BaseCosts.PayCreative*Ply.NumCreative));
 		Ply.Money=Ply.Money+Net;
 	}
-	DecrementCategoryChanges();
 	TheGame.CurrentRound=TheGame.CurrentRound+1;
 	if (TheGame.CurrentPlayer.Type=="Computer")
 		$("#ControlLock").show();
 	else
 		$("#ControlLock").hide();
-	RandomEventSelector();
 	RandomEventIterator();
 	UpdatePlayerDisplay();
+	DecrementCategoryChanges();
 	if(CurrentlySelectedProduct!=null){
 		UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
 	}
@@ -838,16 +852,17 @@ function DecrementCategoryChanges(){
 		if (SubCat[3] == 0)
 			SubCat[3] = 0.1;
 		else{
-			if (SubCat[3] > 1)
-				SubCat[3] -= 0.1;
-			else if (SubCat[3] < 1)
+			if (Math.round(SubCat[3]*10)/10 > 1)
+				SubCat[3] -= 0.2;
+			else if (Math.round(SubCat[3]*10)/10 < 1)
 				SubCat[3] += 0.1;
+		}
 		if (SubCat[4] > 0)
 			SubCat[4]--;
 	}
-	if (TotalPayoutRate > 1)
+	if (Math.round(TotalPayoutRate*10)/10 > 1)
 		TotalPayoutRate -= 0.1;
-	else if (TotalPayoutRate < 1)
+	else if (Math.round(TotalPayoutRate*10)/10 < 1){
 		TotalPayoutRate += 0.1;
 	}
 }
@@ -1159,7 +1174,10 @@ function RandomEventIterator(){
 						}
 					}
 				}
-				Desc+="All players have lost up to " + Value.toString() + " products!";
+				Desc+="All players have lost up to " + Value.toString() + " product";
+				if (Value != 1)
+					Desc+= "s"
+				Desc+="!";
 			}
 			else {
 				var numProd = 0;
@@ -1175,8 +1193,10 @@ function RandomEventIterator(){
 						}
 					}
 				}
-				if (numProd > 0)
+				if (numProd > 1)
 					Desc+="Player " + Target.Name + " has lost " + numProd.toString() + " products!";
+				else if (numProd > 0)
+					Desc+="Player " + Target.Name + " has lost a product!";
 				else
 					Desc+="Player " + Target.Name + " luckily did not lose anything!"
 			}
@@ -1252,9 +1272,9 @@ function EmployeeReductionCheck(employeeType, Ply, prod){
 function IsItSoBadItGetsRemoved(Ply, Prod, AmountLost) {
 	if (Prod)
 		if ((AmountLost >= 1000) || (AmountLost >= getMonetaryValue(Prod))) {
+			removeProduct(Prod);
 			Ply.TriggeredEvents.push(function(){
 				TriggeredEventDisplay("Your " + Prod.Name + " was just recalled due to a massive net loss! Try again with something new!", GameSounds.Event, "fail");
-				removeProduct(Prod);
 			});
 		}
 }

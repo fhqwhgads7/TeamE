@@ -46,6 +46,7 @@
 			}
 			function CreateGame(){
 				if (SaveData()){
+					localStorage.setItem("LoadingAGame", null);
 					SwitchToPage("game_board.html");
 				}
 				else {

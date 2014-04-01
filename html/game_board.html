@@ -7,7 +7,7 @@
 		-->
 		<script src="../js/jquery.js"></script>
 		<script src="../js/shared.js"></script>
-		<script src="../js/cycle.js"></script>
+		<script src="../js/CircularJSON.js"></script>
 		<script src="../js/virtual_intelligence.js"></script>
 		<script src="../js/primary_gameboard_operation.js"></script>
 		<script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
@@ -130,15 +130,14 @@
 				$("#QuitDialog").show();
 			}
 			function QuitGame(saveFirst){
-				if(saveFirst){
-					alert("get your filthy hands off that");
-					return;
-				}else{
+				if(saveFirst)//{
+					SaveThisGame("SomeName");
+				//}else{
 					CloseQuitDialog();
 					TheGame=null;
 					localStorage.setItem("TheBrandNewGame",null);
 					SwitchToPage("title.html");
-				}
+				//}
 			}
 			function CloseQuitDialog(){
 				$("#QuitDialog").hide();

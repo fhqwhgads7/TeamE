@@ -105,6 +105,13 @@ var SubCategoryAttributes={
 	"Key Holder":[0.1,0.2,0.2,1,0]
 };
 function GameInitialize(){
+	var doILoadGame = localStorage.getItem("LoadingAGame");
+	if (doILoadGame != "null")
+		LoadGameInitialize(doILoadGame);
+	else
+		NewGameInitialize();
+}
+function NewGameInitialize(){
 	var GameCreationInfo=JSON.parse(localStorage.getItem("TheBrandNewGame"));
 	TheGame=new Game("2947");
 	TransferGameStartupInfo(GameCreationInfo,TheGame);
@@ -119,6 +126,36 @@ function GameInitialize(){
 	setTimeout(DisplayNewRoundEvent,1);
 	$("#MainBoard").hide();
 	setTimeout(Appear,750);
+
+}
+function LoadGameInitialize(gameName){
+	TheGame = CircularJSON.parse(localStorage.getItem("SomeName"));
+	if (!TheGame)
+		NewGameInitialize();
+	else{
+		SubCategoryAttributes = TheGame.SubCategoryAttributes;
+		RandomEvents = TheGame.RandomEvents;
+		for (q = 0; q < TheGame.Players.length; q++) {
+			for (j = 0; j < TheGame.Players[q].Products.length; j++) {
+				RecreateProductDisplay(TheGame.Players[q].Products[j]);
+			}
+			UpdatePlayerProductDisplayPosition(TheGame.Players[q]);
+		}
+		TheGame.CurrentPlayer=TheGame.Players[TheGame.CurrentPlayerNum];
+		TheGame.CurrentPlayerNum=TheGame.CurrentPlayer.Number;
+		UpdatePlayerDisplay();
+		PopulateNewProdCategories();
+		if (TheGame.Settings.NumberOfRounds-TheGame.CurrentRound <= 5)
+			changeCurrentBGM("TimeRunningOut");
+		setInterval("TipThink();",10);
+	}
+}
+function SaveThisGame(gameName){
+	TheGame.SubCategoryAttributes = SubCategoryAttributes;
+	TheGame.RandomEvents = RandomEvents;
+	var saveMe = CircularJSON.stringify(TheGame);		
+	localStorage.setItem(gameName, saveMe);
+	alert("Game object was stringified and stored in the local storage");
 }
 function TipThink(){
 	var Elem=document.getElementById("TipSpan");
@@ -184,7 +221,7 @@ function createNewProduct(){
 		CreateProductDisplay(prod);
 		hideNewProductDialog();
 		playSound(GameSounds.ProductPlacement);
-		$("#new-product-button").attr("disabled",true);
+		TheGame.CurrentPlayer.hasMadeProductThisTurn = true;
 	}
 	else {
 		$("#NewProdName").css("background-color", "red");
@@ -216,9 +253,32 @@ function CreateProductDisplay(prod){
 	ProdElem.style.webkitTransform="rotate("+(-Rotation).toString()+"deg)";
 	ProdElem.style.MozTransform="rotate("+(-Rotation).toString()+"deg)";
 	GameBoard.appendChild(ProdElem);
-	UpdateProductDisplayPosition(prod);
+	UpdateProductListDisplayPosition(GetProductsInSamePhase(prod));
 	UpdatePlayerDisplay();
 	UpdateCurProdDisplay(ProdElem.id);
+}
+function RecreateProductDisplay(prod){
+	var GameBoard=document.getElementById("GameBoardCircle");
+	var ProdElem=document.createElement("div");
+	ProdElem.id="ProductDisplayItem_"+prod.GlobalID;
+	prod.DisplayItemID=ProdElem.id;
+	ProdElem.addEventListener("click",function(){
+		if (prod!=CurrentlySelectedProduct){
+			playSound(GameSounds.Message);
+		}
+		UpdateCurProdDisplay(ProdElem.id);
+	});
+	ProdElem.className="ProductDisplayItem";
+	ProdElem.style.backgroundImage="url('../images/ProductIcons/"+prod.Category.toLowerCase()+"_"+prod.SubCategory.toLowerCase()+".png')";
+	ProdElem.style.left="0px";
+	ProdElem.style.top="0px";
+	ProdElem.style.zIndex="2";
+	ProdElem.style.borderStyle="outset";
+	ProdElem.style.borderColor=PlayerColors[prod.Color];
+	ProdElem.style.backgroundColor=prod.Color;
+	ProdElem.style.webkitTransform="rotate("+(-Rotation).toString()+"deg)";
+	ProdElem.style.MozTransform="rotate("+(-Rotation).toString()+"deg)";
+	GameBoard.appendChild(ProdElem);
 }
 //Removes the product passed through the parameter
 function removeProduct(prod){
@@ -253,6 +313,57 @@ function removeMultipleProducts(HitList) {
 	}
 }
 
+function GetProductsInSamePhase(prod){
+	var ProdsInSameSpot = new Array();
+	
+	for (i = 0; i < prod.Owner.Products.length; i++){
+		if (prod.Owner.Products[i].Phase == prod.Phase){
+			ProdsInSameSpot.push(prod.Owner.Products[i]);
+		}
+	}
+	
+	return ProdsInSameSpot;
+}
+
+function GetProductsInThisPhase(ThisPhase, Ply){
+	var ProdsInSameSpot = new Array();
+	
+	for (i = 0; i < Ply.Products.length; i++){
+		if (Ply.Products[i].Phase == ThisPhase){
+			ProdsInSameSpot.push(Ply.Products[i]);
+		}
+	}
+	
+	return ProdsInSameSpot;
+}
+
+function UpdatePlayerProductDisplayPosition(Ply){
+	var ProductPhaseArray = new Array();
+	for (i = 0; i < Ply.Products.length; i++){
+		if (ProductPhaseArray.indexOf(Ply.Products[i].Phase) <= -1) {
+			ProductPhaseArray.push(Ply.Products[i].Phase);
+		}
+	}
+	for (i = 0; i < ProductPhaseArray.length; i++){
+		UpdateProductListDisplayPosition(GetProductsInThisPhase(ProductPhaseArray[i], Ply));
+	}
+}
+
+function UpdateProductListDisplayPosition(ProdList){
+	var angularIncrement = 2*(Math.PI)/(ProdList.length);
+	var Magnitude = 30*Math.log(ProdList.length)/Math.log(5);
+	var scalar = 1;
+	
+	for (i = 0; i < ProdList.length; i++){
+		TheProd = ProdList[i];
+		XOffset = Math.cos(angularIncrement*i);
+		YOffset = Math.sin(angularIncrement*i);
+		var ProdElem=$("#"+"ProductDisplayItem_"+TheProd.GlobalID);
+		ProdElem.css("left",(PhasePositions[TheProd.Phase][0]+XOffset*Magnitude).toString()+"px");
+		ProdElem.css("top",(PhasePositions[TheProd.Phase][1]+YOffset*Magnitude).toString()+"px");
+	}	
+}
+
 function UpdateProductDisplayPosition(prod){
 	var AlreadyThere=-2;
 	for(Biz in TheGame.Players){
@@ -270,6 +381,7 @@ function UpdateProductDisplayPosition(prod){
 		ProdElem.css("top",(PhasePositions[prod.Phase][1]+Add).toString()+"px");
 	},1);	
 }
+
 function EmployeeChange(type,num){
 	
 	var designers = parseInt($("#EmpPopupDes").text());
@@ -424,7 +536,7 @@ function TryToAdvanceProduct(){
 		CurrentlySelectedProduct.isANewProduct = false;
 	}
 	
-	UpdateProductDisplayPosition(CurrentlySelectedProduct);
+	UpdateProductListDisplayPosition(GetProductsInSamePhase(CurrentlySelectedProduct));
 	UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
 	UpdatePlayerDisplay();
 }
@@ -457,7 +569,7 @@ function TryToRevertProduct(){
 		CurrentlySelectedProduct.Phase=ProductPhases.PostDepTesting;
 	}
 	if (!removeCheck){
-		UpdateProductDisplayPosition(CurrentlySelectedProduct);
+		UpdateProductListDisplayPosition(GetProductsInSamePhase(CurrentlySelectedProduct));
 		UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
 		UpdatePlayerDisplay();
 	}

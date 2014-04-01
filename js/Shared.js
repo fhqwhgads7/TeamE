@@ -270,6 +270,7 @@ function Player(game,name,type,color){
 	newPlayer.Money=2000;
 	newPlayer.LastDisplayedMoney=newPlayer.Money;
 	newPlayer.TriggeredEvents=new Array();
+	newPlayer.hasMadeProductThisTurn = false;
 	if(game != null){
 		newPlayer.ParentGame=game;
 		game.Players.push(newPlayer);

@@ -9,25 +9,27 @@
 			function Initialize()
 			{
 				GlobalInitialize();
+				LoadPageInitialize();
 			}
-			$(document).ready(function() {
-				function showLoadAlert(gameTitle) {
-					$("#load-alert").find("#loaded-game-name").text(gameTitle);
-					$("#load-alert").show();
-				}
-
+			function LoadPageInitialize(){
 				$("#game-list").find("li").click(function(){
 					var gameTitle = $(this).find(".game-title").text();
-					showLoadAlert(gameTitle);
+					ShowLoadAlert(gameTitle);
 				});
-
-				$("#yep-button").click(function(){
-					$("#load-alert").hide();
-				});
-				$("#nope-button").click(function(){
-					$("#load-alert").hide();
-				});
-			});
+			}
+			function ShowLoadAlert(gameTitle){
+				$("#LoadAlert").find("#loaded-game-name").text(gameTitle);
+				$("#LoadAlert").show();
+				$("#PopupOverlay").show();
+			}
+			function HideLoadAlert(loadGame){
+				$("#LoadAlert").hide();
+				$("#PopupOverlay").hide();
+				if (loadGame){
+					localStorage.setItem("LoadingAGame", "SomeName");
+					SwitchToPage("game_board.html");
+				}
+			}
 			function GoBackToMainMenu()
 			{
 				SwitchToPage("title.html");
@@ -44,52 +46,6 @@
 				width:60%;
 				height:60%;
 				box-shadow: 0px 0px 40px 5px #AAAAAA;
-			}
-			.BigText{
-				font-family:"Times New Roman";
-				font-size:50px;
-				font-weight:900;
-				text-align:center;
-				color:white;
-			}
-			div.SmallText{
-				position:absolute;
-				font-family:"Arial";
-				font-size:20px;
-				font-weight:900;
-				text-align:center;
-				color:white;
-			}
-			button.Medium{
-				text-align:center;
-				font-family:"Arial";
-				font-weight:700;
-				font-size:15px;
-				color:rgb(0,0,0);
-				background-image:-moz-linear-gradient(top,rgba(170,170,170,1),rgba(70,70,70,1) 100%);
-				background-image:-webkit-linear-gradient(top,rgba(170,170,170,1),rgba(70,70,70,1) 100%);
-				height: 2em:
-				border-width:5px;
-				border-style:solid;
-				border-color:rgba(120,120,120,1);
-				outline:none;
-				-moz-border-radius:20px;
-				-webkit-border-radius:20px;
-				border-radius:20px;
-			}
-			button.Medium:hover{
-				color:rgb(255,255,255);
-				cursor: pointer;
-			}
-			button.Medium:active{
-				background-image:-moz-linear-gradient(top,rgba(80,80,80,1),rgba(150,150,150,1) 100%);
-				background-image:-webkit-linear-gradient(top,rgba(80,80,80,1),rgba(150,150,150,1) 100%);
-				color:rgb(180,180,180);
-			}
-			button.Medium:disabled{
-				background-color:rgb(140,140,140);
-				color:rgb(110,110,110);
-				background-image:none;
 			}
 			.Options{
 				position:absolute;
@@ -130,27 +86,28 @@
 	</head>
 	<body onload="Initialize()">
 		<div id="MainBackground">
-		<div id="ContentContainer">
-			<div class="StandardText" id="MainTitle" style="margin:0;width:800px;top:7%">Load Game</div>
-			<div class="OptionsBox" id="OptionsBox" style="left:20%;top:20%;">
-				<ol id="game-list">
-					<li><span class="game-title">Game 1</span> (2014-02-03 17:54)</li>
-					<li><span class="game-title">Game 2</span> (2014-02-04 03:16)</li>
-					<li><span class="game-title">Game 3</span> (2014-02-04 03:16)</li>
-				</ol>
+			<div id="ContentContainer">
+				<div class="StandardText" id="MainTitle" style="margin:0px;width:100%;top:7%">Load Game</div>
+				<div class="OptionsBox" id="OptionsBox" style="left:20%;top:20%;">
+					<ol id="game-list">
+						<li><span class="game-title">Game 1</span> (2014-02-03 17:54)</li>
+						<li><span class="game-title">Game 2</span> (2014-02-04 03:16)</li>
+						<li><span class="game-title">Game 3</span> (2014-02-04 03:16)</li>
+					</ol>
+				</div>
+				<div class="PopupOverlay" id="PopupOverlay">
+					<div class="Popup" style="width:40%;left:30%;height:20%;top:40%" id="LoadAlert">
+						<div class="StandardText" style="margin:0px;width:100%;top:20%;font-size:20px">
+							Load <span id="loaded-game-name">Game 1</span>?
+						</div>
+						<div>
+							<button class="Standard" id="yep-button" style="font-size:14px;left:15%;top:60%;width:30%" onclick="HideLoadAlert(true)">Yes</button>
+							<button class="Standard" id="nope-button" style="font-size:14px;right:15%;top:60%;width:30%" onclick="HideLoadAlert(false)">No</button>
+						</div>
+					</div>
+				</div>
+			<button class="Standard" onclick="GoBackToMainMenu()" style="left:34%;top:86%;width:32%">Main Menu</button>
 			</div>
-
-		<div class="alert" id="load-alert">
-			<p>
-				Load <span id="loaded-game-name">Game 1</span>?
-			</p>
-			<div>
-				<button class="Medium RoundEdge" id="yep-button">Yep</button>
-				<button class="Medium RoundEdge" id="nope-button">Nope</button>
-			</div>
-		</div>
-		<button class="Standard" onclick="GoBackToMainMenu()" style="left:34%;top:86%;width:32%">Main Menu</button>
-		</div>
 		</div>
 	</body>
 </html>

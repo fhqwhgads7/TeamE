@@ -5,11 +5,6 @@
 		<script src="../js/shared.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
 		<script>
-			var BGM_MainMenu;
-			var BGM_InGame;
-			var BGM_TimeRunningOut;
-			var BGM_FinalScores;
-			
 			var unsavedChanges = false;
 			
 			function Initialize(){
@@ -19,10 +14,6 @@
 			function SaveChanges(){
 				localStorage.setItem("BGMVolume", $("#BGMVolumeNum").text());
 				localStorage.setItem("SFXVolume", $("#SFXVolumeNum").text());
-				//localStorage.setItem("BGM_MainMenu", $("#BGM_MainMenu").val());
-				//localStorage.setItem("BGM_InGame", $("#BGM_InGame").val());
-				//localStorage.setItem("BGM_TimeRunningOut", $("#BGM_TimeRunningOut").val());
-				//localStorage.setItem("BGM_FinalScores", $("#BGM_FinalScores").val());
 				unsavedChanges = false;
 			}
 			function GoToMenu(Unsaved){

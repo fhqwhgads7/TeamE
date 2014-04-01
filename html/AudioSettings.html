@@ -26,10 +26,10 @@
 			}
 			function LoadOptions(){
 				var BGMVolume = parseInt(localStorage.getItem("BGMVolume"));
-				if (!BGMVolume)
+				if (BGMVolume == null)
 					BGMVolume = 50;
 				var SFXVolume = parseInt(localStorage.getItem("SFXVolume"));
-				if (!SFXVolume)
+				if (SFXVolume == null)
 					SFXVolume = 50;
 					
 				dialSet("BGMDial", BGMVolume);

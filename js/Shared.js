@@ -130,7 +130,7 @@ var GameSounds={
 }
 function playSound(sound){
 	SFXVolume = parseInt(localStorage.getItem("SFXVolume"));
-	if (!SFXVolume)
+	if (SFXVolume == null)
 		SFXVolume = 50;
 	var theSound = new Audio(sound);
 	theSound.volume = SFXVolume/100.0;

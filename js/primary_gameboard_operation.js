@@ -123,6 +123,7 @@ function NewGameInitialize(){
 	UpdatePlayerDisplay();
 	PopulateNewProdCategories();
 	setInterval("TipThink();",10);
+	setInterval("CanMakeProductThink();",10);
 	setTimeout(DisplayNewRoundEvent,1);
 	$("#MainBoard").hide();
 	setTimeout(Appear,750);
@@ -176,6 +177,9 @@ function TipThink(){
 		Elem.innerHTML=Tips[SelectedTip];
 	}
 	Elem.style.left=(NewPos).toString()+"px";
+}
+function CanMakeProductThink(){
+	$("#new-product-button").attr("disabled",(TheGame.CurrentPlayer.hasMadeProductThisTurn));
 }
 function TransferGameStartupInfo(from,to){
 	for(var i=1;i<=6;i++){
@@ -294,19 +298,23 @@ function RecreateProductDisplay(prod){
 //Removes the product passed through the parameter
 function removeProduct(prod){
 	if (prod) {
+		playSound(GameSounds.LoseMoney);
 		$("#ProductWindow").hide();
 		if (isThisProductPatented(prod, TheGame))
 			removePatentFromRecords(prod, TheGame);
 		if (prod == CurrentlySelectedProduct)
 			CurrentlySelectedProduct = null;
-		$("div").remove("#ProductDisplayItem_"+prod.GlobalID);
+		$("#ProductDisplayItem_"+prod.GlobalID).css('opacity', '0');
+		$("#ProductDisplayItem_"+prod.GlobalID).css('transition', '500ms ease-out');
+		setTimeout(function(){
+			$("div").remove("#ProductDisplayItem_"+prod.GlobalID);
+		},500);
 		if (prod.justStarted)
-			$("#new-product-button").attr("disabled",false);
+			TheGame.CurrentPlayer.hasMadeProductThisTurn = false;
 		prod.Owner.Products.splice(prod.Number, 1);
 		TheGame.Players[TheGame.CurrentPlayerNum].NumProducts--;
 		UpdatePlayerProductDisplayPosition(prod.Owner);
 		UpdatePlayerDisplay();
-		playSound(GameSounds.LoseMoney);
 	}
 }
 //Takes a series of products and removes them in succession
@@ -643,7 +651,7 @@ function PopulateScoreboard(){
 	}
 }
 function CycleTurn(){
-	$("#new-product-button").attr("disabled",false);
+	TheGame.CurrentPlayer.hasMadeProductThisTurn = false;
 	$(".ProductDisplayItem").css("z-index",1);
 	if(TheGame.NumPlayers>1){
 		var WillGo=false;
@@ -654,7 +662,6 @@ function CycleTurn(){
 		}
 		TheGame.CurrentPlayerNum=NewPlyNum;
 		TheGame.CurrentPlayer=TheGame.Players[TheGame.CurrentPlayerNum];
-		//$('.Standard').attr("disabled", TheGame.CurrentPlayer.Type=="Computer");
 		$("#CurProdAdvanceButton").prop("disabled",true);
 		$("#CurProdRevertButton").prop("disabled",true);
 		if(CurrentlySelectedProduct!=null){

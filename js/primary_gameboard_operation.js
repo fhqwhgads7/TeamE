@@ -129,17 +129,23 @@ function NewGameInitialize(){
 
 }
 function LoadGameInitialize(gameName){
-	TheGame = CircularJSON.parse(localStorage.getItem("SomeName"));
+	TheGame = CircularJSON.parse(localStorage.getItem("LastSavedGame"));
 	if (!TheGame)
 		NewGameInitialize();
 	else{
+		//This code includes logic to recreate each object's particular functions, as even Circular-JSON loses sight of them.
+		//Luckily there are only four such lines that are needed.
+		Appear();
 		SubCategoryAttributes = TheGame.SubCategoryAttributes;
 		RandomEvents = TheGame.RandomEvents;
+		TheGame.toString = function () { return this.ClassName + " " + this.ID.toString(); };
 		for (q = 0; q < TheGame.Players.length; q++) {
+			TheGame.Players[q].toString = function () { return this.ClassName+" "+this.GlobalID+": "+this.Name+", "+this.Type+", "+this.Color; };
+			TheGame.Players[q].TurnInit = function () { if (this.Type=="Computer") { VI_Begin(this); } };
 			for (j = 0; j < TheGame.Players[q].Products.length; j++) {
+				TheGame.Players[q].Products[j].toString = function () { return this.ClassName+" "+this.GlobalID+": "+this.Name+", "+this.Owner.Name+", "+this.Category+", "+this.SubCategory+", "+this.Color; };
 				RecreateProductDisplay(TheGame.Players[q].Products[j]);
 			}
-			UpdatePlayerProductDisplayPosition(TheGame.Players[q]);
 		}
 		TheGame.CurrentPlayer=TheGame.Players[TheGame.CurrentPlayerNum];
 		TheGame.CurrentPlayerNum=TheGame.CurrentPlayer.Number;
@@ -147,7 +153,11 @@ function LoadGameInitialize(gameName){
 		PopulateNewProdCategories();
 		if (TheGame.Settings.NumberOfRounds-TheGame.CurrentRound <= 5)
 			changeCurrentBGM("TimeRunningOut");
+		$("#RoundNumberDisplay").text("ROUND " + TheGame.CurrentRound.toString());
 		setInterval("TipThink();",10);
+		setTimeout(function(){
+			TheGame.CurrentPlayer.TurnInit();
+		},1250);
 	}
 }
 function SaveThisGame(gameName){
@@ -155,7 +165,6 @@ function SaveThisGame(gameName){
 	TheGame.RandomEvents = RandomEvents;
 	var saveMe = CircularJSON.stringify(TheGame);		
 	localStorage.setItem(gameName, saveMe);
-	alert("Game object was stringified and stored in the local storage");
 }
 function TipThink(){
 	var Elem=document.getElementById("TipSpan");
@@ -163,7 +172,8 @@ function TipThink(){
 	var NewPos=Pos-1;
 	if(NewPos<=-Elem.innerHTML.length*15){
 		NewPos=BOARD_WIDTH+1;
-		Elem.innerHTML=Tips[Math.floor((Math.random()*Tips.length))];
+		SelectedTip = Math.floor(Math.random()*Tips.length*0.5*(1+(TheGame.CurrentRound/TheGame.Settings.NumberOfRounds)));
+		Elem.innerHTML=Tips[SelectedTip];
 	}
 	Elem.style.left=(NewPos).toString()+"px";
 }
@@ -279,6 +289,7 @@ function RecreateProductDisplay(prod){
 	ProdElem.style.webkitTransform="rotate("+(-Rotation).toString()+"deg)";
 	ProdElem.style.MozTransform="rotate("+(-Rotation).toString()+"deg)";
 	GameBoard.appendChild(ProdElem);
+	UpdateProductListDisplayPosition(GetProductsInSamePhase(prod));
 }
 //Removes the product passed through the parameter
 function removeProduct(prod){
@@ -293,6 +304,7 @@ function removeProduct(prod){
 			$("#new-product-button").attr("disabled",false);
 		prod.Owner.Products.splice(prod.Number, 1);
 		TheGame.Players[TheGame.CurrentPlayerNum].NumProducts--;
+		UpdatePlayerProductDisplayPosition(prod.Owner);
 		UpdatePlayerDisplay();
 		playSound(GameSounds.LoseMoney);
 	}
@@ -328,9 +340,9 @@ function GetProductsInSamePhase(prod){
 function GetProductsInThisPhase(ThisPhase, Ply){
 	var ProdsInSameSpot = new Array();
 	
-	for (i = 0; i < Ply.Products.length; i++){
-		if (Ply.Products[i].Phase == ThisPhase){
-			ProdsInSameSpot.push(Ply.Products[i]);
+	for (j = 0; j < Ply.Products.length; j++){
+		if (Ply.Products[j].Phase == ThisPhase){
+			ProdsInSameSpot.push(Ply.Products[j]);
 		}
 	}
 	
@@ -351,8 +363,8 @@ function UpdatePlayerProductDisplayPosition(Ply){
 
 function UpdateProductListDisplayPosition(ProdList){
 	var angularIncrement = 2*(Math.PI)/(ProdList.length);
-	var Magnitude = 30*Math.log(ProdList.length)/Math.log(5);
-	var scalar = 1;
+	var Magnitude = 50*Math.log(ProdList.length)/Math.log(5);
+	var scalar = Math.pow(Math.E, -((ProdList.length - 1)*0.1)).toString();
 	
 	for (i = 0; i < ProdList.length; i++){
 		TheProd = ProdList[i];
@@ -361,6 +373,9 @@ function UpdateProductListDisplayPosition(ProdList){
 		var ProdElem=$("#"+"ProductDisplayItem_"+TheProd.GlobalID);
 		ProdElem.css("left",(PhasePositions[TheProd.Phase][0]+XOffset*Magnitude).toString()+"px");
 		ProdElem.css("top",(PhasePositions[TheProd.Phase][1]+YOffset*Magnitude).toString()+"px");
+		ProdElem.css({ transform: 'scale('+scalar+','+scalar+')'});
+		//ProdElem.css("webkitTransform","scale(scalar,scalar)");
+		//ProdElem.css("mozTransform","scale(scalar,scalar)");
 	}	
 }
 
@@ -537,6 +552,7 @@ function TryToAdvanceProduct(){
 	}
 	
 	UpdateProductListDisplayPosition(GetProductsInSamePhase(CurrentlySelectedProduct));
+	UpdatePlayerProductDisplayPosition(CurrentlySelectedProduct.Owner);
 	UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
 	UpdatePlayerDisplay();
 }
@@ -570,6 +586,7 @@ function TryToRevertProduct(){
 	}
 	if (!removeCheck){
 		UpdateProductListDisplayPosition(GetProductsInSamePhase(CurrentlySelectedProduct));
+		UpdatePlayerProductDisplayPosition(CurrentlySelectedProduct.Owner);
 		UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
 		UpdatePlayerDisplay();
 	}
@@ -694,6 +711,7 @@ function DisplayNewRoundEvent(){
 					$("#ProductDisplayItem_" + TheGame.CurrentPlayer.Products[i].GlobalID).css("z-index",2);
 				}
 				$("#ProductWindow").hide();
+				$("#RoundNumberDisplay").text("ROUND " + Num.toString());
 				CurrentlySelectedProduct=null;
 				setTimeout(function(){
 					var Elem=document.getElementById("MainBoard");
@@ -808,16 +826,16 @@ function NewRoundCalc(){
 	}
 }
 function DecrementCategoryChanges(){
-	for (i = 0; i < SubCategoryAttributes.length; i++){
-		if (SubCategoryAttributes[3] == 0)
-			SubCategoryAttributes[3] = 0.1;
+	for (SubCat in SubCategoryAttributes){
+		if (SubCat[3] == 0)
+			SubCat[3] = 0.1;
 		else{
-			if (SubCategoryAttributes[3] > 1)
-				SubCategoryAttributes[3] -= 0.1;
-			else if (SubCategoryAttributes[3] < 1)
-				SubCategoryAttributes[3] += 0.1;
-		if (SubCategoryAttributes[4] > 0)
-			SubCategoryAttributes[4]--;
+			if (SubCat[3] > 1)
+				SubCat[3] -= 0.1;
+			else if (SubCat[3] < 1)
+				SubCat[3] += 0.1;
+		if (SubCat[4] > 0)
+			SubCat[4]--;
 	}
 	if (TotalPayoutRate > 1)
 		TotalPayoutRate -= 0.1;
@@ -1035,7 +1053,7 @@ function RandomEventSelector(){
 		var theValue = Math.floor(Math.random()*11-5) + difficultyOffset;
 		for (i=0; i < RandomEvents.length; i++){
 			if (RandomEvents[i][9] > 0)
-				RandomEvents[i][9]--;
+				RandomEvents[i][9] = RandomEvents[i][9] - 1;
 			if (theValue == RandomEvents[i][3]) {
 				if (IterateThroughThese.indexOf(RandomEvents[i]) < 0) {
 					if ((RandomEvents[i][9] <= 0) && (RandomEvents[i][7] >= Math.random())){
@@ -1064,7 +1082,7 @@ function RandomEventIterator(){
 		var Value=Event[5];
 		var Target;
 		
-		if (AreaOfEffect="OnePlayer")
+		if (AreaOfEffect=="OnePlayer")
 			Target=TheGame.Players[Math.floor(Math.random()*TheGame.Players.length)];
 		else
 			Target=TheGame.Players;

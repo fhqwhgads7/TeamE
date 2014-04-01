@@ -186,7 +186,7 @@ div.ProductDisplayItem{
 	border-width:5px;
 	border-color:red;
 	box-shadow:4px 4px 15px -2px #000000;
-	transition:top 1s ease-out,left 1s ease-out;
+	transition:1s ease-out;
 	webkit-transform-origin:50% 50%;
 	moz-transform-origin:50% 50%;
 }

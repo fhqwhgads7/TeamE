@@ -23,6 +23,7 @@
 				GlobalInitialize();
 				GameInitialize();
 				setInterval("RotateThink();",50);
+				setInterval("SaveThink();",1000);
 			}
 			function RotateBegin(dir){
 				RotateDir=dir*5;
@@ -46,6 +47,9 @@
 						}
 					}
 				}
+			}
+			function SaveThink(){
+				SaveThisGame("LastSavedGame");
 			}
 			function displayNewProductDialog() {
 				$("#PopupOverlay").show();
@@ -129,15 +133,12 @@
 				$("#PopupOverlay").show();
 				$("#QuitDialog").show();
 			}
-			function QuitGame(saveFirst){
-				if(saveFirst)//{
-					SaveThisGame("SomeName");
-				//}else{
-					CloseQuitDialog();
-					TheGame=null;
-					localStorage.setItem("TheBrandNewGame",null);
-					SwitchToPage("title.html");
-				//}
+			function QuitGame(){
+				SaveThisGame("LastSavedGame");
+				CloseQuitDialog();
+				TheGame=null;
+				localStorage.setItem("TheBrandNewGame",null);
+				SwitchToPage("title.html");
 			}
 			function CloseQuitDialog(){
 				$("#QuitDialog").hide();
@@ -266,10 +267,10 @@
 						<button class="Standard Compact" id="CurProdDetailsButton" style="top:82%;left:6%;height:15%;width:42%;" onmouseover="noSound()" onclick="ShowProductStats();" disabled>Details</button>
 						<button class="Standard Compact" id="CurProdPatentButton" style="top:82%;left:52%;height:15%;width:42%;" onmouseover="noSound()" onclick="TryToPatentProduct(); noSound();" disabled>Patent</button>
 					</div>
-					<button id="new-product-button" class="Standard Compact" style="top:80%;left:3%;width:10%;height:8%;"onclick="displayNewProductDialog()">New<br>Product</button>
-					<button id="employee_button" class="Standard Compact" style="top:80%;left:13%;width:11%;height:8%;" onclick="displayEmployeeDialog()">Manage<br>Employees</button>
-					<button class="Standard Compact" style="top:88%;left:3%;width:10%;height:8%;" onclick="ShowAllPlayers()">Show Players</button>
-					<button id="EndTurnBtn" class="Standard Compact" style="top:88%;left:13%;width:11%;height:8%;" onclick="EndCurrentTurn(); noSound()">End Turn</button>
+					<button id="new-product-button" class="Standard Compact" style="top:80%;left:3%;width:11%;height:8%;"onclick="displayNewProductDialog()">New<br>Product</button>
+					<button id="employee_button" class="Standard Compact" style="top:80%;left:14%;width:11%;height:8%;" onclick="displayEmployeeDialog()">Manage<br>Employees</button>
+					<button class="Standard Compact" style="top:88%;left:3%;width:11%;height:8%;" onclick="ShowAllPlayers()">Show Players</button>
+					<button id="EndTurnBtn" class="Standard Compact" style="top:88%;left:14%;width:11%;height:8%;" onclick="EndCurrentTurn(); noSound()">End Turn</button>
 					
 					<button class="Standard Compact" style="top:90%;left:90%;width:8%;height:5%;" onclick="TryToQuitGame()">Quit</button>
 
@@ -403,11 +404,10 @@
 							<button class="Standard" style="left:10%;top:75%;width:30%" onclick="CloseRemoveDialog()">Cancel</button>
 							<button class="Standard" style="right:10%;top:75%;width:30%" onclick="removeProduct(CurrentlySelectedProduct); CloseRemoveDialog(); noSound()">Remove</button>
 						</div>
-						<div class="Popup" id="QuitDialog">
-							<div class="StandardText" style="margin:0px;width:100%;top:10%">Are You Sure?</div>
-							<button class="Standard" style="left:14%;top:35%;width:72%" onclick="QuitGame(true)">Save and Quit</button>
-							<button class="Standard" style="left:14%;top:55%;width:72%" onclick="QuitGame(false)">Quit Without Saving</button>
-							<button class="Standard" style="left:14%;top:75%;width:72%" onclick="CloseQuitDialog()">Cancel</button>
+						<div class="Popup" id="QuitDialog" style="top:25%;height:50%;width:56%;left:22%">
+							<div class="StandardText" style="font-size:40px;margin:0px;width:100%;top:10%">Are you sure you want to quit?</div>
+							<button class="Standard" style="font-size:20px;left:14%;top:55%;width:72%" onclick="QuitGame()">Yes, I'm Done</button>
+							<button class="Standard" style="font-size:20px;left:14%;top:75%;width:72%" onclick="CloseQuitDialog()">No, I misclicked</button>
 						</div>
 						<div class="Popup" id="EventDialog" style="top:10%;height:80%;width:60%;left:20%">
 							<div class="StandardText" id="EventTitle" style="font-size:35px;margin:0px;width:100%;top:3%;">Code is broken!</div>
@@ -428,6 +428,7 @@
 					<span id="CashFive" class="CashAlert">0</span>
 					<span id="CashSix" class="CashAlert">0</span>
 					<div class="StandardText" id="TipSpan" style="font-size:12px;transition:none;white-space:nowrap;color:rgba(255,255,255,.8);top:97%;left:980px;">Welcome to the stage of Entrepreneurship!</div>
+					<div class="StandardText" id="RoundNumberDisplay" style="font-size:20px;transition:none;top:1%;right:1%;text-align:right">Round Borked!</div>
 				</div>
 			</div>
 			<div id="RoundAnnouncer">ROUND<br>1</div>

@@ -90,24 +90,36 @@ var NumberNameTable={
 	5:"Five",
 	6:"Six"
 }
-var theTips=[
-	"Don't drink and drive &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp 		&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Don't fail too hard or else flying monkeys will appear out of nowhere and eat your face. &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp 		&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Try the salad; it's delicious. &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp 		&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp If you lose your entire investment on a product with no designers, testers, or developers, it's probably your own fault. &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp 		&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Lisa needs braces.&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp 		&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspYOU MUST RECOVER &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp 		&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Innovation requires taking risks. &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp 		&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp The more risks you take, the higher your chances of success will be. &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp 		&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Make a product!&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp 		&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Don't die! &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp 		&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspNineteen!                                                                  2+2 = Fish!&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp 		&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspEmployees will cost money over time. Produce a profitable product to gain it back!"
-]
 var Tips=[
-	"Don't drink and drive.",
-	"Don't fail too hard or else flying monkeys will appear out of nowhere and eat your face.",
-	"Try the salad; it's delicious.",
-	"If you lose your entire investment on a product with no designers, testers, or developers, it's probably your own fault.",
-	"Lisa needs braces.",
-	"YOU MUST RECOVER",
 	"Innovation requires taking risks.",
 	"The more risks you take, the higher your chances of success will be.",
+	"Employees will cost money over time. Produce a profitable product to gain it back!",
+	"One way to secure your assets is by patenting a product. Be sure to patent a good product, though!",
+	"Pay attention to current events to help you with decision making!",
+	"It takes some time to prototype or deploy a product. Patience!",
+	"Don't leave a product in the same phase for too long. Spending too much time on one thing produces diminishing results!",
+	"It takes time to build a prototype or deploy a product; this is why progression from these phases is not immediate.",
+	"Try to hold on to your employees; it costs money just to get them started!",
+	"If a product fails out on the market, don't panic! Failure is but a learning experience, a path to success.",
+	"Don't leave too many products in the same phase. Multitasking is not the easiest thing to do.",
+	"Different kinds of products have different characteristics. Some are riskier or more expensive than others, but it can be easy to build their idea strength.",
+	"A stable product is a successful product. Testing is key! There are three phases for it.",
+	"Be sure to keep an eye on the other players and stay ahead of the competition.",
+	"The Maintenance phase is your target.",
 	"Make a product!",
-	"Don't die!",
+	"Those arrows below your player window can turn the board for easier readability.",
+	"Don't pursue so many ventures you can't click on any of them to view their details!",
+	"If you lose your entire investment on a product without taking the time to refine its idea or, design, develop, or test it, it's probably your own fault.",
+	"Don't drink and drive.",
+	"Don't die. That hurts.",
+	"Try the salad; it's delicious.",
+	"YOU MUST RECOVER",
+	"Lisa needs braces!",
+	"2 + 2 = Fish!",
 	"Nineteen!",
-	"2+2 = Fish!",
-	"Employees will cost money over time. Produce a profitable product to gain it back!"
-]
+	"Don't fail too hard or else flying monkeys will appear out of nowhere and eat your face.",
+	"If you can read this, you have mastered visual recognition and probably don't need glasses. Or are wearing glasses already."
+];
 var GameSounds={
 	ButtonHover: '../sounds/sfx/button_hover.wav',
 	ButtonSelect: '../sounds/sfx/button_select.wav',
@@ -130,7 +142,7 @@ var GameSounds={
 }
 function playSound(sound){
 	SFXVolume = parseInt(localStorage.getItem("SFXVolume"));
-	if (SFXVolume == null)
+	if (isNaN(SFXVolume))
 		SFXVolume = 50;
 	var theSound = new Audio(sound);
 	theSound.volume = SFXVolume/100.0;

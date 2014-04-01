@@ -49,7 +49,7 @@
 			}
 			
 			BGMVolume = parseInt(localStorage.getItem("BGMVolume"));
-			if (BGMVolume==null)
+			if (isNaN(BGMVolume))
 				BGMVolume = 50;
 			TheBGM.volume = BGMVolume/100.0;
 			

@@ -5,11 +5,12 @@
 		<script src="../js/shared.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
 		<script>
-			var unsavedChanges = false;
+			var unsavedChanges;
 			
 			function Initialize(){
 				GlobalInitialize();
 				LoadOptions();
+				unsavedChanges = false;
 			}
 			function SaveChanges(){
 				localStorage.setItem("BGMVolume", $("#BGMVolumeNum").text());
@@ -26,10 +27,10 @@
 			}
 			function LoadOptions(){
 				var BGMVolume = parseInt(localStorage.getItem("BGMVolume"));
-				if (BGMVolume == null)
+				if (isNaN(BGMVolume))
 					BGMVolume = 50;
 				var SFXVolume = parseInt(localStorage.getItem("SFXVolume"));
-				if (SFXVolume == null)
+				if (isNaN(SFXVolume))
 					SFXVolume = 50;
 					
 				dialSet("BGMDial", BGMVolume);

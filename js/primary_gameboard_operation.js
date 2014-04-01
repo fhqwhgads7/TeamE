@@ -123,7 +123,6 @@ function NewGameInitialize(){
 	UpdatePlayerDisplay();
 	PopulateNewProdCategories();
 	setInterval("TipThink();",10);
-	setInterval("CanMakeProductThink();",10);
 	setTimeout(DisplayNewRoundEvent,1);
 	$("#MainBoard").hide();
 	setTimeout(Appear,750);
@@ -155,8 +154,8 @@ function LoadGameInitialize(gameName){
 		if (TheGame.Settings.NumberOfRounds-TheGame.CurrentRound <= 5)
 			changeCurrentBGM("TimeRunningOut");
 		$("#RoundNumberDisplay").text("ROUND " + TheGame.CurrentRound.toString());
+		$("#new-product-button").attr("disabled",(TheGame.CurrentPlayer.hasMadeProductThisTurn));
 		setInterval("TipThink();",10);
-		setInterval("CanMakeProductThink();",10);
 		setTimeout(function(){
 			TheGame.CurrentPlayer.TurnInit();
 		},1250);
@@ -178,9 +177,6 @@ function TipThink(){
 		Elem.innerHTML=Tips[SelectedTip];
 	}
 	Elem.style.left=(NewPos).toString()+"px";
-}
-function CanMakeProductThink(){
-	$("#new-product-button").attr("disabled",(TheGame.CurrentPlayer.hasMadeProductThisTurn));
 }
 function TransferGameStartupInfo(from,to){
 	for(var i=1;i<=6;i++){
@@ -259,6 +255,7 @@ function createNewProduct(){
 		},200);
 		playSound(GameSounds.Wrong_Med);
 	}
+	$("#new-product-button").attr("disabled",(TheGame.CurrentPlayer.hasMadeProductThisTurn));
 }
 function CreateProductDisplay(prod){
 	var GameBoard=document.getElementById("GameBoardCircle");
@@ -331,6 +328,7 @@ function removeProduct(prod){
 		UpdatePlayerProductDisplayPosition(prod.Owner);
 		UpdatePlayerDisplay();
 	}
+	$("#new-product-button").attr("disabled",(TheGame.CurrentPlayer.hasMadeProductThisTurn));
 }
 //Takes a series of products and removes them in succession
 function removeMultipleProducts(HitList) {
@@ -396,28 +394,9 @@ function UpdateProductListDisplayPosition(ProdList){
 		var ProdElem=$("#"+"ProductDisplayItem_"+TheProd.GlobalID);
 		ProdElem.css("left",(PhasePositions[TheProd.Phase][0]+XOffset*Magnitude).toString()+"px");
 		ProdElem.css("top",(PhasePositions[TheProd.Phase][1]+YOffset*Magnitude).toString()+"px");
-		ProdElem.css({ transform: 'scale('+scalar+','+scalar+')'});
-		//ProdElem.css("webkitTransform","scale(scalar,scalar)");
-		//ProdElem.css("mozTransform","scale(scalar,scalar)");
+		ProdElem.css({ 'webkit-transform': 'scale('+scalar+','+scalar+')'});
+		ProdElem.css({ 'transform': 'scale('+scalar+','+scalar+')'});
 	}	
-}
-
-function UpdateProductDisplayPosition(prod){
-	var AlreadyThere=-2;
-	for(Biz in TheGame.Players){
-		var Ply=TheGame.Players[Biz]
-		for(Prod in Ply.Products){
-			if(TheGame.Players[Biz].Products[Prod].Phase==prod.Phase){
-				AlreadyThere=AlreadyThere+1;
-			}
-		}
-	}
-	var Add=15*AlreadyThere;
-	var ProdElem=$("#"+"ProductDisplayItem_"+prod.GlobalID);
-	setTimeout(function(){
-		ProdElem.css("left",(PhasePositions[prod.Phase][0]+Add).toString()+"px");
-		ProdElem.css("top",(PhasePositions[prod.Phase][1]+Add).toString()+"px");
-	},1);	
 }
 
 function EmployeeChange(type,num){
@@ -667,6 +646,7 @@ function PopulateScoreboard(){
 }
 function CycleTurn(){
 	TheGame.CurrentPlayer.hasMadeProductThisTurn = false;
+	$("#new-product-button").attr("disabled",(TheGame.CurrentPlayer.hasMadeProductThisTurn));
 	$(".ProductDisplayItem").css("z-index",1);
 	if(TheGame.NumPlayers>1){
 		var WillGo=false;
@@ -773,29 +753,29 @@ function NewRoundCalc(){
 					}
 				}
 				if(Prod.Phase==ProductPhases.Idea){
-					Prod.IdeaStrength=Prod.IdeaStrength+Math.ceil(SubCategoryAttributes[Prod.SubCategory][2]*6.0/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.IdeaStrength=Prod.IdeaStrength+Math.ceil(SubCategoryAttributes[Prod.SubCategory][2]*6.0*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty)))/(numOnSameSpot+Prod.turnsInSamePhase));
 					MoveItSoon(Ply, Prod);
 				}else if(Prod.Phase==ProductPhases.Design){
 					EmployeeReductionCheck("des", Ply, Prod);
-					Prod.DesignStrength=Prod.DesignStrength+Math.ceil(2*Ply.NumCreative/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.DesignStrength=Prod.DesignStrength+Math.ceil(2*Ply.NumCreative*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty)))/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.Prototype){
 					Prod.hasPrototype=true;
 				}else if(Prod.Phase==ProductPhases.PrototypeTesting){
 					EmployeeReductionCheck("tes", Ply, Prod);
-					Prod.DesignStrength=Prod.DesignStrength+Math.ceil(Ply.NumQA*1.2/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.DesignStrength=Prod.DesignStrength+Math.ceil(Ply.NumQA*1.2*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty)))/(numOnSameSpot+Prod.turnsInSamePhase));
 					Prod.TestingStrength+=(Prod.DesignStrength*Ply.NumQA/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.Development){
 					EmployeeReductionCheck("dev", Ply, Prod);
-					Prod.BuildStrength=Prod.BuildStrength+Math.ceil(2*Ply.NumDevs/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.BuildStrength=Prod.BuildStrength+Math.ceil(2*Ply.NumDevs*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty)))/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.PreDepTesting){
 					EmployeeReductionCheck("tes", Ply, Prod);
-					Prod.BuildStrength=Prod.BuildStrength+Math.ceil(Ply.NumQA*1.2/(numOnSameSpot+Prod.turnsInSamePhase));
-					Prod.TestingStrength+=(Prod.BuildStrength*Ply.NumQA/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.BuildStrength=Prod.BuildStrength+Math.ceil(Ply.NumQA*1.2*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty)))/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.TestingStrength+=(Prod.BuildStrength*Ply.NumQA*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty)))/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.Deployment){
 					Prod.readyToDeploy=true;
 				}else if(Prod.Phase==ProductPhases.PostDepTesting){
 					EmployeeReductionCheck("tes", Ply, Prod);
-					Prod.TestingStrength+=Math.ceil(0.5*(Prod.DesignStrength+Prod.BuildStrength)*Ply.NumQA/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.TestingStrength+=Math.ceil(0.5*(Prod.DesignStrength+Prod.BuildStrength)*Ply.NumQA*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty)))/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.Maintenance){
 					var Broken = DoesItBreak(Prod);
 					if (Broken>0){
@@ -805,7 +785,7 @@ function NewRoundCalc(){
 						Prod.TestingStrength+=(Prod.DesignStrength+Prod.BuildStrength);
 					}
 				}
-				Prod.Volatility = 1/(1+.1*Prod.TestingStrength);
+				Prod.Volatility = 1/(1+.1*Prod.TestingStrength*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty))));
 			}
 		}
 	}

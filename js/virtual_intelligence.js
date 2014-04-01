@@ -18,7 +18,9 @@ function VI_Logic(){
 		self.VIMemory.Products.push(["Win-o-Tron 9000"]);
 	}else{
 		self.VIMemory.CurProdNum=0;
-		// now iterate and manage each product you have
+		self.VIMemory.Products.foreach(function(prod)){
+			alert(prod);
+		}
 	}
 	VI_End();
 }

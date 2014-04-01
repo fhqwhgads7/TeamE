@@ -511,7 +511,7 @@ function PopulateDetails(id){
 		$("#DetailsPIS").text(Prod.IdeaStrength.toString());
 		$("#DetailsPDS").text(Prod.DesignStrength.toString());
 		$("#DetailsPBS").text(Prod.BuildStrength.toString());
-		$("#DetailsTSS").text(Prod.TestingStrength.toString());
+		$("#DetailsTSS").text(Math.round(Prod.TestingStrength).toString());
 		$("#DetailsCOS").text((Math.round((1-Prod.Volatility)*100)).toString()+"%");
 		if (Prod.hasPrototype)
 			$("#DetailsHPT").text("Yes");
@@ -848,7 +848,7 @@ function DecrementCategoryChanges(){
 	if (TotalPayoutRate > 1)
 		TotalPayoutRate -= 0.1;
 	else if (TotalPayoutRate < 1)
-		TotalPayoutRate += 1;
+		TotalPayoutRate += 0.1;
 	}
 }
 function Appear(){

@@ -68,7 +68,29 @@
 				$("#WinningPercent").html(percent);
 				$("#TotalDollars").html(Ply.Money);
 			}
-		}			
+		}
+///Not done yet working on save function to save to logged in player		
+		function SaveStats(){
+			var FinalStats=Parse.Object.extend("Final");
+			var finalStats=new FinalStats();
+		
+			finalStats.set("playerName", "#PlyOneStatsName");
+			finalStats.set("gamesplayed", games);
+			finalStats.set("gameswon", games);
+			finalStats.set("winpercent", percent);
+			finalStats.set("totaldollars", Ply.Money);
+		
+			finalStats.save(null, {
+				success: function(finalStats) {
+				  alert('New object created with objectId: ' + finalStats.id);
+                },
+                error: function(finalStats, error) {
+
+                  alert('Failed to create new object, with error code: ' + error.description);
+                }
+            });
+
+        }		
 		</script>
 		
 		<style>

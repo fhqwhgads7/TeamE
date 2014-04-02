@@ -39,6 +39,10 @@
 			function joinGameLobby(game) {
 				gameName = game.get("name");
 				players = game.get("players");
+				// host = game.get("host");
+				// if(YOU ARE THE HOST) {
+				// 	$("#begin-game-button").show();
+				// }
 				populateLobby(players);
 				$("#new-game-name").text(gameName);
 				goToLobby();
@@ -250,20 +254,9 @@
 			function GoBack(){
 				goToFindGame();
 			}
-			function CreateGame(){
-				if (SaveData()){
-					SwitchToPage("game_board.html");
-				}
-				else {
-					for(var i=1;i<=6;i++){
-						var Num=NumberNameTable[i];
-						if(($("#Player"+Num+"Type option:selected").text()=="Player") && !($("#Player"+Num+"Name").val())) {
-							NameFieldFlash(Num);
-						}
-					}
-					playSound(GameSounds.Wrong_Med);
-				}
+			function BeginGame(){
 			}
+
 			function NameFieldFlash(Num){
 				$("#Player"+Num+"Name").css("background-color", "red");
 				setTimeout(function(){ $("#Player"+Num+"Name").css("background-color", "white"); },100);
@@ -304,7 +297,7 @@
 			div.PlayerBox:hover{
 				background:rgba(255,255,255,.1);
 			}
-			#lobby-wrapper {
+			#lobby-wrapper, #begin-game-button {
 				display: none;
 			}
 		</style>
@@ -399,8 +392,8 @@
 					</select>
 				</div>
 				<button class="Standard" onclick="GoBack()" style="left:16%;top:82%;width:28%;font-size:20px">Back</button>
-<!-- 				<button class="Standard" onclick="CreateGame()" style="right:16%;top:82%;width:28%;font-size:20px">Create Game</button>
- -->			</div>
+				<button id="begin-game-button" class="Standard" onclick="BeginGame()" style="right:16%;top:82%;width:28%;font-size:20px">Begin Game</button>
+			</div>
 		<button class="Standard" onclick="GoBackToMainMenu()" style="left:34%;top:90%;width:32%">Main Menu</button>
 		</div>
 		</div>

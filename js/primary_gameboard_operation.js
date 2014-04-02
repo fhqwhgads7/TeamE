@@ -164,7 +164,7 @@ function LoadGameInitialize(gameName){
 function SaveThisGame(gameName){
 	TheGame.SubCategoryAttributes = SubCategoryAttributes;
 	TheGame.RandomEvents = RandomEvents;
-	var saveMe = CircularJSON.stringify(TheGame);		
+	var saveMe = CircularJSON.stringify(TheGame);
 	localStorage.setItem(gameName, saveMe);
 }
 function TipThink(){
@@ -1048,7 +1048,7 @@ function RandomEventSelector(){
 	if (TheGame.Settings.Difficulty=="EASY")
 		difficultyOffset = 5;
 	else if (TheGame.Settings.Difficulty=="HARD")
-		difficultyOffset = -2
+		difficultyOffset = -2;
 	else if (TheGame.Settings.Difficulty=="LUNATIC")
 		difficultyOffset = -5;
 	for (j = 0; j < (Math.log(TheGame.CurrentRound+6)/Math.log(10)); j++)

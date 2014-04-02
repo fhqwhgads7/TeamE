@@ -151,6 +151,9 @@ function LoadGameInitialize(gameName){
 		TheGame.CurrentPlayerNum=TheGame.CurrentPlayer.Number;
 		UpdatePlayerDisplay();
 		PopulateNewProdCategories();
+		for (i=0; i<TheGame.CurrentPlayer.Products.length; i++){
+			$("#ProductDisplayItem_" + TheGame.CurrentPlayer.Products[i].GlobalID).css("z-index",2);
+		}
 		if (TheGame.Settings.NumberOfRounds-TheGame.CurrentRound <= 5)
 			changeCurrentBGM("TimeRunningOut");
 		$("#RoundNumberDisplay").text("ROUND " + TheGame.CurrentRound.toString());
@@ -298,7 +301,7 @@ function RecreateProductDisplay(prod){
 	ProdElem.style.backgroundImage="url('../images/ProductIcons/"+prod.Category.toLowerCase()+"_"+prod.SubCategory.toLowerCase()+".png')";
 	ProdElem.style.left="0px";
 	ProdElem.style.top="0px";
-	ProdElem.style.zIndex="2";
+	ProdElem.style.zIndex="1";
 	ProdElem.style.borderStyle="outset";
 	ProdElem.style.borderColor=PlayerColors[prod.Color];
 	ProdElem.style.backgroundColor=prod.Color;
@@ -406,13 +409,13 @@ function EmployeeChange(type,num){
 	var testers = parseInt($("#EmpPopupTes").text());
 	
 	if (type=="des"){
-		if (num+designers>=0)
+		if (num+designers>=0 && num+designers<=100)
 			$("#EmpPopupDes").text((num+designers).toString());
 	}else if(type=="dev"){
-		if (num+developers>=0)
+		if (num+developers>=0 && num+developers<=100)
 			$("#EmpPopupDev").text((num+developers).toString());
 	}else if(type=="tes"){
-		if (num+testers>=0)
+		if (num+testers>=0 && num+testers<=100)
 			$("#EmpPopupTes").text((num+testers).toString());	
 	}
 }
@@ -487,7 +490,7 @@ function UpdateCurProdDisplay(id){
 		document.getElementById("ProdOwnerDisplayName").innerHTML=Prod.Owner.Name;
 		document.getElementById("DisplayCAT").innerHTML=Prod.Category;
 		document.getElementById("DisplaySUBCAT").innerHTML=Prod.SubCategory;
-		var productScore = getMonetaryValue(Prod);
+		var productScore = Math.round(getMonetaryValue(Prod)*TotalPayoutRate*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty))));
 		var rating = productScore.toString();
 		document.getElementById("DisplayOVLS").innerHTML="$"+rating.toString();
 	}

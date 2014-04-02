@@ -26,6 +26,11 @@
 				$("#lobby-wrapper").hide();
 				$("#find-game-wrapper").show();
 			} 
+
+			function joinGameLobby(gameName) {
+				$("#new-game-name").text(gameName);
+				goToLobby();
+			}
 			
 		
 		</script>
@@ -67,12 +72,12 @@
 						var newHostElement = $("<td>").html(host);
 
 						$(newGameElement).dblclick(function(){
+							gameName = game.get("name");
 							players = game.get("players");
 							// This is where the 'game' object needs to be updated upon joining
 							game.save(null, {
 								success: function() {
-									alert("Join was successful");
-									goToLobby();
+									joinGameLobby(gameName);
 								},
 								error: function(error) {
 									alert("Unable to join");
@@ -310,7 +315,7 @@
 				</div>
 			</div>
 			<div id="lobby-wrapper">
-				<div class="StandardText" id="StartNewGameTitle" style="font-size:40px;margin:10px;width:800px;top:7%;">New Game: Players</div> 
+				<div class="StandardText" id="StartNewGameTitle" style="font-size:40px;margin:10px;width:800px;top:7%;">New Game: <span id="new-game-name">Players</span></div> 
 				<div class="PlayerBox" id="PlayerOneBox" style="border-color:red;left:13%;top:22%;">
 					<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business One</div>
 					<textarea maxlength=10 id="PlayerOneName" class="OneColumn" placeholder="Business/Player Name" style="position:absolute;overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>

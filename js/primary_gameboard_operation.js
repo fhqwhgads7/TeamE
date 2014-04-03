@@ -557,7 +557,7 @@ function TryToAdvanceProduct(){
 	}
 	
 	UpdateProductListDisplayPosition(GetProductsInSamePhase(CurrentlySelectedProduct));
-	UpdatePlayerProductDisplayPosition(CurrentlySelectedProduct.Owner);
+	UpdateProductListDisplayPosition(GetProductsInThisPhase(CurPhase,CurrentlySelectedProduct.Owner))
 	UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
 	UpdatePlayerDisplay();
 }
@@ -591,7 +591,7 @@ function TryToRevertProduct(){
 	}
 	if (!removeCheck){
 		UpdateProductListDisplayPosition(GetProductsInSamePhase(CurrentlySelectedProduct));
-		UpdatePlayerProductDisplayPosition(CurrentlySelectedProduct.Owner);
+		UpdateProductListDisplayPosition(GetProductsInThisPhase(CurPhase,CurrentlySelectedProduct.Owner));
 		UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
 		UpdatePlayerDisplay();
 	}

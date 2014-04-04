@@ -21,7 +21,7 @@ var BaseCosts={
 	Deployment:370
 }
 var BasePayouts={
-	DayJobEachTurn:30
+	DayJobEachTurn:100
 }
 var ProductPhases={
 	Idea:"Idea",
@@ -158,6 +158,13 @@ function LoadGameInitialize(gameName){
 			changeCurrentBGM("TimeRunningOut");
 		$("#RoundNumberDisplay").text("ROUND " + TheGame.CurrentRound.toString());
 		$("#new-product-button").attr("disabled",(TheGame.CurrentPlayer.hasMadeProductThisTurn));
+		var Elem=document.getElementById("TipSpan");
+		var welcomeBackMessage = "Welcome back to the stage of Entrepreneurship!";
+		if (TheGame.CurrentRound >= TheGame.Settings.NumberOfRounds/2){
+			welcomeBackMessage = "We missed you."
+		}
+		Elem.style.left=BOARD_WIDTH.toString()+"px";
+		Elem.innerHTML=welcomeBackMessage;
 		setInterval("TipThink();",10);
 		setTimeout(function(){
 			TheGame.CurrentPlayer.TurnInit();
@@ -387,7 +394,7 @@ function UpdatePlayerProductDisplayPosition(Ply){
 
 function UpdateProductListDisplayPosition(ProdList){
 	var angularIncrement = 2*(Math.PI)/(ProdList.length);
-	var Magnitude = 50*Math.log(ProdList.length)/Math.log(5);
+	var Magnitude = 25*Math.log(ProdList.length)/Math.log(3);
 	var scalar = Math.pow(Math.E, -((ProdList.length - 1)*0.1)).toString();
 	
 	for (i = 0; i < ProdList.length; i++){
@@ -557,7 +564,7 @@ function TryToAdvanceProduct(){
 	}
 	
 	UpdateProductListDisplayPosition(GetProductsInSamePhase(CurrentlySelectedProduct));
-	UpdateProductListDisplayPosition(GetProductsInThisPhase(CurPhase,CurrentlySelectedProduct.Owner))
+	UpdateProductListDisplayPosition(GetProductsInThisPhase(CurPhase,CurrentlySelectedProduct.Owner));
 	UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
 	UpdatePlayerDisplay();
 }
@@ -836,7 +843,7 @@ function DecrementCategoryChanges(){
 			SubCat[3] = 0.1;
 		else{
 			if (Math.round(SubCat[3]*10)/10 > 1)
-				SubCat[3] -= 0.2;
+				SubCat[3] -= 0.1;
 			else if (Math.round(SubCat[3]*10)/10 < 1)
 				SubCat[3] += 0.1;
 		}
@@ -1210,7 +1217,7 @@ function DoesItBreak(prod){
 //Below is the list of functions that run during each player's turn cycle.
 //Warning for product being in same spot for too long
 function MoveItSoon(Ply, prod){
-	if (prod.turnsInSamePhase >= 4){
+	if (prod.turnsInSamePhase >= 6){
 		Ply.TriggeredEvents.push(function(){
 			TriggeredEventDisplay("Your product " + prod.Name + " has been in the " + prod.Phase + " phase for a while. Consider moving it along.", GameSounds.Message, "longtime");
 		});
@@ -1220,7 +1227,7 @@ function MoveItSoon(Ply, prod){
 function EmployeeReductionCheck(employeeType, Ply, prod){
 	var numLost;
 	var messagePart;
-	if (prod.turnsInSamePhase >= 7){
+	if (prod.turnsInSamePhase >= 8){
 		numLost=Math.ceil(Math.random()*3);
 		if (employeeType=="des"){
 			if (numLost > Ply.NumCreative)

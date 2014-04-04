@@ -31,6 +31,14 @@
 				},150);
 				$("#ButtonSheetTwo").css("left","0%");
 			}
+			function AttemptToLoad(){
+				if (localStorage.getItem("LastSavedGame") === null){
+					ShowLoadFailAlert();
+				}
+				else{
+					ShowLoadAlert();
+				}
+			}
 			function ShowLoadAlert(){
 				$("#LoadAlert").show();
 				$("#PopupOverlay").show();
@@ -42,6 +50,14 @@
 					localStorage.setItem("LoadingAGame", "LastSavedGame");
 					SwitchToPage("game_board.html");
 				}
+			}
+			function ShowLoadFailAlert(){
+				$("#LoadFailAlert").show();
+				$("#PopupOverlay").show();
+			}
+			function HideLoadFailAlert(){
+				$("#LoadFailAlert").hide();
+				$("#PopupOverlay").hide();
 			}
 			function CreateMPGame(){
 				alert("match hosting not implemented yet");
@@ -115,7 +131,7 @@
 				</div>
 				<div id="ButtonSheetThree" class="ButtonSheet" style="left:100%">
 					<button class="Standard" style="left:24%;top:55%;width:25%" onclick="CreateSPGame()">Create</button>
-					<button class="Standard" style="left:52%;top:55%;width:25%" onclick="ShowLoadAlert()">Load</button>
+					<button class="Standard" style="left:52%;top:55%;width:25%" onclick="AttemptToLoad()">Load</button>
 					<button class="Standard" style="left:40%;top:66%" onclick="BackFromSP()">Back</button>
 				</div>
 				<div class="StandardText" style="opacity:0.5;font-size:10px;margin:8px;width:100%;bottom:20px;">Please use the on screen controls to navigate through the pages. Do not use your browser's back button.</div>
@@ -126,6 +142,10 @@
 						<div class="StandardText" style="margin:0px;width:100%;top:20%;font-size:20px">Load your last saved game?</div>
 						<button class="Standard" id="yep-button" style="font-size:14px;left:15%;top:60%;width:30%" onclick="HideLoadAlert(true)">Yes</button>
 						<button class="Standard" id="nope-button" style="font-size:14px;right:15%;top:60%;width:30%" onclick="HideLoadAlert(false)">No</button>
+					</div>
+					<div class="Popup" style="width:40%;left:30%;height:20%;top:40%" id="LoadFailAlert">
+						<div id="test" class="StandardText" style="margin:0px;width:100%;top:10%;font-size:20px">No recent game detected. Create a new game instead.</div>
+						<button class="Standard" id="okay-button" style="font-size:14px;left:35%;top:60%;width:30%" onclick="HideLoadFailAlert()">OK</button>
 					</div>
 				</div>
 				

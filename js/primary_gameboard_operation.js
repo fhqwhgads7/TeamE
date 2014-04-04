@@ -763,29 +763,29 @@ function NewRoundCalc(){
 					}
 				}
 				if(Prod.Phase==ProductPhases.Idea){
-					Prod.IdeaStrength=Prod.IdeaStrength+Math.ceil(SubCategoryAttributes[Prod.SubCategory][2]*6.0*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty)))/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.IdeaStrength=Prod.IdeaStrength+Math.ceil(SubCategoryAttributes[Prod.SubCategory][2]*60*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty)))/(numOnSameSpot+Prod.turnsInSamePhase));
 					MoveItSoon(Ply, Prod);
 				}else if(Prod.Phase==ProductPhases.Design){
 					EmployeeReductionCheck("des", Ply, Prod);
-					Prod.DesignStrength=Prod.DesignStrength+Math.ceil(2*Ply.NumCreative*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty)))/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.DesignStrength=Prod.DesignStrength+Math.ceil(20*Ply.NumCreative*(Math.log(3)/Math.log(3+Ply.NumCreative))/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.Prototype){
 					Prod.hasPrototype=true;
 				}else if(Prod.Phase==ProductPhases.PrototypeTesting){
 					EmployeeReductionCheck("tes", Ply, Prod);
-					Prod.DesignStrength=Prod.DesignStrength+Math.ceil(Ply.NumQA*1.2*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty)))/(numOnSameSpot+Prod.turnsInSamePhase));
-					Prod.TestingStrength+=(Prod.DesignStrength*Ply.NumQA/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.DesignStrength=Prod.DesignStrength+Math.ceil(Ply.NumQA*12*(Math.log(3)/Math.log(3+Ply.NumQA))/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.TestingStrength+=(Prod.DesignStrength*0.1*Ply.NumQA*(Math.log(3)/Math.log(3+Ply.NumQA))/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.Development){
 					EmployeeReductionCheck("dev", Ply, Prod);
-					Prod.BuildStrength=Prod.BuildStrength+Math.ceil(2*Ply.NumDevs*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty)))/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.BuildStrength=Prod.BuildStrength+Math.ceil(20*Ply.NumDevs*(Math.log(3)/Math.log(3+Ply.NumDevs))/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.PreDepTesting){
 					EmployeeReductionCheck("tes", Ply, Prod);
-					Prod.BuildStrength=Prod.BuildStrength+Math.ceil(Ply.NumQA*1.2*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty)))/(numOnSameSpot+Prod.turnsInSamePhase));
-					Prod.TestingStrength+=(Prod.BuildStrength*Ply.NumQA*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty)))/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.BuildStrength=Prod.BuildStrength+Math.ceil(Ply.NumQA*12*(Math.log(3)/Math.log(3+Ply.NumCreative))/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.TestingStrength+=(Prod.BuildStrength*0.1*Ply.NumQA*(Math.log(3)/Math.log(3+Ply.NumCreative))/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.Deployment){
 					Prod.readyToDeploy=true;
 				}else if(Prod.Phase==ProductPhases.PostDepTesting){
 					EmployeeReductionCheck("tes", Ply, Prod);
-					Prod.TestingStrength+=Math.ceil(0.5*(Prod.DesignStrength+Prod.BuildStrength)*Ply.NumQA*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty)))/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.TestingStrength+=Math.ceil(0.05*(Prod.DesignStrength+Prod.BuildStrength)*Ply.NumQA*(Math.log(3)/Math.log(3+Ply.NumCreative))/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.Maintenance){
 					var Broken = DoesItBreak(Prod);
 					if (Broken>0){
@@ -1206,7 +1206,7 @@ function RandomEventIterator(){
 
 //Function that determines a product's worth
 function getMonetaryValue(prod){
-	return Math.ceil(Math.pow(prod.IdeaStrength,2)*Math.pow(prod.DesignStrength,1.1)*Math.pow(prod.BuildStrength,1.1));
+	return Math.ceil(Math.pow(prod.IdeaStrength,2)*Math.pow(prod.DesignStrength,1.1)*Math.pow(prod.BuildStrength,1.1)/1000);
 }
 
 //Function that checks if a product "breaks" while in Maintenance mode. Returns an integer indicating how badly it broke.

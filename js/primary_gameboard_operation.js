@@ -35,15 +35,15 @@ var ProductPhases={
 	Maintenance:"Maintenance"
 }
 var PhasePositions={
-	Idea:[350,50],
-	Design:[480,180],
-	Prototype:[480,340],
-	PrototypeTesting:[350,480],
-	Development:[190,480],
-	PreDeploymentTesting:[60,340],
-	Deployment:[60,180],
-	PostDeploymentTesting:[190,50],
-	Maintenance:[260,260]
+	Idea:[270+225*Math.cos(13*Math.PI/8),270+225*Math.sin(13*Math.PI/8)], //[350,50],
+	Design:[270+225*Math.cos(15*Math.PI/8),270+225*Math.sin(15*Math.PI/8)], //[480,180],
+	Prototype:[270+225*Math.cos(1*Math.PI/8),270+225*Math.sin(1*Math.PI/8)], //[480,340],
+	PrototypeTesting:[270+225*Math.cos(3*Math.PI/8),270+225*Math.sin(3*Math.PI/8)], //[350,480],
+	Development:[270+225*Math.cos(5*Math.PI/8),270+225*Math.sin(5*Math.PI/8)], //[190,480],
+	PreDeploymentTesting:[270+225*Math.cos(7*Math.PI/8),270+225*Math.sin(7*Math.PI/8)], //[60,340],
+	Deployment:[270+225*Math.cos(9*Math.PI/8),270+225*Math.sin(9*Math.PI/8)], //[60,180],
+	PostDeploymentTesting:[270+225*Math.cos(11*Math.PI/8),270+225*Math.sin(11*Math.PI/8)], //[190,50],
+	Maintenance:[270,270]
 }
 //Format is: Name, Initial Description, AreaOfEffect, Scale, Type, Value, Picture, Likeliness, and OccurrenceInterval (With a counter)
 //0  Name is a self-explanatory string

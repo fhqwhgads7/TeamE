@@ -51,7 +51,7 @@
 			BGMVolume = parseInt(localStorage.getItem("BGMVolume"));
 			if (isNaN(BGMVolume))
 				BGMVolume = 50;
-			TheBGM.volume = BGMVolume/100.0;
+			TheBGM.volume = BGMVolume/100.0*Number((localStorage.getItem("BGMMute")!="Muted"));
 			
 		}
 		function fadeToNextBackground()

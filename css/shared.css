@@ -80,7 +80,7 @@ button.Standard:disabled:hover{
 }
 button.Compact{
 	font-size:.7em;
-	padding:.2em 1em;
+	padding:0.2em 0em;
 	font-weight:700;
 }
 div.StandardText{

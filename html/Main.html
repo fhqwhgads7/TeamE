@@ -1,11 +1,142 @@
 <!DOCTYPE html>
 <html>
+	<meta charset="utf-8"> 
 	<head>
 		<Title>Entrepreneurship: The Movie: The Game</Title>
+		<script src="../js/jquery.js"></script>
+		<script src="../js/shared.js"></script>
+		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
+		<script>
+			function Initialize(){
+				localStorage.setItem("BGMMute", "");
+				localStorage.setItem("SFXMute", "");
+				$(":button.Standard").mouseenter( function(){
+					if (this.getAttribute("onmouseover") == null)
+						playSound(GameSounds.ButtonHover);
+					else if (((this.getAttribute("onmouseover")).toString().indexOf("playSound") <= -1) && ((this.getAttribute("onmouseover")).toString().indexOf("noSound") <= -1))
+						playSound(GameSounds.ButtonHover);
+				});
+				$(":button.Standard").click( function(){
+					if (this.getAttribute("onclick") == null)
+						playSound(GameSounds.ButtonSelect);
+					else if (((this.getAttribute("onclick")).toString().indexOf("playSound") <= -1) && ((this.getAttribute("onclick")).toString().indexOf("noSound") <= -1))
+						playSound(GameSounds.ButtonSelect);
+				});
+				LoadOptions();
+			}
+			function ShowAudioSettings(){
+				$("#AudioSettings").css("visibility","visible");
+			}
+			function HideAudioSettings(){
+				$("#AudioSettings").css("visibility","hidden");
+			}
+			function SaveChanges(){
+				localStorage.setItem("BGMVolume", $("#BGMVolumeNum").text());
+				localStorage.setItem("SFXVolume", $("#SFXVolumeNum").text());
+				unsavedChanges = false;
+			}
+			function LoadOptions(){
+				var BGMVolume = parseInt(localStorage.getItem("BGMVolume"));
+				if (isNaN(BGMVolume))
+					BGMVolume = 50;
+				var SFXVolume = parseInt(localStorage.getItem("SFXVolume"));
+				if (isNaN(SFXVolume))
+					SFXVolume = 50;
+					
+				dialSet("BGMDial", BGMVolume);
+				ChangeVolume("BGMVolumeNum", BGMVolume);
+				dialSet("SFXDial", SFXVolume);
+				ChangeVolume("SFXVolumeNum", SFXVolume);
+			}
+			function dialSet(id, value){
+				$("#"+id).val(value);
+			}
+			function ChangeVolume(id, value){
+				if ($("#"+id).text() != value)
+					unsavedChanges = true;
+				$("#"+id).text(value);
+			}
+			function BGMSwitch(){
+				if (localStorage.getItem("BGMMute")=="Muted"){
+					localStorage.setItem("BGMMute", "");
+					$("#BGMSwitcher").css("background","rgba(255,255,255,0.75)");
+					$("#BGMSwitcher").css("color","rgba(0,0,0,0.7)");
+				}
+				else{
+					localStorage.setItem("BGMMute","Muted");
+					$("#BGMSwitcher").css("background","rgba(180,0,0,1)");
+					$("#BGMSwitcher").css("color","rgba(255,255,255,0.75)");
+				}
+			}
+			function SFXSwitch(){
+				if (localStorage.getItem("SFXMute")=="Muted"){
+					localStorage.setItem("SFXMute", "");
+					$("#SFXSwitcher").css("background","rgba(255,255,255,0.75)");
+					$("#SFXSwitcher").css("color","rgba(0,0,0,0.7)");
+				}
+				else{
+					localStorage.setItem("SFXMute","Muted");
+					$("#SFXSwitcher").css("background","rgba(180,0,0,1)");
+					$("#SFXSwitcher").css("color","rgba(255,255,255,0.75)");
+				}
+			}
+		</script>
+		<style>
+			div.OptionsBox{
+				position:absolute;
+				border-style:solid;
+				border-width:5px;
+				width:60%;
+				height:28%;
+				box-shadow: 0px 0px 40px 5px #AAAAAA;
+				background-color:rgba(0,0,0,.5);
+			}
+			div.OptionsBox:hover{
+				background-color:rgba(20,20,20,.5);
+			}
+			.Options{
+				position:absolute;
+				right:3%;
+				width:28%;
+				font-family:"Arial";
+				font-size:15px;
+				font-weight:900;
+			}
+			.roundSlider{
+				position:absolute;
+				width:100px;
+			}
+			input[type='range'] {
+				-webkit-appearance: none;
+				padding-left:2px; padding-right:2px;
+				-webkit-border-radius: 5px;
+				background-image: -webkit-linear-gradient(top, #000000, #333333, #000000);
+				-moz-appearance: none;
+				-moz-border-radius: 5px;
+				background-image: -moz-linear-gradient(top, #000000, #333333, #000000);
+			}
+		</style>
 	</head>
 	
-	<body>
-		<div id="MainGame" style="position:absolute;top:0px;left:0px;width:800px;height:600px;z-index:999;">
+	<body onload="Initialize()">
+		<button class="Standard" onclick="ShowAudioSettings();" style="padding:0.4em 0em;left:2px;top:2px;width:40px;font-size:8px;z-index:2">Volume</button>
+		<button class="Standard" id="BGMSwitcher" onclick="BGMSwitch();" style="padding:0em 0em;left:42px;top:2px;width:20px;font-size:14px;z-index:2">♫</button>
+		<button class="Standard" id="SFXSwitcher" onclick="SFXSwitch();" style="padding:0em 0em;left:62px;top:2px;width:20px;font-size:12px;z-index:2">🔊</button>
+		<div id="AudioSettings" style="visibility:hidden;position:absolute;background-color:rgba(0,0,0,.75);top:0px;left:0px;width:800px;height:600px;z-index:5;">
+				<div class="OptionsBox" id="OptionsBox" style="left:20%;top:35%;">
+					<div class="StandardText" style="font-size:30px;left:3%;top:18%;">BGM Volume</div>
+					<div class="StandardText" style="font-size:30px;left:3%;top:55%;">SFX Volume</div>
+					
+					<input type="range" min=0 max=100 value=50 id="BGMDial" step=1 style="position:absolute;left:60%;top:20%;" oninput="ChangeVolume('BGMVolumeNum',value); SaveChanges();" onchange="ChangeVolume('BGMVolumeNum',value); SaveChanges();"></input>
+					<input type="range" min=0 max=100 value=50 id="SFXDial" step=1 style="position:absolute;left:60%;top:62%;" oninput="ChangeVolume('SFXVolumeNum',value);" onchange="ChangeVolume('SFXVolumeNum',value); SaveChanges();"></input>
+					<div class="StandardText" style="font-size:20px;right:40%;top:20%;text-align:right"id="BGMVolumeNum">50</div>
+					<div class="StandardText" style="font-size:20px;right:40%;top:62%;text-align:right"id="SFXVolumeNum">50</div>				
+					
+				</div>
+				<div class="StandardText" id="MainTitle" style="font-size:45px;margin:0px;width:100%;top:20%;">Audio Settings</div>
+				<button class="Standard" onclick="HideAudioSettings();" style="left:35%;top:68%;width:30%">Done</button>
+		</div>
+		<div id="MainGame" style="position:absolute;top:0px;left:0px;width:800px;height:600px;z-index:1;">
 			<iframe src="title.html" style="top:0px;left:0px;width:800px;height:600px;" frameborder="0" allowtransparency="yes" scrolling="no"></iframe>
 		</div>
 		<div id="Background" style="position:absolute;top:0px;left:0px;width:800px;height:600px;z-index:0;">

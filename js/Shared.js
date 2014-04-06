@@ -141,12 +141,14 @@ var GameSounds={
 	MinorFail: '../sounds/sfx/minor_fail.wav'
 }
 function playSound(sound){
-	SFXVolume = parseInt(localStorage.getItem("SFXVolume"));
-	if (isNaN(SFXVolume))
-		SFXVolume = 50;
-	var theSound = new Audio(sound);
-	theSound.volume = SFXVolume/100.0*Number(localStorage.getItem("SFXMute")!="Muted");
-	theSound.play();
+	if (localStorage.getItem("SFXMute")!="Muted"){
+		SFXVolume = parseInt(localStorage.getItem("SFXVolume"));
+		if (isNaN(SFXVolume))
+			SFXVolume = 50;
+		var theSound = new Audio(sound);
+		theSound.volume = SFXVolume/100.0;
+		theSound.play();
+	}
 }
 function getTimeOfDay(x){
 	timeOfDay = "";

@@ -273,10 +273,14 @@ function CreateProductDisplay(prod){
 	ProdElem.id="ProductDisplayItem_"+prod.GlobalID;
 	prod.DisplayItemID=ProdElem.id;
 	ProdElem.addEventListener("click",function(){
-		if (prod!=CurrentlySelectedProduct){
-			playSound(GameSounds.Message);
-		}
+		playSound(GameSounds.Message);
+		$("#"+ProdElem.id).css("box-shadow", "0px 0px 60px 10px #AAAAAA");
+		$("#"+ProdElem.id).css("opacity", "1");
 		UpdateCurProdDisplay(ProdElem.id);
+		setTimeout(function(){
+			$("#"+ProdElem.id).css("box-shadow", "4px 4px 15px -2px #000000");
+			$("#"+ProdElem.id).css("opacity", "0.8");
+		},200);
 	});
 	ProdElem.className="ProductDisplayItem";
 	ProdElem.style.backgroundImage="url('../images/ProductIcons/"+prod.Category.toLowerCase()+"_"+prod.SubCategory.toLowerCase()+".png')";
@@ -299,10 +303,14 @@ function RecreateProductDisplay(prod){
 	ProdElem.id="ProductDisplayItem_"+prod.GlobalID;
 	prod.DisplayItemID=ProdElem.id;
 	ProdElem.addEventListener("click",function(){
-		if (prod!=CurrentlySelectedProduct){
-			playSound(GameSounds.Message);
-		}
+		playSound(GameSounds.Message);
+		$("#"+ProdElem.id).css("box-shadow", "0px 0px 60px 10px #AAAAAA");
+		$("#"+ProdElem.id).css("opacity", "1");
 		UpdateCurProdDisplay(ProdElem.id);
+		setTimeout(function(){
+			$("#"+ProdElem.id).css("box-shadow", "4px 4px 15px -2px #000000");
+			$("#"+ProdElem.id).css("opacity", "0.8");
+		},200);
 	});
 	ProdElem.className="ProductDisplayItem";
 	ProdElem.style.backgroundImage="url('../images/ProductIcons/"+prod.Category.toLowerCase()+"_"+prod.SubCategory.toLowerCase()+".png')";
@@ -333,8 +341,8 @@ function removeProduct(prod){
 		},500);
 		if (prod.justStarted)
 			TheGame.CurrentPlayer.hasMadeProductThisTurn = false;
-		prod.Owner.Products.splice(prod.Number, 1);
-		TheGame.Players[TheGame.CurrentPlayerNum].NumProducts--;
+		prod.Owner.Products.splice(prod.Owner.Products.indexOf(prod), 1);
+		TheGame.Players[TheGame.CurrentPlayerNum].NumProducts = TheGame.Players[TheGame.CurrentPlayerNum].Products.length;
 		UpdatePlayerProductDisplayPosition(prod.Owner);
 		UpdatePlayerDisplay();
 	}
@@ -401,11 +409,15 @@ function UpdateProductListDisplayPosition(ProdList){
 		TheProd = ProdList[i];
 		XOffset = Math.cos(angularIncrement*i);
 		YOffset = Math.sin(angularIncrement*i);
+		XPos = PhasePositions[TheProd.Phase][0]+XOffset*Magnitude;
+		YPos = PhasePositions[TheProd.Phase][1]+YOffset*Magnitude;
+		Rotation = Math.atan2(-XPos+PhasePositions["Maintenance"][0], YPos-PhasePositions["Maintenance"][1])-Math.PI*Number((TheProd.Phase!="Maintenance") || (ProdList.length>1));
+		
 		var ProdElem=$("#"+"ProductDisplayItem_"+TheProd.GlobalID);
-		ProdElem.css("left",(PhasePositions[TheProd.Phase][0]+XOffset*Magnitude).toString()+"px");
-		ProdElem.css("top",(PhasePositions[TheProd.Phase][1]+YOffset*Magnitude).toString()+"px");
-		ProdElem.css({ 'webkit-transform': 'scale('+scalar+','+scalar+')'});
-		ProdElem.css({ 'transform': 'scale('+scalar+','+scalar+')'});
+		ProdElem.css("left",(XPos.toString()+"px"));
+		ProdElem.css("top",(YPos.toString()+"px"));
+		ProdElem.css({ 'webkit-transform': 'scale('+scalar+','+scalar+') rotate('+ Rotation.toString() +'rad)'});
+		ProdElem.css({ 'transform': 'scale('+scalar+','+scalar+') rotate('+Rotation.toString()+'rad)'});
 	}	
 }
 
@@ -1087,6 +1099,7 @@ function RandomEventIterator(){
 	if (RandomEventsToIterate.length > 0)
 	{
 		playSound(GameSounds.Event);
+		EventFlash();
 		var Event=RandomEventsToIterate[0];
 		var Msg=Event[0];
 		var Desc=Event[1]+" ";
@@ -1249,6 +1262,7 @@ function EmployeeReductionCheck(employeeType, Ply, prod){
 		}
 		if (numLost > 0)
 			Ply.TriggeredEvents.push(function(){
+				EventFlash();
 				TriggeredEventDisplay("Your " + prod.Name + " has been in the same phase for too long! " + messagePart, GameSounds.Event, "employeeloss");
 				UpdatePlayerDisplay();
 			});
@@ -1260,13 +1274,18 @@ function EmployeeReductionCheck(employeeType, Ply, prod){
 }
 //Product is so horribly broken that it gets removed from the board
 function IsItSoBadItGetsRemoved(Ply, Prod, AmountLost) {
-	if (Prod)
-		if ((AmountLost >= 1000) || (AmountLost >= getMonetaryValue(Prod))) {
-			removeProduct(Prod);
-			Ply.TriggeredEvents.push(function(){
+	if ((AmountLost >= 1000) || (AmountLost >= getMonetaryValue(Prod))) {
+		Ply.TriggeredEvents.push(function(){
+			EventFlash();
+			if (Prod){
+				removeProduct(Prod);
 				TriggeredEventDisplay("Your " + Prod.Name + " was just recalled due to a massive net loss! Try again with something new!", GameSounds.Event, "fail");
-			});
-		}
+			}
+			else{
+				TriggeredEventDisplay("Your " + Prod.Name + " would have been recalled due to a massive net loss, if it had not been destroyed already!", GameSounds.Event, "fail");
+			}
+		});
+	}
 }
 //Displays the triggered event.
 function TriggeredEventDisplay(message, sound, picture) {
@@ -1281,4 +1300,16 @@ function TriggeredEventIterator(TheTriggeredEvents){
 		TheTriggeredEvents[0]();
 		TheTriggeredEvents.splice(0,1);
 	}
+}
+
+//Makes a little flash when something important happens
+function EventFlash(){
+	setTimeout(function(){
+		$("#PopupOverlay").css("transition","0ms ease-out");
+		$("#PopupOverlay").css("background-color", "rgba(100,100,100,.75)");
+		setTimeout(function(){
+			$("#PopupOverlay").css("transition","450ms ease-out");
+			$("#PopupOverlay").css("background-color", "rgba(0,0,0,.5)");
+		},50);
+	},2);
 }

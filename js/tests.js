@@ -5,6 +5,13 @@ test("new Product can be instantiated", function() {
     ok(newProduct, "New Product was successfully created");
     equal(newProduct.Name, newProductName, "New Product object was created with expected name" );
 });
+test("new Player can be instantiated", function() {
+    var newPlayerName = "new Player name";
+    var newPlayer = Product(null, newPlayerName, 'Test', 'Colorless');
+
+    ok(newPlayer, "New Player was successfully created");
+    equal(newPlayer.Name, newPlayerName, "New Player object was created with expected name" );
+});
 
 test("background can actually change", function(){
 	
@@ -19,14 +26,6 @@ test("background can actually change", function(){
 	for (i = 22; (i < 5 || i >= 22); i=(i%24)+1){
 		equal("Night", getTimeOfDay(i), "Hour is " + i.toString() + " and should return Night.");}
 });
-
-/*
-test("Game options and values properly stored", function(){
-	
-	This is a test that has yet to be written.
-	
-});
-*/
 
 test("patenting functions work properly", function(){
 	
@@ -52,9 +51,9 @@ test("patenting functions work properly", function(){
 
 	ok(TryToBuyPatent(Product_3_1, testGame), "The function for buying patents doesn't break.");
 	ok((TryToBuyPatent(Product_3_1, testGame).indexOf("impressive enough") > -1), "This product isn't impressive enough just yet.");
-	Product_3_1.IdeaStrength=10;
-	Product_3_1.DesignStrength=10;
-	Product_3_1.BuildStrength=10;
+	Product_3_1.IdeaStrength=100;
+	Product_3_1.DesignStrength=100;
+	Product_3_1.BuildStrength=100;
 	PlayerThree.Money=0;
 	ok((TryToBuyPatent(Product_3_1, testGame).indexOf("short") > -1), "More money should be required.");
 	PlayerThree.Money=9015;

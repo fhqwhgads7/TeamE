@@ -110,6 +110,7 @@ function GameInitialize(){
 		LoadGameInitialize(doILoadGame);
 	else
 		NewGameInitialize();
+	TheGame.GameState = "ACTIVE"
 }
 function NewGameInitialize(){
 	var GameCreationInfo=JSON.parse(localStorage.getItem("TheBrandNewGame"));
@@ -1051,27 +1052,6 @@ function doIPayRoyalties(product, patentTracker)
 	return patentOwnerID;
 }
 
-//Function that ends the game.
-function FinishGame(){
-	var Plyr = new Object();
-	
-	for(PlyNum in TheGame.Players){
-		var Ply=TheGame.Players[PlyNum];
-					
-		Plyr[PlyNum]=new Object();
-		Plyr[PlyNum].Name=Ply.Name;
-		Plyr[PlyNum].Money=Ply.Money;
-		Plyr[PlyNum].Color=Ply.Color;
-		Plyr[PlyNum].NumProducts=Ply.NumProducts;
-		Plyr[PlyNum].NumEmployees=(Ply.NumQA+Ply.NumDevs+Ply.NumCreative);
-		
-	}
-	
-	localStorage.setItem("FinalResults",JSON.stringify(Plyr));
-	//Maybe a more fancy transition can go in here later.
-	SwitchToPage("gameover.html");
-}
-
 function RandomEventSelector(){
 	var IterateThroughThese = new Array();
 	var difficultyOffset = 2;
@@ -1320,4 +1300,81 @@ function EventFlash(){
 			$("#PopupOverlay").css("background-color", "rgba(0,0,0,.5)");
 		},50);
 	},2);
+}
+
+
+function FinishGame(){
+	TheGame.GameState = "COMPLETE";
+	ShowCashAlert=false;
+	for(var i=0;i<TheGame.Players.length;i++){
+		var Ply=TheGame.Players[i];
+		var Net=0;
+		if(Ply.NumProducts<1){
+			Net=Math.round(BasePayouts.DayJobEachTurn*TotalPayoutRate*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty))));
+		}else{
+			for(var j=0;j<Ply.Products.length;j++){
+				var Prod=Ply.Products[j];
+				if(Prod.Phase==ProductPhases.Maintenance && (SubCategoryAttributes[Prod.SubCategory][4] <= 0)){
+					var earnings = Math.round(getMonetaryValue(Prod)*SubCategoryAttributes[Prod.SubCategory][3]*TotalPayoutRate*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty))));
+					if (TheGame.PatentTracker){
+						patentOwnerID = doIPayRoyalties(Prod, TheGame.PatentTracker);
+						if (patentOwnerID != -1)
+						{
+							cashOwed = Math.round(earnings/10);
+							earnings -= cashOwed;
+							TheGame.Players[patentOwnerID].Money += cashOwed;
+						}
+					}
+					Net+=earnings;
+				}
+			}
+		}
+		Net=Net-((BaseCosts.PayDev*Ply.NumDevs)+(BaseCosts.PayQA*Ply.NumQA)+(BaseCosts.PayCreative*Ply.NumCreative));
+		Ply.Money=Ply.Money+Net;
+	}
+	UpdatePlayerDisplay();
+	GameOverDisplay();
+}
+
+function GameOverDisplay(){
+	playSound(GameSounds.GameOver);
+	$("#PopupOverlay").show();
+	$("#GameOverTitle").css("top", "200px");
+	setTimeout(function(){
+		$("#FinishGameButton").css("visibility","visible");
+		$("#FinishGameButton").attr("disabled",false);
+		$("#FinishGameButton").css("transition", "opacity .6s ease-out");
+		$("#FinishGameButton").css("opacity","1");
+	},900);
+}
+
+//Function that ends the game.
+function GetFinalResults(){
+	var Plyr = new Object();
+	
+	for(PlyNum in TheGame.Players){
+		var Ply=TheGame.Players[PlyNum];
+					
+		Plyr[PlyNum]=new Object();
+		Plyr[PlyNum].Name=Ply.Name;
+		Plyr[PlyNum].Money=Ply.Money;
+		Plyr[PlyNum].Color=Ply.Color;
+		Plyr[PlyNum].NumProducts=Ply.NumProducts;
+		Plyr[PlyNum].NumEmployees=(Ply.NumQA+Ply.NumDevs+Ply.NumCreative);
+		
+	}
+	
+	localStorage.setItem("FinalResults",JSON.stringify(Plyr));
+}
+
+function SwitchToFinalResults(){
+	GetFinalResults();
+	$("#Blanket").show();
+	setTimeout(function(){
+		$("#Blanket").css("transition","500ms ease-out");
+		$("#Blanket").css("opacity","1");
+		setTimeout(function(){
+			window.location="gameover.html";
+		},650);
+	},50);
 }

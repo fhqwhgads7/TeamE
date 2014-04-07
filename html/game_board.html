@@ -41,7 +41,8 @@
 			}
 			function SaveThink(){
 				if (TheGame)
-					SaveThisGame("LastSavedGame");
+					if (TheGame.GameState=="ACTIVE")
+						SaveThisGame("LastSavedGame");
 			}
 			function displayNewProductDialog() {
 				$("#PopupOverlay").show();
@@ -198,14 +199,22 @@
 			div.PlayerBox:hover{
 				background:rgba(30,30,30,.75);
 			}
-			marquee#GameAdvice{
+			#GameOverTitle{
 				position:absolute;
-				bottom:3%;
-				height:0px;
-				font-family: calibri, verdana, arial, sans-serif; 
-				font-size: 15pt; 
-				color: #CCCCCC;
-				cursor: hand;
+				top:-500px;
+				left:0px;
+				width:800px;
+				height:600px;
+				overflow:hidden;
+				font-family:"Arial";
+				font-size:100px;
+				font-weight:900;
+				text-align:center;
+				color:gray;
+				text-shadow:-5px -5px 5px #FFFFFF,10px 10px 10px #000000;
+				transition: 900ms ease-in-out;
+				-webkit-transition: 900ms ease-in-out;
+				-moz-transition: 900ms ease-in-out;
 			}
 		</style>
 	</head>
@@ -414,6 +423,10 @@
 							<div class="StandardText" id="TriggerDesc" style="font-size:15px;margin:0px;width:100%;top:62%;">Something went wrong probably because of lack of quality code practices!</div>
 							<button class="Standard" id="TriggerButton" onclick="CloseTriggerDialog()" style="left:20%;top:80%;width:60%">Continue</button>
 						</div>
+						<div id="GameOverDisplay" style="z-index:6">
+							<div id="GameOverTitle">GAME OVER</div>
+							<button class="Standard" id="FinishGameButton" onclick="SwitchToFinalResults()" style="visibility:hidden;opacity:0;left:35%;top:65%;width:30%" disabled>Continue</button>
+						</div>
 					</div>
 					<span id="CashOne" class="CashAlert">0</span>
 					<span id="CashTwo" class="CashAlert">0</span>
@@ -427,6 +440,7 @@
 			</div>
 			<div id="RoundAnnouncer">ROUND<br>1</div>
 		</div>
+		<div id="Blanket" class="Blanket" style="position:fixed;left:0px;top:0px;display:none;"></div>
 		<div id="ControlLock" style="position:fixed;left:0px;top:0px;width:1000px;height:1000px;display:none;z-index:999"></div>
 	</body>
 </html>

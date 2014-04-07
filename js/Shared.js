@@ -179,54 +179,6 @@ function getTimeOfDay(x){
     }                   
 	return timeOfDay;
 }
-function MakeBGM(){	
-	var audioArray = document.getElementsByClassName('playsong');
-		
-	//document.write(audioArray.length);
-		var i = 0;
-		var nowPlaying = audioArray[i];
-		nowPlaying.load();
-		nowPlaying.play();
-		//alert("hi");
-		/*$('.play').on('click', function() {
-			nowPlaying.play();
-		});
-		
-		$('.stop').on('click', function() {
-			nowPlaying.pause();
-		});
-		
-		$('.next').on('click', function() {*/
-		//alert(audioArray.length);
-		$('#player').on('ended', function(){
-    // done playing
-			//alert("Player stopped");
-			//alert(i);
-			/*$.each($('audio.playsong'), function(){
-				this.pause();
-			});
-			
-			if(i>=audioArray.length-1){
-				i=0;
-			}
-			else{
-				i++;
-			}*/
-			
-			//document.write(audioArray.length);
-			nowPlaying = audioArray[1];
-			nowPlaying.load();
-			nowPlaying.play();
-			
-			$('#player2').on('ended', function(){
-			
-				nowPlaying = audioArray[2];
-				nowPlaying.load();
-				nowPlaying.play();
-			});
-			//nowPlaying.pause();
-		});	
-}
 
 //Backgrounds are "MainMenu", "InGame", "TimeRunningOut", and "FinalScores"
 function changeCurrentBGM(theSong){
@@ -332,7 +284,7 @@ function Game(id){
 		PatentingEnabled:null,
 		NumberOfRounds:null
 	}
-	newGame.GameState="Uninitialized"; // this game-state is going to become very important when we start the networking
+	newGame.GameState="UNINITIALIZED"; // this game-state is going to become very important when we start the networking
 	newGame.toString=function(){
 		return newGame.ClassName+" "+this.ID.toString();
 	}

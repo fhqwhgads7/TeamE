@@ -325,6 +325,7 @@ function Game(id){
 	newGame.CurrentPlayerNum=0;
 	newGame.CurrentRound=0;
 	newGame.PatentTracker=null;
+	newGame.GameType;
 	newGame.Settings={
 		Difficulty:null,
 		CPUIntelligence:null,

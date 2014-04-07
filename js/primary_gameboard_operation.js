@@ -123,6 +123,10 @@ function NewGameInitialize(){
 	UpdatePlayerDisplay();
 	PopulateNewProdCategories();
 	setInterval("TipThink();",10);
+	if (TheGame.GameType=="Local"){
+		setInterval("SaveThink();",1000);
+		localStorage.setItem("LoadingAGame", "LastSavedGame");
+	}
 	setTimeout(DisplayNewRoundEvent,1);
 	$("#MainBoard").hide();
 	setTimeout(Appear,750);
@@ -166,6 +170,9 @@ function LoadGameInitialize(gameName){
 		Elem.style.left=BOARD_WIDTH.toString()+"px";
 		Elem.innerHTML=welcomeBackMessage;
 		setInterval("TipThink();",10);
+		if (TheGame.GameType=="Local"){
+			setInterval("SaveThink();",1000);
+		}
 		setTimeout(function(){
 			TheGame.CurrentPlayer.TurnInit();
 		},1250);
@@ -200,6 +207,7 @@ function TransferGameStartupInfo(from,to){
 	to.Settings.CPUIntelligence=from.Options.CPUIntelligence;
 	to.Settings.PatentingEnabled=from.Options.PatentingEnabled;
 	to.Settings.NumberOfRounds=from.Options.NumberOfRounds;
+	to.GameType=from.GameType;
 }
 function GetDifficultyConstant(difficulty){
 	var returnValue = 0;

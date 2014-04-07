@@ -23,7 +23,6 @@
 				GlobalInitialize();
 				GameInitialize();
 				setInterval("RotateThink();",50);
-				setInterval("SaveThink();",1000);
 			}
 			function RotateBegin(dir){
 				RotateDir=dir*5;
@@ -127,7 +126,9 @@
 				$("#QuitDialog").show();
 			}
 			function QuitGame(){
-				SaveThisGame("LastSavedGame");
+				if (TheGame.GameType=="Local"){
+					SaveThisGame("LastSavedGame");
+				}
 				CloseQuitDialog();
 				TheGame=null;
 				localStorage.setItem("TheBrandNewGame",null);

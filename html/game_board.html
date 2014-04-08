@@ -23,7 +23,6 @@
 				GlobalInitialize();
 				GameInitialize();
 				setInterval("RotateThink();",50);
-				setInterval("SaveThink();",1000);
 			}
 			function RotateBegin(dir){
 				RotateDir=dir*5;
@@ -38,19 +37,12 @@
 					document.getElementById("GameBoardCircle").style.webkitTransform="rotate("+Rotation.toString()+"deg)";
 					document.getElementById("GameBoardCircle").style.MozTransform="rotate("+Rotation.toString()+"deg)";
 					var Prods=document.getElementsByClassName("ProductDisplayItem");
-					if(Prods.length>0){
-						for(Key in Prods){
-							if(Prods[Key].style){
-								Prods[Key].style.webkitTransform="rotate("+(-Rotation).toString()+"deg)";
-								Prods[Key].style.MozTransform="rotate("+(-Rotation).toString()+"deg)";
-							}
-						}
-					}
 				}
 			}
 			function SaveThink(){
 				if (TheGame)
-					SaveThisGame("LastSavedGame");
+					if (TheGame.GameState=="ACTIVE")
+						SaveThisGame("LastSavedGame");
 			}
 			function displayNewProductDialog() {
 				$("#PopupOverlay").show();
@@ -135,7 +127,9 @@
 				$("#QuitDialog").show();
 			}
 			function QuitGame(){
-				SaveThisGame("LastSavedGame");
+				if (TheGame.GameType=="Local"){
+					SaveThisGame("LastSavedGame");
+				}
 				CloseQuitDialog();
 				TheGame=null;
 				localStorage.setItem("TheBrandNewGame",null);
@@ -205,14 +199,22 @@
 			div.PlayerBox:hover{
 				background:rgba(30,30,30,.75);
 			}
-			marquee#GameAdvice{
+			#GameOverTitle{
 				position:absolute;
-				bottom:3%;
-				height:0px;
-				font-family: calibri, verdana, arial, sans-serif; 
-				font-size: 15pt; 
-				color: #CCCCCC;
-				cursor: hand;
+				top:-500px;
+				left:0px;
+				width:800px;
+				height:600px;
+				overflow:hidden;
+				font-family:"Arial";
+				font-size:100px;
+				font-weight:900;
+				text-align:center;
+				color:gray;
+				text-shadow:-5px -5px 5px #FFFFFF,10px 10px 10px #000000;
+				transition: 900ms ease-in-out;
+				-webkit-transition: 900ms ease-in-out;
+				-moz-transition: 900ms ease-in-out;
 			}
 		</style>
 	</head>
@@ -224,8 +226,8 @@
 				<!--<marquee id="GameAdvice" scrollamount="20" onmouseover="this.scrollAmount=0;" onmouseout="this.scrollAmount=20;">
 				</marquee>-->
 				
-					<div class="PlayerBox" id="CurPlyBox" style="border-color:grey;width:25%;left:2%;top:4%;">
-						<div class="StandardText" id="CurPlyName" style="font-size:16px;left:8%;top:5%;">nil</div>
+					<div class="PlayerBox" id="CurPlyBox" style="border-color:grey;width:25%;left:2%;top:4%;overflow:hidden;">
+						<div class="StandardText" id="CurPlyName" style="font-size:16px;margin:0px;width:100%;top:5%;">nil</div>
 						<div class="StandardText" style="font-size:18px;left:8%;top:35%;color:rgb(160,160,160)">$<span id="CurPlyMoney" style="color:white">nil</span><sup style="font-size:8px">.00</sup></div>
 						
 						<div class="StandardText" style="font-size:10px;left:8%;top:62%;color:rgb(160,160,160);font-size:10px;text-align:left">Products:</div>
@@ -268,10 +270,10 @@
 						<button class="Standard Compact" id="CurProdDetailsButton" style="top:82%;left:6%;height:15%;width:42%;" onmouseover="noSound()" onclick="ShowProductStats();" disabled>Details</button>
 						<button class="Standard Compact" id="CurProdPatentButton" style="top:82%;left:52%;height:15%;width:42%;" onmouseover="noSound()" onclick="TryToPatentProduct(); noSound();" disabled>Patent</button>
 					</div>
-					<button id="new-product-button" class="Standard Compact" style="top:80%;left:3%;width:11%;height:8%;"onclick="displayNewProductDialog()">New<br>Product</button>
-					<button id="employee_button" class="Standard Compact" style="top:80%;left:14%;width:11%;height:8%;" onclick="displayEmployeeDialog()">Manage<br>Employees</button>
-					<button class="Standard Compact" style="top:88%;left:3%;width:11%;height:8%;" onclick="ShowAllPlayers()">Show Players</button>
-					<button id="EndTurnBtn" class="Standard Compact" style="top:88%;left:14%;width:11%;height:8%;" onclick="EndCurrentTurn(); noSound()">End Turn</button>
+					<button id="new-product-button" class="Standard Compact" style="padding:0.4em 0em;top:80%;left:3%;width:11%;height:8%;"onclick="displayNewProductDialog()">New<br>Product</button>
+					<button id="employee_button" class="Standard Compact" style="padding:0.4em 0em;top:80%;left:14%;width:11%;height:8%;" onclick="displayEmployeeDialog()">Manage<br>Employees</button>
+					<button id="showplayers_button" class="Standard Compact" style="padding:0.4em 0em;top:88%;left:3%;width:11%;height:8%;" onclick="ShowAllPlayers()">Show Players</button>
+					<button id="EndTurnBtn" class="Standard Compact" style="padding:0.4em 0em;top:88%;left:14%;width:11%;height:8%;" onclick="EndCurrentTurn(); noSound()">End Turn</button>
 					
 					<button class="Standard Compact" style="top:90%;left:90%;width:8%;height:5%;" onclick="TryToQuitGame()">Quit</button>
 
@@ -287,31 +289,31 @@
 							<select class="OneColumn" id="NewProductSubCategory" style="top:60%;left:40%;width:40%;">
 								<!-- dynamic -->
 							</select>
-							<button class="Standard" style="left:10%;top:75%" onclick="hideNewProductDialog()">Cancel</button>
+							<button id="CreateNewProdCancel" class="Standard" style="left:10%;top:75%" onclick="hideNewProductDialog()">Cancel</button>
 							<button id="CreateNewProdConfirm" class="Standard" style="left:51%;top:75%" onclick="createNewProduct(); noSound()">Create</button>
 						</div>
 						<div class="Popup" id="employee-dialog">
 							<div class="StandardText" style="margin:0px;width:100%;top:5%">Manage Employees</div>
 							<div class="StandardText" style="top:22%;left:14.5%;width:10%;font-size:12px">Designers</div>
-							<button class="Standard" style="top:27%;left:10%;width:10%" onclick="EmployeeChange('des',1); playSound(GameSounds.PageDoneLoading)" onmouseover="noSound()"><b>+</b></button>
-							<div class="StandardText" style="top:44%;left:18%" id="EmpPopupDes">0</div>
-							<button class="Standard" style="top:57%;left:10%;width:10%" onclick="EmployeeChange('des',-1); playSound(GameSounds.PageDoneLoading)" onmouseover="noSound()"><b>-</b></button>
+							<button class="Standard" id="DesPlus" style="top:27%;left:10%;width:10%" onclick="EmployeeChange('des',1); playSound(GameSounds.PageDoneLoading)" onmouseover="noSound()"><b>+</b></button>
+							<div class="StandardText" style="top:44%;left:16%;width:10%;text-align:center" id="EmpPopupDes">0</div>
+							<button class="Standard" id="DesMinus" style="top:57%;left:10%;width:10%" onclick="EmployeeChange('des',-1); playSound(GameSounds.PageDoneLoading)" onmouseover="noSound()"><b>-</b></button>
 						
 							<div class="StandardText" style="top:22%;left:43.25%;font-size:12px">Developers</div>
-							<button class="Standard" style="top:27%;left:40%;width:10%" onclick="EmployeeChange('dev',1); playSound(GameSounds.PageDoneLoading)" onmouseover="noSound()"><b>+</b></button>
-							<div class="StandardText" style="top:44%;left:48%" id="EmpPopupDev">0</div>
-							<button class="Standard" style="top:57%;left:40%;width:10%" onclick="EmployeeChange('dev',-1); playSound(GameSounds.PageDoneLoading)" onmouseover="noSound()"><b>-</b></button>
+							<button class="Standard" id="DevPlus" style="top:27%;left:40%;width:10%" onclick="EmployeeChange('dev',1); playSound(GameSounds.PageDoneLoading)" onmouseover="noSound()"><b>+</b></button>
+							<div class="StandardText" style="top:44%;left:46%;width:10%;text-align:center" id="EmpPopupDev">0</div>
+							<button class="Standard" id="DevMinus" style="top:57%;left:40%;width:10%" onclick="EmployeeChange('dev',-1); playSound(GameSounds.PageDoneLoading)" onmouseover="noSound()"><b>-</b></button>
 							
 							<div class="StandardText" style="top:22%;left:75.75%;font-size:12px">Testers</div>
-							<button class="Standard" style="top:27%;left:70%;width:10%" onclick="EmployeeChange('tes',1); playSound(GameSounds.PageDoneLoading)" onmouseover="noSound()"><b>+</b></button>
-							<div class="StandardText" style="top:44%;left:78%" id="EmpPopupTes">0</div>
-							<button class="Standard" style="top:57%;left:70%;width:10%" onclick="EmployeeChange('tes',-1); playSound(GameSounds.PageDoneLoading)" onmouseover="noSound()"><b>-</b></button>
+							<button class="Standard" id="TesPlus" style="top:27%;left:70%;width:10%" onclick="EmployeeChange('tes',1); playSound(GameSounds.PageDoneLoading)" onmouseover="noSound()"><b>+</b></button>
+							<div class="StandardText" style="top:44%;left:76%;width:10%;text-align:center" id="EmpPopupTes">0</div>
+							<button class="Standard" id="TesMinus" style="top:57%;left:70%;width:10%" onclick="EmployeeChange('tes',-1); playSound(GameSounds.PageDoneLoading)" onmouseover="noSound()"><b>-</b></button>
 							
-							<button class="Standard" style="top:80%;left:10%;width:80%" onclick="hideEmployeeDialog()">Done</button>
+							<button class="Standard" id="EmployeeDoneButton" style="top:80%;left:10%;width:80%" onclick="hideEmployeeDialog()">Done</button>
 						</div>
 						<div class="Popup" id="Scoreboard" style="left:10%;top:10%;width:80%;height:80%">
 							<div class="StandardText" id="ScoreboardTitle" style="left:10%;top:5%;width:80%;height:80%">Scoreboard</div>
-							<div class="PlayerBox" id="PlyOneScbdBox" style="display:none;border-color:red;left:13%;top:19%;">
+							<div class="PlayerBox" id="PlyOneScbdBox" style="display:none;border-color:red;left:13%;top:19%;overflow:hidden;">
 								<div class="StandardText" id="PlyOneScbdName" style="margin:0px;width:100%;top:5%;font-size:16px">nil</div>
 								<div class="StandardText" style="left:8%;top:35%;color:rgb(120,120,120);font-size:14px">$<span id="PlyOneScbdMoney" style="color:white">nil</span><sup style="font-size:8px">.00</sup></div>
 								<div class="StandardText" style="font-size:10px;left:8%;top:70%;color:rgb(120,120,120);font-size:10px;text-align:left">Products:</div>
@@ -319,7 +321,7 @@
 								<div class="StandardText" style="font-size:10px;left:50%;top:70%;color:rgb(120,120,120);font-size:10px;text-align:left">Employees:</div>
 								<div id="PlyOneScbdEmps" class="StandardText" style="color:white;font-size:10px;right:8%;top:70%;font-size:10px;text-align:right">nil</div>
 							</div>
-							<div class="PlayerBox" id="PlyTwoScbdBox" style="display:none;border-color:red;left:55%;top:19%;">
+							<div class="PlayerBox" id="PlyTwoScbdBox" style="display:none;border-color:red;left:55%;top:19%;overflow:hidden;">
 								<div class="StandardText" id="PlyTwoScbdName" style="margin:0px;width:100%;top:5%;font-size:16px">nil</div>
 								<div class="StandardText" style="left:8%;top:35%;color:rgb(120,120,120);font-size:14px">$<span id="PlyTwoScbdMoney" style="color:white">nil</span><sup style="font-size:8px">.00</sup></div>
 								<div class="StandardText" style="font-size:10px;left:8%;top:70%;color:rgb(120,120,120);font-size:10px;text-align:left">Products:</div>
@@ -327,7 +329,7 @@
 								<div class="StandardText" style="font-size:10px;left:50%;top:70%;color:rgb(120,120,120);font-size:10px;text-align:left">Employees:</div>
 								<div id="PlyTwoScbdEmps" class="StandardText" style="color:white;font-size:10px;right:8%;top:70%;font-size:10px;text-align:right">nil</div>
 							</div>
-							<div class="PlayerBox" id="PlyThreeScbdBox" style="display:none;border-color:red;left:13%;top:41%;">
+							<div class="PlayerBox" id="PlyThreeScbdBox" style="display:none;border-color:red;left:13%;top:41%;overflow:hidden;">
 								<div class="StandardText" id="PlyThreeScbdName" style="margin:0px;width:100%;top:5%;font-size:16px">nil</div>
 								<div class="StandardText" style="left:8%;top:35%;color:rgb(120,120,120);font-size:14px">$<span id="PlyThreeScbdMoney" style="color:white">nil</span><sup style="font-size:8px">.00</sup></div>
 								<div class="StandardText" style="font-size:10px;left:8%;top:70%;color:rgb(120,120,120);font-size:10px;text-align:left">Products:</div>
@@ -335,7 +337,7 @@
 								<div class="StandardText" style="font-size:10px;left:50%;top:70%;color:rgb(120,120,120);font-size:10px;text-align:left">Employees:</div>
 								<div id="PlyThreeScbdEmps" class="StandardText" style="color:white;font-size:10px;right:8%;top:70%;font-size:10px;text-align:right">nil</div>
 							</div>
-							<div class="PlayerBox" id="PlyFourScbdBox" style="display:none;border-color:red;left:55%;top:41%;">	
+							<div class="PlayerBox" id="PlyFourScbdBox" style="display:none;border-color:red;left:55%;top:41%;overflow:hidden;">	
 								<div class="StandardText" id="PlyFourScbdName" style="margin:0px;width:100%;top:5%;font-size:16px">nil</div>
 								<div class="StandardText" style="left:8%;top:35%;color:rgb(120,120,120);font-size:14px">$<span id="PlyFourScbdMoney" style="color:white">nil</span><sup style="font-size:8px">.00</sup></div>
 								<div class="StandardText" style="font-size:10px;left:8%;top:70%;color:rgb(120,120,120);font-size:10px;text-align:left">Products:</div>
@@ -343,7 +345,7 @@
 								<div class="StandardText" style="font-size:10px;left:50%;top:70%;color:rgb(120,120,120);font-size:10px;text-align:left">Employees:</div>
 								<div id="PlyFourScbdEmps" class="StandardText" style="color:white;font-size:10px;right:8%;top:70%;font-size:10px;text-align:right">nil</div>
 							</div>
-							<div class="PlayerBox" id="PlyFiveScbdBox" style="display:none;border-color:red;left:13%;top:63%;">
+							<div class="PlayerBox" id="PlyFiveScbdBox" style="display:none;border-color:red;left:13%;top:63%;overflow:hidden;">
 								<div class="StandardText" id="PlyFiveScbdName" style="margin:0px;width:100%;top:5%;font-size:16px">nil</div>
 								<div class="StandardText" style="left:8%;top:35%;color:rgb(120,120,120);font-size:14px">$<span id="PlyFiveScbdMoney" style="color:white">nil</span><sup style="font-size:8px">.00</sup></div>
 								<div class="StandardText" style="font-size:10px;left:8%;top:70%;color:rgb(120,120,120);font-size:10px;text-align:left">Products:</div>
@@ -351,7 +353,7 @@
 								<div class="StandardText" style="font-size:10px;left:50%;top:70%;color:rgb(120,120,120);font-size:10px;text-align:left">Employees:</div>
 								<div id="PlyFiveScbdEmps" class="StandardText" style="color:white;font-size:10px;right:8%;top:70%;font-size:10px;text-align:right">nil</div>
 							</div>
-							<div class="PlayerBox" id="PlySixScbdBox" style="display:none;border-color:red;left:55%;top:63%;">
+							<div class="PlayerBox" id="PlySixScbdBox" style="display:none;border-color:red;left:55%;top:63%;overflow:hidden;">
 								<div class="StandardText" id="PlySixScbdName" style="margin:0px;width:100%;top:5%;font-size:16px">nil</div>
 								<div class="StandardText" style="left:8%;top:35%;color:rgb(120,120,120);font-size:14px">$<span id="PlySixScbdMoney" style="color:white">nil</span><sup style="font-size:8px">.00</sup></div>
 								<div class="StandardText" style="font-size:10px;left:8%;top:70%;color:rgb(120,120,120);font-size:10px;text-align:left">Products:</div>
@@ -365,7 +367,7 @@
 							<div class="StandardText" id="PatentTitle" style="font-size:50px;margin:0px;width:100%;top:6%">ERROR!</div>
 							<div class="StandardText" id="PatentText" style="font-size:25px;margin:0px;width:100%;top:28%">Something got borked in your code!</div>
 							<div class="StandardText" id="PatentTip" style="font-size:10px;margin-left:10%;width:80%;top:63%">Have you tried a code review?</div>
-							<button class="Standard" style="left:14%;top:75%;width:72%" onclick="ClosePatentDialog()">Continue</button>
+							<button class="Standard" id="PatentCloseButton" style="left:14%;top:75%;width:72%" onclick="ClosePatentDialog()">Continue</button>
 						</div>
 						<div class="Popup" id="DetailsDialog" style="top:15%;height:70%;width:55%;left:22.5%">
 							<div class="StandardText" id="DetailsTitle" style="font-size:40px;margin:0px;width:100%;top:2%">Product Details</div>
@@ -402,8 +404,8 @@
 						</div>
 						<div class="Popup" id="RemoveDialog">
 							<div id="RemoveMessage" class="StandardText" style="margin:0px;width:100%;top:10%">Are you sure you want to remove this product from the gameboard?</div>
-							<button class="Standard" style="left:10%;top:75%;width:30%" onclick="CloseRemoveDialog()">Cancel</button>
-							<button class="Standard" style="right:10%;top:75%;width:30%" onclick="removeProduct(CurrentlySelectedProduct); CloseRemoveDialog(); noSound()">Remove</button>
+							<button class="Standard" id="CancelRemoveButton" style="left:10%;top:75%;width:30%" onclick="CloseRemoveDialog()">Cancel</button>
+							<button class="Standard" id="ConfirmRemoveButton" style="right:10%;top:75%;width:30%" onclick="removeProduct(CurrentlySelectedProduct); CloseRemoveDialog(); noSound()">Remove</button>
 						</div>
 						<div class="Popup" id="QuitDialog" style="top:25%;height:50%;width:56%;left:22%">
 							<div class="StandardText" style="font-size:40px;margin:0px;width:100%;top:10%">Are you sure you want to quit?</div>
@@ -414,12 +416,16 @@
 							<div class="StandardText" id="EventTitle" style="font-size:35px;margin:0px;width:100%;top:3%;">Code is broken!</div>
 							<div class="StandardText" id="EventDesc" style="font-size:20px;margin:0px;width:100%;top:60%;">Something went wrong probably because of lack of quality code practices!</div>
 							<img id="EventImage" src="../images/events/event_cyberattack.png" style="position:absolute;left:29%;top:15%;width:200px;height:200px"></img>
-							<button class="Standard" onclick="CloseEventDialog()" style="left:20%;top:84%;width:60%">Continue</button>
+							<button class="Standard" id="EventButton" onclick="CloseEventDialog()" style="left:20%;top:84%;width:60%">Continue</button>
 						</div>
 						<div class="Popup" id="TriggerDialog" style="top:20%;height:60%;width:60%;left:20%">
 							<img id="TriggerImage" src="../images/events/event_cyberattack.png" style="position:absolute;left:29%;top:3%;width:200px;height:200px"></img>
 							<div class="StandardText" id="TriggerDesc" style="font-size:15px;margin:0px;width:100%;top:62%;">Something went wrong probably because of lack of quality code practices!</div>
-							<button class="Standard" onclick="CloseTriggerDialog()" style="left:20%;top:80%;width:60%">Continue</button>
+							<button class="Standard" id="TriggerButton" onclick="CloseTriggerDialog()" style="left:20%;top:80%;width:60%">Continue</button>
+						</div>
+						<div id="GameOverDisplay" style="z-index:6">
+							<div id="GameOverTitle">GAME OVER</div>
+							<button class="Standard" id="FinishGameButton" onclick="SwitchToFinalResults()" style="visibility:hidden;opacity:0;left:35%;top:65%;width:30%" disabled>Continue</button>
 						</div>
 					</div>
 					<span id="CashOne" class="CashAlert">0</span>
@@ -434,6 +440,7 @@
 			</div>
 			<div id="RoundAnnouncer">ROUND<br>1</div>
 		</div>
+		<div id="Blanket" class="Blanket" style="position:fixed;left:0px;top:0px;display:none;"></div>
 		<div id="ControlLock" style="position:fixed;left:0px;top:0px;width:1000px;height:1000px;display:none;z-index:999"></div>
 	</body>
 </html>

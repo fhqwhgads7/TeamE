@@ -20,14 +20,9 @@
 		var user = new Parse.User();
 		
 		
-			var tabNumber;
-			var TABCOUNT = 4;
 			function Initialize()
 			{
-				tabNumber = 1;
 				GlobalInitialize();
-				buttonCheck();
-				$("#Tab"+tabNumber).css("visibility", "visible");
 			}
 			function GoBackToMainMenu()
 			{
@@ -41,12 +36,6 @@
 			}
 			function CreateSPGame(){
 				SwitchToPage("new_game_options.html");
-			}
-			function LoadGame(){
-				SwitchToPage("load.html");
-			}
-			function HomePage(){
-				SwitchToPage("title.html");
 			}
 			function SubmitRegistration(){
 				

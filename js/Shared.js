@@ -97,11 +97,11 @@ var Tips=[
 	"One way to secure your assets is by patenting a product. Be sure to patent a good product, though!",
 	"Pay attention to current events to help you with decision making!",
 	"It takes some time to prototype or deploy a product. Patience!",
-	"Don't leave a product in the same phase for too long. Spending too much time on one thing produces diminishing results!",
+	"Don't leave a product in the same outer phase for too long. Spending too much time on one thing produces diminishing results!",
 	"It takes time to build a prototype or deploy a product; this is why progression from these phases is not immediate.",
 	"Try to hold on to your employees; it costs money just to get them started!",
 	"If a product fails out on the market, don't panic! Failure is but a learning experience, a path to success.",
-	"Don't leave too many products in the same phase. Multitasking is not the easiest thing to do.",
+	"Don't leave too many products in the same outer phase. Multitasking is not the easiest thing to do.",
 	"Different kinds of products have different characteristics. Some are riskier or more expensive than others, but it can be easy to build their idea strength.",
 	"A stable product is a successful product. Testing is key! There are three phases for it.",
 	"Be sure to keep an eye on the other players and stay ahead of the competition.",
@@ -109,7 +109,7 @@ var Tips=[
 	"Make a product!",
 	"Those arrows below your player window can turn the board for easier readability.",
 	"Don't pursue so many ventures you can't click on any of them to view their details!",
-	"If you lose your entire investment on a product without taking the time to refine its idea or, design, develop, or test it, it's probably your own fault.",
+	"If you lose your entire investment on a product without taking the time to refine its idea or design, develop, or test it, it's probably your own fault.",
 	"Don't drink and drive.",
 	"Don't die. That hurts.",
 	"Try the salad; it's delicious.",
@@ -141,12 +141,14 @@ var GameSounds={
 	MinorFail: '../sounds/sfx/minor_fail.wav'
 }
 function playSound(sound){
-	SFXVolume = parseInt(localStorage.getItem("SFXVolume"));
-	if (isNaN(SFXVolume))
-		SFXVolume = 50;
-	var theSound = new Audio(sound);
-	theSound.volume = SFXVolume/100.0;
-	theSound.play();
+	if (localStorage.getItem("SFXMute")!="Muted"){
+		SFXVolume = parseInt(localStorage.getItem("SFXVolume"));
+		if (isNaN(SFXVolume))
+			SFXVolume = 50;
+		var theSound = new Audio(sound);
+		theSound.volume = SFXVolume/100.0;
+		theSound.play();
+	}
 }
 function getTimeOfDay(x){
 	timeOfDay = "";
@@ -176,54 +178,6 @@ function getTimeOfDay(x){
 		timeOfDay = "Night";
     }                   
 	return timeOfDay;
-}
-function MakeBGM(){	
-	var audioArray = document.getElementsByClassName('playsong');
-		
-	//document.write(audioArray.length);
-		var i = 0;
-		var nowPlaying = audioArray[i];
-		nowPlaying.load();
-		nowPlaying.play();
-		//alert("hi");
-		/*$('.play').on('click', function() {
-			nowPlaying.play();
-		});
-		
-		$('.stop').on('click', function() {
-			nowPlaying.pause();
-		});
-		
-		$('.next').on('click', function() {*/
-		//alert(audioArray.length);
-		$('#player').on('ended', function(){
-    // done playing
-			//alert("Player stopped");
-			//alert(i);
-			/*$.each($('audio.playsong'), function(){
-				this.pause();
-			});
-			
-			if(i>=audioArray.length-1){
-				i=0;
-			}
-			else{
-				i++;
-			}*/
-			
-			//document.write(audioArray.length);
-			nowPlaying = audioArray[1];
-			nowPlaying.load();
-			nowPlaying.play();
-			
-			$('#player2').on('ended', function(){
-			
-				nowPlaying = audioArray[2];
-				nowPlaying.load();
-				nowPlaying.play();
-			});
-			//nowPlaying.pause();
-		});	
 }
 
 //Backgrounds are "MainMenu", "InGame", "TimeRunningOut", and "FinalScores"
@@ -323,13 +277,14 @@ function Game(id){
 	newGame.CurrentPlayerNum=0;
 	newGame.CurrentRound=0;
 	newGame.PatentTracker=null;
+	newGame.GameType;
 	newGame.Settings={
 		Difficulty:null,
 		CPUIntelligence:null,
 		PatentingEnabled:null,
 		NumberOfRounds:null
 	}
-	newGame.GameState="Uninitialized"; // this game-state is going to become very important when we start the networking
+	newGame.GameState="UNINITIALIZED"; // this game-state is going to become very important when we start the networking
 	newGame.toString=function(){
 		return newGame.ClassName+" "+this.ID.toString();
 	}

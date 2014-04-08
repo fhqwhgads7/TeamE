@@ -80,7 +80,7 @@ button.Standard:disabled:hover{
 }
 button.Compact{
 	font-size:.7em;
-	padding:.2em 1em;
+	padding:0.2em 0em;
 	font-weight:700;
 }
 div.StandardText{
@@ -189,6 +189,7 @@ div.ProductDisplayItem{
 	transition:1s ease-out;
 	webkit-transform-origin:50% 50%;
 	moz-transform-origin:50% 50%;
+	opacity: 0.8;
 }
 .OneColumn{
 	position:absolute;
@@ -224,4 +225,17 @@ div.ProductDisplayItem{
 	-moz-border-radius:20px;
 	-webkit-border-radius:20px;
 	border-radius:20px;
+}
+div.Blanket{
+	position:fixed;
+	width:800px;
+	height:600px;
+	left:0px;
+	top:0px;
+	z-index:10;
+	background-color:rgba(0,0,0,1);
+	opacity:0;
+	transition: 600ms ease-in-out;
+	-webkit-transition: 600ms ease-in-out;
+	-moz-transition: 600ms ease-in-out;
 }

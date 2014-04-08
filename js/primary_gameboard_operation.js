@@ -21,7 +21,7 @@ var BaseCosts={
 	Deployment:370
 }
 var BasePayouts={
-	DayJobEachTurn:30
+	DayJobEachTurn:100
 }
 var ProductPhases={
 	Idea:"Idea",
@@ -35,15 +35,15 @@ var ProductPhases={
 	Maintenance:"Maintenance"
 }
 var PhasePositions={
-	Idea:[350,50],
-	Design:[480,180],
-	Prototype:[480,340],
-	PrototypeTesting:[350,480],
-	Development:[190,480],
-	PreDeploymentTesting:[60,340],
-	Deployment:[60,180],
-	PostDeploymentTesting:[190,50],
-	Maintenance:[260,260]
+	Idea:[270+225*Math.cos(13*Math.PI/8),270+225*Math.sin(13*Math.PI/8)], //[350,50],
+	Design:[270+225*Math.cos(15*Math.PI/8),270+225*Math.sin(15*Math.PI/8)], //[480,180],
+	Prototype:[270+225*Math.cos(1*Math.PI/8),270+225*Math.sin(1*Math.PI/8)], //[480,340],
+	PrototypeTesting:[270+225*Math.cos(3*Math.PI/8),270+225*Math.sin(3*Math.PI/8)], //[350,480],
+	Development:[270+225*Math.cos(5*Math.PI/8),270+225*Math.sin(5*Math.PI/8)], //[190,480],
+	PreDeploymentTesting:[270+225*Math.cos(7*Math.PI/8),270+225*Math.sin(7*Math.PI/8)], //[60,340],
+	Deployment:[270+225*Math.cos(9*Math.PI/8),270+225*Math.sin(9*Math.PI/8)], //[60,180],
+	PostDeploymentTesting:[270+225*Math.cos(11*Math.PI/8),270+225*Math.sin(11*Math.PI/8)], //[190,50],
+	Maintenance:[270,270]
 }
 //Format is: Name, Initial Description, AreaOfEffect, Scale, Type, Value, Picture, Likeliness, and OccurrenceInterval (With a counter)
 //0  Name is a self-explanatory string
@@ -110,6 +110,7 @@ function GameInitialize(){
 		LoadGameInitialize(doILoadGame);
 	else
 		NewGameInitialize();
+	TheGame.GameState = "ACTIVE"
 }
 function NewGameInitialize(){
 	var GameCreationInfo=JSON.parse(localStorage.getItem("TheBrandNewGame"));
@@ -123,6 +124,10 @@ function NewGameInitialize(){
 	UpdatePlayerDisplay();
 	PopulateNewProdCategories();
 	setInterval("TipThink();",10);
+	if (TheGame.GameType=="Local"){
+		setInterval("SaveThink();",1000);
+		localStorage.setItem("LoadingAGame", "LastSavedGame");
+	}
 	setTimeout(DisplayNewRoundEvent,1);
 	$("#MainBoard").hide();
 	setTimeout(Appear,750);
@@ -151,11 +156,24 @@ function LoadGameInitialize(gameName){
 		TheGame.CurrentPlayerNum=TheGame.CurrentPlayer.Number;
 		UpdatePlayerDisplay();
 		PopulateNewProdCategories();
+		for (i=0; i<TheGame.CurrentPlayer.Products.length; i++){
+			$("#ProductDisplayItem_" + TheGame.CurrentPlayer.Products[i].GlobalID).css("z-index",2);
+		}
 		if (TheGame.Settings.NumberOfRounds-TheGame.CurrentRound <= 5)
 			changeCurrentBGM("TimeRunningOut");
 		$("#RoundNumberDisplay").text("ROUND " + TheGame.CurrentRound.toString());
 		$("#new-product-button").attr("disabled",(TheGame.CurrentPlayer.hasMadeProductThisTurn));
+		var Elem=document.getElementById("TipSpan");
+		var welcomeBackMessage = "Welcome back to the stage of Entrepreneurship!";
+		if (TheGame.CurrentRound >= TheGame.Settings.NumberOfRounds/2){
+			welcomeBackMessage = "We missed you."
+		}
+		Elem.style.left=BOARD_WIDTH.toString()+"px";
+		Elem.innerHTML=welcomeBackMessage;
 		setInterval("TipThink();",10);
+		if (TheGame.GameType=="Local"){
+			setInterval("SaveThink();",1000);
+		}
 		setTimeout(function(){
 			TheGame.CurrentPlayer.TurnInit();
 		},1250);
@@ -190,6 +208,7 @@ function TransferGameStartupInfo(from,to){
 	to.Settings.CPUIntelligence=from.Options.CPUIntelligence;
 	to.Settings.PatentingEnabled=from.Options.PatentingEnabled;
 	to.Settings.NumberOfRounds=from.Options.NumberOfRounds;
+	to.GameType=from.GameType;
 }
 function GetDifficultyConstant(difficulty){
 	var returnValue = 0;
@@ -263,10 +282,14 @@ function CreateProductDisplay(prod){
 	ProdElem.id="ProductDisplayItem_"+prod.GlobalID;
 	prod.DisplayItemID=ProdElem.id;
 	ProdElem.addEventListener("click",function(){
-		if (prod!=CurrentlySelectedProduct){
-			playSound(GameSounds.Message);
-		}
+		playSound(GameSounds.Message);
+		$("#"+ProdElem.id).css("box-shadow", "0px 0px 60px 10px #AAAAAA");
+		$("#"+ProdElem.id).css("opacity", "1");
 		UpdateCurProdDisplay(ProdElem.id);
+		setTimeout(function(){
+			$("#"+ProdElem.id).css("box-shadow", "4px 4px 15px -2px #000000");
+			$("#"+ProdElem.id).css("opacity", "0.8");
+		},200);
 	});
 	ProdElem.className="ProductDisplayItem";
 	ProdElem.style.backgroundImage="url('../images/ProductIcons/"+prod.Category.toLowerCase()+"_"+prod.SubCategory.toLowerCase()+".png')";
@@ -289,16 +312,20 @@ function RecreateProductDisplay(prod){
 	ProdElem.id="ProductDisplayItem_"+prod.GlobalID;
 	prod.DisplayItemID=ProdElem.id;
 	ProdElem.addEventListener("click",function(){
-		if (prod!=CurrentlySelectedProduct){
-			playSound(GameSounds.Message);
-		}
+		playSound(GameSounds.Message);
+		$("#"+ProdElem.id).css("box-shadow", "0px 0px 60px 10px #AAAAAA");
+		$("#"+ProdElem.id).css("opacity", "1");
 		UpdateCurProdDisplay(ProdElem.id);
+		setTimeout(function(){
+			$("#"+ProdElem.id).css("box-shadow", "4px 4px 15px -2px #000000");
+			$("#"+ProdElem.id).css("opacity", "0.8");
+		},200);
 	});
 	ProdElem.className="ProductDisplayItem";
 	ProdElem.style.backgroundImage="url('../images/ProductIcons/"+prod.Category.toLowerCase()+"_"+prod.SubCategory.toLowerCase()+".png')";
 	ProdElem.style.left="0px";
 	ProdElem.style.top="0px";
-	ProdElem.style.zIndex="2";
+	ProdElem.style.zIndex="1";
 	ProdElem.style.borderStyle="outset";
 	ProdElem.style.borderColor=PlayerColors[prod.Color];
 	ProdElem.style.backgroundColor=prod.Color;
@@ -323,8 +350,8 @@ function removeProduct(prod){
 		},500);
 		if (prod.justStarted)
 			TheGame.CurrentPlayer.hasMadeProductThisTurn = false;
-		prod.Owner.Products.splice(prod.Number, 1);
-		TheGame.Players[TheGame.CurrentPlayerNum].NumProducts--;
+		prod.Owner.Products.splice(prod.Owner.Products.indexOf(prod), 1);
+		TheGame.Players[TheGame.CurrentPlayerNum].NumProducts = TheGame.Players[TheGame.CurrentPlayerNum].Products.length;
 		UpdatePlayerProductDisplayPosition(prod.Owner);
 		UpdatePlayerDisplay();
 	}
@@ -384,18 +411,22 @@ function UpdatePlayerProductDisplayPosition(Ply){
 
 function UpdateProductListDisplayPosition(ProdList){
 	var angularIncrement = 2*(Math.PI)/(ProdList.length);
-	var Magnitude = 50*Math.log(ProdList.length)/Math.log(5);
+	var Magnitude = 25*Math.log(ProdList.length)/Math.log(3);
 	var scalar = Math.pow(Math.E, -((ProdList.length - 1)*0.1)).toString();
 	
 	for (i = 0; i < ProdList.length; i++){
 		TheProd = ProdList[i];
 		XOffset = Math.cos(angularIncrement*i);
 		YOffset = Math.sin(angularIncrement*i);
+		XPos = PhasePositions[TheProd.Phase][0]+XOffset*Magnitude;
+		YPos = PhasePositions[TheProd.Phase][1]+YOffset*Magnitude;
+		Rotation = Math.atan2(-XPos+PhasePositions["Maintenance"][0], YPos-PhasePositions["Maintenance"][1])-Math.PI*Number((TheProd.Phase!="Maintenance") || (ProdList.length>1));
+		
 		var ProdElem=$("#"+"ProductDisplayItem_"+TheProd.GlobalID);
-		ProdElem.css("left",(PhasePositions[TheProd.Phase][0]+XOffset*Magnitude).toString()+"px");
-		ProdElem.css("top",(PhasePositions[TheProd.Phase][1]+YOffset*Magnitude).toString()+"px");
-		ProdElem.css({ 'webkit-transform': 'scale('+scalar+','+scalar+')'});
-		ProdElem.css({ 'transform': 'scale('+scalar+','+scalar+')'});
+		ProdElem.css("left",(XPos.toString()+"px"));
+		ProdElem.css("top",(YPos.toString()+"px"));
+		ProdElem.css({ 'webkit-transform': 'scale('+scalar+','+scalar+') rotate('+ Rotation.toString() +'rad)'});
+		ProdElem.css({ 'transform': 'scale('+scalar+','+scalar+') rotate('+Rotation.toString()+'rad)'});
 	}	
 }
 
@@ -406,13 +437,13 @@ function EmployeeChange(type,num){
 	var testers = parseInt($("#EmpPopupTes").text());
 	
 	if (type=="des"){
-		if (num+designers>=0)
+		if (num+designers>=0 && num+designers<=100)
 			$("#EmpPopupDes").text((num+designers).toString());
 	}else if(type=="dev"){
-		if (num+developers>=0)
+		if (num+developers>=0 && num+developers<=100)
 			$("#EmpPopupDev").text((num+developers).toString());
 	}else if(type=="tes"){
-		if (num+testers>=0)
+		if (num+testers>=0 && num+testers<=100)
 			$("#EmpPopupTes").text((num+testers).toString());	
 	}
 }
@@ -487,7 +518,7 @@ function UpdateCurProdDisplay(id){
 		document.getElementById("ProdOwnerDisplayName").innerHTML=Prod.Owner.Name;
 		document.getElementById("DisplayCAT").innerHTML=Prod.Category;
 		document.getElementById("DisplaySUBCAT").innerHTML=Prod.SubCategory;
-		var productScore = getMonetaryValue(Prod);
+		var productScore = Math.round(getMonetaryValue(Prod)*TotalPayoutRate*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty))));
 		var rating = productScore.toString();
 		document.getElementById("DisplayOVLS").innerHTML="$"+rating.toString();
 	}
@@ -554,7 +585,7 @@ function TryToAdvanceProduct(){
 	}
 	
 	UpdateProductListDisplayPosition(GetProductsInSamePhase(CurrentlySelectedProduct));
-	UpdatePlayerProductDisplayPosition(CurrentlySelectedProduct.Owner);
+	UpdateProductListDisplayPosition(GetProductsInThisPhase(CurPhase,CurrentlySelectedProduct.Owner));
 	UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
 	UpdatePlayerDisplay();
 }
@@ -588,7 +619,7 @@ function TryToRevertProduct(){
 	}
 	if (!removeCheck){
 		UpdateProductListDisplayPosition(GetProductsInSamePhase(CurrentlySelectedProduct));
-		UpdatePlayerProductDisplayPosition(CurrentlySelectedProduct.Owner);
+		UpdateProductListDisplayPosition(GetProductsInThisPhase(CurPhase,CurrentlySelectedProduct.Owner));
 		UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
 		UpdatePlayerDisplay();
 	}
@@ -753,29 +784,29 @@ function NewRoundCalc(){
 					}
 				}
 				if(Prod.Phase==ProductPhases.Idea){
-					Prod.IdeaStrength=Prod.IdeaStrength+Math.ceil(SubCategoryAttributes[Prod.SubCategory][2]*6.0*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty)))/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.IdeaStrength=Prod.IdeaStrength+Math.ceil(SubCategoryAttributes[Prod.SubCategory][2]*60*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty)))/(numOnSameSpot+Prod.turnsInSamePhase));
 					MoveItSoon(Ply, Prod);
 				}else if(Prod.Phase==ProductPhases.Design){
 					EmployeeReductionCheck("des", Ply, Prod);
-					Prod.DesignStrength=Prod.DesignStrength+Math.ceil(2*Ply.NumCreative*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty)))/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.DesignStrength=Prod.DesignStrength+Math.ceil(20*Ply.NumCreative*(Math.log(3)/Math.log(3+Ply.NumCreative))/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.Prototype){
 					Prod.hasPrototype=true;
 				}else if(Prod.Phase==ProductPhases.PrototypeTesting){
 					EmployeeReductionCheck("tes", Ply, Prod);
-					Prod.DesignStrength=Prod.DesignStrength+Math.ceil(Ply.NumQA*1.2*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty)))/(numOnSameSpot+Prod.turnsInSamePhase));
-					Prod.TestingStrength+=(Prod.DesignStrength*Ply.NumQA/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.DesignStrength=Prod.DesignStrength+Math.ceil(Ply.NumQA*12*(Math.log(3)/Math.log(3+Ply.NumQA))/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.TestingStrength+=(Prod.DesignStrength*0.1*Ply.NumQA*(Math.log(3)/Math.log(3+Ply.NumQA))/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.Development){
 					EmployeeReductionCheck("dev", Ply, Prod);
-					Prod.BuildStrength=Prod.BuildStrength+Math.ceil(2*Ply.NumDevs*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty)))/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.BuildStrength=Prod.BuildStrength+Math.ceil(20*Ply.NumDevs*(Math.log(3)/Math.log(3+Ply.NumDevs))/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.PreDepTesting){
 					EmployeeReductionCheck("tes", Ply, Prod);
-					Prod.BuildStrength=Prod.BuildStrength+Math.ceil(Ply.NumQA*1.2*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty)))/(numOnSameSpot+Prod.turnsInSamePhase));
-					Prod.TestingStrength+=(Prod.BuildStrength*Ply.NumQA*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty)))/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.BuildStrength=Prod.BuildStrength+Math.ceil(Ply.NumQA*12*(Math.log(3)/Math.log(3+Ply.NumCreative))/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.TestingStrength+=(Prod.BuildStrength*0.1*Ply.NumQA*(Math.log(3)/Math.log(3+Ply.NumCreative))/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.Deployment){
 					Prod.readyToDeploy=true;
 				}else if(Prod.Phase==ProductPhases.PostDepTesting){
 					EmployeeReductionCheck("tes", Ply, Prod);
-					Prod.TestingStrength+=Math.ceil(0.5*(Prod.DesignStrength+Prod.BuildStrength)*Ply.NumQA*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty)))/(numOnSameSpot+Prod.turnsInSamePhase));
+					Prod.TestingStrength+=Math.ceil(0.05*(Prod.DesignStrength+Prod.BuildStrength)*Ply.NumQA*(Math.log(3)/Math.log(3+Ply.NumCreative))/(numOnSameSpot+Prod.turnsInSamePhase));
 				}else if(Prod.Phase==ProductPhases.Maintenance){
 					var Broken = DoesItBreak(Prod);
 					if (Broken>0){
@@ -833,7 +864,7 @@ function DecrementCategoryChanges(){
 			SubCat[3] = 0.1;
 		else{
 			if (Math.round(SubCat[3]*10)/10 > 1)
-				SubCat[3] -= 0.2;
+				SubCat[3] -= 0.1;
 			else if (Math.round(SubCat[3]*10)/10 < 1)
 				SubCat[3] += 0.1;
 		}
@@ -1021,27 +1052,6 @@ function doIPayRoyalties(product, patentTracker)
 	return patentOwnerID;
 }
 
-//Function that ends the game.
-function FinishGame(){
-	var Plyr = new Object();
-	
-	for(PlyNum in TheGame.Players){
-		var Ply=TheGame.Players[PlyNum];
-					
-		Plyr[PlyNum]=new Object();
-		Plyr[PlyNum].Name=Ply.Name;
-		Plyr[PlyNum].Money=Ply.Money;
-		Plyr[PlyNum].Color=Ply.Color;
-		Plyr[PlyNum].NumProducts=Ply.NumProducts;
-		Plyr[PlyNum].NumEmployees=(Ply.NumQA+Ply.NumDevs+Ply.NumCreative);
-		
-	}
-	
-	localStorage.setItem("FinalResults",JSON.stringify(Plyr));
-	//Maybe a more fancy transition can go in here later.
-	SwitchToPage("gameover.html");
-}
-
 function RandomEventSelector(){
 	var IterateThroughThese = new Array();
 	var difficultyOffset = 2;
@@ -1077,6 +1087,7 @@ function RandomEventIterator(){
 	if (RandomEventsToIterate.length > 0)
 	{
 		playSound(GameSounds.Event);
+		EventFlash();
 		var Event=RandomEventsToIterate[0];
 		var Msg=Event[0];
 		var Desc=Event[1]+" ";
@@ -1196,7 +1207,7 @@ function RandomEventIterator(){
 
 //Function that determines a product's worth
 function getMonetaryValue(prod){
-	return Math.ceil(Math.pow(prod.IdeaStrength,2)*Math.pow(prod.DesignStrength,1.1)*Math.pow(prod.BuildStrength,1.1));
+	return Math.ceil(Math.pow(prod.IdeaStrength,2)*Math.pow(prod.DesignStrength,1.1)*Math.pow(prod.BuildStrength,1.1)/1000);
 }
 
 //Function that checks if a product "breaks" while in Maintenance mode. Returns an integer indicating how badly it broke.
@@ -1207,7 +1218,7 @@ function DoesItBreak(prod){
 //Below is the list of functions that run during each player's turn cycle.
 //Warning for product being in same spot for too long
 function MoveItSoon(Ply, prod){
-	if (prod.turnsInSamePhase >= 4){
+	if (prod.turnsInSamePhase >= 6){
 		Ply.TriggeredEvents.push(function(){
 			TriggeredEventDisplay("Your product " + prod.Name + " has been in the " + prod.Phase + " phase for a while. Consider moving it along.", GameSounds.Message, "longtime");
 		});
@@ -1217,7 +1228,7 @@ function MoveItSoon(Ply, prod){
 function EmployeeReductionCheck(employeeType, Ply, prod){
 	var numLost;
 	var messagePart;
-	if (prod.turnsInSamePhase >= 7){
+	if (prod.turnsInSamePhase >= 8){
 		numLost=Math.ceil(Math.random()*3);
 		if (employeeType=="des"){
 			if (numLost > Ply.NumCreative)
@@ -1239,6 +1250,7 @@ function EmployeeReductionCheck(employeeType, Ply, prod){
 		}
 		if (numLost > 0)
 			Ply.TriggeredEvents.push(function(){
+				EventFlash();
 				TriggeredEventDisplay("Your " + prod.Name + " has been in the same phase for too long! " + messagePart, GameSounds.Event, "employeeloss");
 				UpdatePlayerDisplay();
 			});
@@ -1250,13 +1262,18 @@ function EmployeeReductionCheck(employeeType, Ply, prod){
 }
 //Product is so horribly broken that it gets removed from the board
 function IsItSoBadItGetsRemoved(Ply, Prod, AmountLost) {
-	if (Prod)
-		if ((AmountLost >= 1000) || (AmountLost >= getMonetaryValue(Prod))) {
-			removeProduct(Prod);
-			Ply.TriggeredEvents.push(function(){
+	if ((AmountLost >= 1000) || (AmountLost >= getMonetaryValue(Prod))) {
+		Ply.TriggeredEvents.push(function(){
+			EventFlash();
+			if (Prod){
+				removeProduct(Prod);
 				TriggeredEventDisplay("Your " + Prod.Name + " was just recalled due to a massive net loss! Try again with something new!", GameSounds.Event, "fail");
-			});
-		}
+			}
+			else{
+				TriggeredEventDisplay("Your " + Prod.Name + " would have been recalled due to a massive net loss, if it had not been destroyed already!", GameSounds.Event, "fail");
+			}
+		});
+	}
 }
 //Displays the triggered event.
 function TriggeredEventDisplay(message, sound, picture) {
@@ -1271,4 +1288,93 @@ function TriggeredEventIterator(TheTriggeredEvents){
 		TheTriggeredEvents[0]();
 		TheTriggeredEvents.splice(0,1);
 	}
+}
+
+//Makes a little flash when something important happens
+function EventFlash(){
+	setTimeout(function(){
+		$("#PopupOverlay").css("transition","0ms ease-out");
+		$("#PopupOverlay").css("background-color", "rgba(100,100,100,.75)");
+		setTimeout(function(){
+			$("#PopupOverlay").css("transition","450ms ease-out");
+			$("#PopupOverlay").css("background-color", "rgba(0,0,0,.5)");
+		},50);
+	},2);
+}
+
+
+function FinishGame(){
+	TheGame.GameState = "COMPLETE";
+	ShowCashAlert=false;
+	for(var i=0;i<TheGame.Players.length;i++){
+		var Ply=TheGame.Players[i];
+		var Net=0;
+		if(Ply.NumProducts<1){
+			Net=Math.round(BasePayouts.DayJobEachTurn*TotalPayoutRate*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty))));
+		}else{
+			for(var j=0;j<Ply.Products.length;j++){
+				var Prod=Ply.Products[j];
+				if(Prod.Phase==ProductPhases.Maintenance && (SubCategoryAttributes[Prod.SubCategory][4] <= 0)){
+					var earnings = Math.round(getMonetaryValue(Prod)*SubCategoryAttributes[Prod.SubCategory][3]*TotalPayoutRate*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty))));
+					if (TheGame.PatentTracker){
+						patentOwnerID = doIPayRoyalties(Prod, TheGame.PatentTracker);
+						if (patentOwnerID != -1)
+						{
+							cashOwed = Math.round(earnings/10);
+							earnings -= cashOwed;
+							TheGame.Players[patentOwnerID].Money += cashOwed;
+						}
+					}
+					Net+=earnings;
+				}
+			}
+		}
+		Net=Net-((BaseCosts.PayDev*Ply.NumDevs)+(BaseCosts.PayQA*Ply.NumQA)+(BaseCosts.PayCreative*Ply.NumCreative));
+		Ply.Money=Ply.Money+Net;
+	}
+	UpdatePlayerDisplay();
+	GameOverDisplay();
+}
+
+function GameOverDisplay(){
+	playSound(GameSounds.GameOver);
+	$("#PopupOverlay").show();
+	$("#GameOverTitle").css("top", "200px");
+	setTimeout(function(){
+		$("#FinishGameButton").css("visibility","visible");
+		$("#FinishGameButton").attr("disabled",false);
+		$("#FinishGameButton").css("transition", "opacity .6s ease-out");
+		$("#FinishGameButton").css("opacity","1");
+	},900);
+}
+
+//Function that ends the game.
+function GetFinalResults(){
+	var Plyr = new Object();
+	
+	for(PlyNum in TheGame.Players){
+		var Ply=TheGame.Players[PlyNum];
+					
+		Plyr[PlyNum]=new Object();
+		Plyr[PlyNum].Name=Ply.Name;
+		Plyr[PlyNum].Money=Ply.Money;
+		Plyr[PlyNum].Color=Ply.Color;
+		Plyr[PlyNum].NumProducts=Ply.NumProducts;
+		Plyr[PlyNum].NumEmployees=(Ply.NumQA+Ply.NumDevs+Ply.NumCreative);
+		
+	}
+	
+	localStorage.setItem("FinalResults",JSON.stringify(Plyr));
+}
+
+function SwitchToFinalResults(){
+	GetFinalResults();
+	$("#Blanket").show();
+	setTimeout(function(){
+		$("#Blanket").css("transition","500ms ease-out");
+		$("#Blanket").css("opacity","1");
+		setTimeout(function(){
+			window.location="gameover.html";
+		},650);
+	},50);
 }

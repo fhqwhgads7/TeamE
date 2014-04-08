@@ -19,7 +19,7 @@ function VI_Logic(){
 	}else{
 		self.VIMemory.CurProdNum=0;
 		self.VIMemory.Products.forEach(function(prod){
-			alert(prod);
+			
 		});
 	}
 	VI_End();
@@ -30,7 +30,9 @@ function VI_End(){
 		Time=Time+action[2]/VISpeed;
 		console.log("scheduling "+action[0]+" to be clicked after "+Time.toString()+" ms");
 		setTimeout(function(){
-			console.log("clicking "+action[0]);
+			if($("#PopupOverlay").is(":visible")){
+				
+			}
 			if(action[1]){
 				$("#"+action[0]).val(action[1]);
 			}else{

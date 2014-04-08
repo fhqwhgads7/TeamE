@@ -72,6 +72,28 @@
 				alert("You have been successfully registered! ");
 			}
 			}
+///Not done yet still working on SaveStats function
+		    function SaveStats(){
+				var FinalStats=Parse.Object.extend("FinalStats");
+				var finalStats=new FinalStats();
+		
+				finalStats.set("playerName", user);
+				finalStats.set("gamesplayed", user);
+				finalStats.set("gameswon", user);
+				finalStats.set("winpercent", user);
+				finalStats.set("totaldollars", user);
+		
+				finalStats.save(null, {
+					success: function(finalStats) {
+					alert('New object created with objectId: ' + finalStats.id);
+					},
+					error: function(finalStats, error) {
+
+					alert('Failed to create new object, with error code: ' + error.description);
+					}
+				});
+
+			}		
 		</script>
 		<style>
 			div.OptionsBox{

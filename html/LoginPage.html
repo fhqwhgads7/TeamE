@@ -2,6 +2,7 @@
 
 <html>
 	<head>
+		<script src="https://www.parsecdn.com/js/parse-1.2.18.min.js"></script>
 		<script src="../js/jquery.js"></script>
 		<script src="../js/shared.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
@@ -15,7 +16,6 @@
 			{
 				tabNumber = 1;
 				GlobalInitialize();
-				buttonCheck();
 				$("#Tab"+tabNumber).css("visibility", "visible");
 			}
 			function GoBackToMainMenu()
@@ -35,22 +35,18 @@
 				SwitchToPage("load.html");
 			}
 			function UserCheck(){
-				var User = Parse.Object.extend("User");
-				var query = new Parse.Query(User);
+				
 				var inputUsername = $("#Username").val();
 				var inputPassword = $("#Password").val();
 				
-				user.logIn
-				query.find({
-				  success: function(user) {
-				    // The object was retrieved successfully.
-				  },
-				  error: function(object, error) {
-				    // The object was not retrieved successfully.
-				    // error is a Parse.Error with an error code and description.
-				  }
+				Parse.User.logIn(inputUsername, inputPassword, {
+					success: function(user) {
+						alert("You have been logged in!");
+					},
+					error: function(user, error) {
+						alert(error.message);
+					}
 				});
-				alert(query.find);
 			}
 		</script>
 		<style>
@@ -114,7 +110,7 @@
 					
 					<textarea id="Username" class="OneColumn" placeholder="Username/Email" style="overflow:hidden;resize:none;top:45%;left:32%;height:5%;width:35%;"></textarea>
 					<textarea id="Password" class="OneColumn" placeholder="Password" style="overflow:hidden;resize:none;top:55%;left:32%;height:5%;width:35%;"></textarea>
-					<button class="Standard" style="left:30%;top:70%;width:40%" onclick="GoBackToMainMenu()">Login</button>
+					<button class="Standard" style="left:30%;top:70%;width:40%" onclick="UserCheck()">Login</button>
 					<button class="Standard" onclick="UserCheck()" style="left:34%;top:86%;width:32%">Main Menu</button>
 				</div>
 				

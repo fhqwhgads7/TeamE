@@ -1,1 +1,1 @@
-phantomjs js/qunit-runner.js --qunit js/qunit.js --tests js/ --junit
+phantomjs js/run-qunit.js html/test.html

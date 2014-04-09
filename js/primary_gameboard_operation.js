@@ -718,7 +718,7 @@ function CycleTurn(){
 function DisplayNewRoundEvent(){
 	var Num=TheGame.CurrentRound+1;
 	$('.Standard').attr("disabled", true);
-	if(Num<=3){//TheGame.Settings.NumberOfRounds){
+	if(Num<=TheGame.Settings.NumberOfRounds){
 		if (TheGame.Settings.NumberOfRounds-Num <= 5)
 			changeCurrentBGM("TimeRunningOut");
 		var Elem=document.getElementById("MainBoard");

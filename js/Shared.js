@@ -146,7 +146,7 @@ function playSound(sound){
 		if (isNaN(SFXVolume))
 			SFXVolume = 50;
 		var theSound = new Audio(sound);
-		theSound.volume = SFXVolume/100.0;
+		theSound.volume = SFXVolume/100;
 		theSound.play();
 	}
 }

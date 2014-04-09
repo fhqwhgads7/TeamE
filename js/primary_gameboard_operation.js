@@ -1117,7 +1117,7 @@ function RandomEventIterator(){
 			if (Value < 1)
 				Desc+="Revenue is reduced to " + Math.round(Value*100) + "%";
 			else
-				Desc+="Revenue is " + Math.round((Value-1.0)*100) + "% more than normal";
+				Desc+="Revenue is " + Math.round((Value-1)*100) + "% more than normal";
 			if (Action.indexOf("_All") > -1) {
 				Desc+=" all around!";
 				TotalPayoutRate = Value;
@@ -1341,7 +1341,7 @@ function GameOverDisplay(){
 	$("#PopupOverlay").show();
 	$("#GameOverTitle").css("top", "200px");
 	setTimeout(function(){
-		$("#FinishGameButton").css("visibility","visible");
+		$("#FinishGameButton").show();
 		$("#FinishGameButton").attr("disabled",false);
 		$("#FinishGameButton").css("transition", "opacity .6s ease-out");
 		$("#FinishGameButton").css("opacity","1");

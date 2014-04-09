@@ -25,10 +25,10 @@
 				LoadOptions();
 			}
 			function ShowAudioSettings(){
-				$("#AudioSettings").css("visibility","visible");
+				$("#AudioSettings").show();
 			}
 			function HideAudioSettings(){
-				$("#AudioSettings").css("visibility","hidden");
+				$("#AudioSettings").hide();
 			}
 			function SaveChanges(){
 				localStorage.setItem("BGMVolume", $("#BGMVolumeNum").text());
@@ -152,7 +152,7 @@
 		<button class="Standard" onclick="ShowAudioSettings();" style="padding:0.4em 0em;left:2px;top:2px;width:40px;font-size:8px;z-index:2">Volume</button>
 		<button class="Standard" id="BGMSwitcher" onclick="BGMSwitch();" style="background-position: -1px -1px;background-image:url(../images/muzak_unmuted.png);padding:0em 0em;left:42px;top:2px;width:20px;font-size:14px;z-index:2"><br></button>
 		<button class="Standard" id="SFXSwitcher" onclick="SFXSwitch();" style="background-position: -1px -1px;background-image:url(../images/speaker_unmuted.png);padding:0em 0em;left:62px;top:2px;width:20px;font-size:14px;z-index:2"><br></button>
-		<div id="AudioSettings" style="visibility:hidden;position:absolute;background-color:rgba(0,0,0,.75);top:0px;left:0px;width:800px;height:600px;z-index:5;">
+		<div id="AudioSettings" style="display:none;position:absolute;background-color:rgba(0,0,0,.75);top:0px;left:0px;width:800px;height:600px;z-index:5;">
 				<div class="OptionsBox" id="OptionsBox" style="left:20%;top:35%;">
 					<div class="StandardText" style="font-size:30px;left:3%;top:18%;">BGM Volume</div>
 					<div class="StandardText" style="font-size:30px;left:3%;top:55%;">SFX Volume</div>

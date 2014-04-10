@@ -216,6 +216,16 @@
 				-webkit-transition: 900ms ease-in-out;
 				-moz-transition: 900ms ease-in-out;
 			}
+			#ControlLock{
+				position:fixed;
+				width:1000px;
+				height:1000px;
+				display:none;
+				z-index:999;
+				background-image:url('../images/vi_overlay.jpg');
+				opacity:0.2;
+				background-repeat:repeat-x;
+			}
 		</style>
 	</head>
 	<body onload="Initialize()">
@@ -441,6 +451,6 @@
 			<div id="RoundAnnouncer">ROUND<br>1</div>
 		</div>
 		<div id="Blanket" class="Blanket" style="position:fixed;left:0px;top:0px;display:none;"></div>
-		<div id="ControlLock" style="position:fixed;left:0px;top:0px;width:1000px;height:1000px;display:none;z-index:999"></div>
+		<div id="ControlLock"></div>
 	</body>
 </html>

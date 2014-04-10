@@ -1,7 +1,7 @@
 // this is a somewhat awkward system to make delayed real-time simulation of a player (virtual intelligence) WITHOUT blocking the rest of the program. JS doesn't have multithreading :/
 var self;
 var ActionQue=[];
-var VISpeed=0.5
+var VISpeed=0.4;
 var NAEMS=["Win","The Awesome Auger","The Big City Slider Station","DC Snowboards","The Ding King","The DualSaw","Engrave-It","ESPN360","The EZ Bundler","The EZ Crunch Bowl","Files Away","The Gopher","The Grabit","The Grater Plater","Green Now!","The Grip Wrench","The Handy Switch","The Hercules Hook","iCan Health Insurance","Impact Gel","The iTie","The Jupiter Jack","Kaboom!","Mighty Mendit","Mighty Shine","Mighty Putty","Mighty Tape","Orange Glo","OxiClean","The Quick Chop","The Samurai Shark","Tool Band-It","The Turbo Tiger","The Ultimate Chopper","The WashMatik","What odor?","Zorbeez","The Slap Chop","ShamWow","The Schticky"]; // R.I.P. Mays
 function VI_Begin(ply){
 	self=ply;
@@ -20,12 +20,16 @@ function VI_Logic(){
 	}else{
 		self.VIMemory.Products.forEach(function(prod){
 			var Id;
+			alert("looking for "+prod.toString());
 			$(".ProductDisplayItem").each(function(ind,val){
+				alert("clicking on "+ind.toString()+" "+val.toString());
 				$(this).trigger("click");
 				if($("#ProdDisplayName").text()==prod){
 					Id=$(this).attr("id");
+					alert("yeah this is the one");
 				}
 			});
+			alert("totally man, we found "+Id.toString());
 			ActionQue.push([Id,null,200]);
 			// now for product logic;
 			if(Math.random()<0.33){
@@ -36,7 +40,7 @@ function VI_Logic(){
 	if(Math.random()<0.2){
 		VI_Support_NewProduct();
 	}
-	if(Math.random()<0.2){
+	if(Math.random()<0.1){
 		VI_Support_MoreEmployees();
 	}
 	VI_End();

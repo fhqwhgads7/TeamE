@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="../js/jquery.js"></script>
+		<script src="../js/shared.js"></script>
+		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
+		<script>
+			var TheBrandNewGame=null;
+			var GameName;
+			var GameDifficulty;			//EASY, NORMAL, HARD, LUNATIC
+			var NumberOfRounds;			//Between 40 and 60
+			var PatentingEnabled;		//true/false
+			
+			function Initialize()
+			{
+				goToCreateGame();
+				PopulatePlayerColorFields();
+				GlobalInitialize();
+				changeCurrentBGM("MainMenu");
+				if(localStorage.getItem("TheBrandNewGame")){
+					TheBrandNewGame=JSON.parse(localStorage.getItem("TheBrandNewGame"));
+				}
+				LoadOptions();
+			}
+			
+			function HostTheGame(){
+				SaveOptions();
+				//Not yet complete
+				//The idea is to check if the game name is taken, then if it isn't, send all the data to pubhub and such
+				//Then start hosting the game
+				goToLobby();
+			}
+			function GoBackToMainMenu(){
+				SwitchToPage("title.html");
+			}
+			function BeginGame(){
+			}
+			
+			function LoadOptions()
+			{
+				if(TheBrandNewGame){
+					if(TheBrandNewGame.Options){
+						$( "#GameName").val(TheBrandNewGame.Options.GameName);
+						$( "#GameDifficulty").val(TheBrandNewGame.Options.GameDifficulty);
+						$( "#NumberOfRounds").val(TheBrandNewGame.Options.NumberOfRounds);
+						if (TheBrandNewGame.Options.PatentingEnabled)
+							$( "#Patenting").val("On");
+						else
+							$( "#Patenting").val("Off");
+					}
+				}
+			}
+			function SaveOptions()
+			{
+				if(!TheBrandNewGame){TheBrandNewGame=new Object();}
+				TheBrandNewGame.Options=new Object();
+				TheBrandNewGame.Options.GameName=$("#GameName").val();
+				TheBrandNewGame.Options.GameDifficulty=$("#GameDifficulty option:selected").val();
+				TheBrandNewGame.Options.NumberOfRounds=$("#NumberOfRounds option:selected").val().toString();
+				TheBrandNewGame.Options.PatentingEnabled=$("#Patenting option:selected").val().toString();
+				localStorage.setItem("TheBrandNewGame",JSON.stringify(TheBrandNewGame));
+			}
+			function RestorePrevious()
+			{
+				LoadOptions();
+				alert("Your previous settings have been restored.");
+			}
+			
+			function ValueToDropDownSelection(theValue, dropdown)
+			{
+				$('[id=dropdown] option').filter(function() { 
+					return ($(this).value() == theValue);
+				}).prop('selected', true);
+			}
+			
+			
+			function goToLobby() {
+				$("#create-game-wrapper").hide();
+				$("#lobby-wrapper").show();
+			} 
+			function goToCreateGame() {
+				$("#lobby-wrapper").hide();
+				$("#create-game-wrapper").show();
+			}
+			function PopulatePlayerColorFields(){
+				var BigNum=1;
+				$("select").each(function(){
+					var Sel=$(this);
+					var Id=Sel.attr("id");
+					if(Id){;
+						if((Id.indexOf("Player")!=-1)&&(Id.indexOf("Color")!=-1)){
+							var Num=1;
+							for(Color in PlayerColors){
+								var Select="";
+								if(BigNum==Num){Select=" selected='selected'";}
+								Sel.append("<option value="+Color+Select+">"+Color+"</option>")
+								Num=Num+1;
+							}
+							BigNum=BigNum+1;
+							SetBoxColor(Id);
+						}
+					}
+				})
+			}
+			function SetBoxColor(id){
+				var Box=$("#"+id);
+				var Col=$("#"+id+" option:selected").val();
+				Box.parent().css("border-color",Col);
+			}
+			
+		</script>
+		<style>
+			div.OptionsBox{
+				position:absolute;
+				border-style:solid;
+				border-width:5px;
+				width:60%;
+				height:35%;
+				box-shadow: 0px 0px 40px 5px #AAAAAA;
+				background-color:rgba(0,0,0,.2);
+			}
+			div.OptionsBox:hover{
+				background-color:rgba(255,255,255,.1);
+			}
+			.Options{
+				position:absolute;
+				right:3%;
+				width:28%;
+				font-family:"Arial";
+				font-size:15px;
+				font-weight:900;
+			}
+			.roundSlider{
+				position:absolute;
+				width:100px;
+			}
+			
+			div.PlayerBox{
+				position:absolute;
+				border-style:solid;
+				border-width:7px;
+				width:30%;
+				height:15%;
+				box-shadow: 0px 0px 40px 5px #AAAAAA;
+				background:rgba(0,0,0,.1);
+				-moz-border-radius:10px;
+				-webkit-border-radius:10px;
+				border-radius:10px;
+			}
+			div.PlayerBox:hover{
+				background:rgba(255,255,255,.1);
+			}
+			#lobby-wrapper{
+				display: none;
+			}
+		</style>
+	</head>
+	<body onload="Initialize()">
+		<div id="MainBackground">
+			<div id="ContentContainer">
+				<div id="create-game-wrapper">
+					<div class="OptionsBox" id="OptionsBox" style="left:20%;top:32.5%;">
+					
+						<div class="StandardText" style="font-size:23px;left:3%;top:7%;">Game Name</div>
+						<div class="StandardText" style="font-size:23px;left:3%;top:31%;">Game Difficulty</div>
+						<div class="StandardText" style="font-size:23px;left:3%;top:55%;">Product Patenting</div>
+						<div class="StandardText" style="font-size:23px;left:3%;top:79%;">Number of Rounds</div>
+						
+							<input type="text" maxlength=30 id="GameName" class="Options" placeholder="Game Name" style="overflow:hidden;resize:none;top:7%;height:10%;width:26.5%"></input>
+							<select class="Options" id="GameDifficulty" style="top:31%;">
+								<option value="EASY">Easy</option>
+								<option value="NORMAL" selected="selected">Normal</option>
+								<option value="HARD">Hard</option>
+								<option value="LUNATIC">Lunatic</option>
+							</select>
+							<select class="Options" id="Patenting" style="top:55%;">
+								<option value="On" selected="selected">On</option>
+								<option value="Off">Off</option>
+							</select>
+							<select class="Options" id="NumberOfRounds" style="top:79%;">
+								<option value=40 selected="selected">40</option>
+								<option value=45>45</option>
+								<option value=50>50</option>
+								<option value=55>55</option>
+								<option value=60>60</option>
+							</select>
+						
+					</div>
+					<div class="StandardText" id="OptionsTitle" style="font-size:40px;margin:10px;width:800px;top:19%;">New Online Game</div> 
+					<button class="Standard" onclick="HostTheGame()" style="right:19%;width:28%;top:73%;font-size:20px">Continue</button>
+					<button class="Standard" onclick="GoBackToMainMenu()" style="left:20%;width:28%;top:73%;font-size:20px">Main Menu</button>
+				</div>
+				<div id="lobby-wrapper">
+					<div class="StandardText" id="StartNewGameTitle" style="font-size:40px;margin:0px;width:100%;top:7%;">New Game: Players</div> 
+					<div class="StandardText" id="NameOfTheGame" style="font-size:15px;margin:0px;width:100%;top:16%;">Game Name: <span id="new-game-name">Borked</span></div> 
+					<div class="PlayerBox" id="PlayerOneBox" style="border-color:red;left:13%;top:22%;">
+						<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business One</div>
+						<textarea disabled maxlength=10 id="PlayerOneName" class="OneColumn" placeholder="Business/Player Name" style="position:absolute;overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
+						<select class="TwoColumnFirst" id="PlayerOneStatus" style="top:70%;">
+							<option selected="selected">Open</option>
+							<option>Closed</option>
+						</select>
+						<select class="TwoColumnSecond" id="PlayerOneColor" style="top:70%;" onchange="SetBoxColor(this.id)">
+							<!-- dynamic -->
+						</select>
+					</div>
+					<div class="PlayerBox" id="PlayerTwoBox" style="border-color:blue;right:13%;top:22%;">
+						<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business Two</div>
+						<textarea disabled maxlength=10 id="PlayerTwoName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
+						<select class="TwoColumnFirst" id="PlayerTwoStatus" style="top:70%;">
+							<option selected="selected">Open</option>
+							<option>Closed</option>
+						</select>
+						<select class="TwoColumnSecond" id="PlayerTwoColor" style="top:70%;" onchange="SetBoxColor(this.id)">
+							<!-- dynamic -->
+						</select>
+					</div>
+					<div class="PlayerBox" id="PlayerThreeBox" style="border-color:green;left:13%;top:42%;">
+						<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business Three</div>
+						<textarea disabled maxlength=10 id="PlayerThreeName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
+						<select class="TwoColumnFirst" id="PlayerThreeStatus" style="top:70%;">
+							<option selected="selected">Open</option>
+							<option>Closed</option>
+						</select>
+						<select class="TwoColumnSecond" id="PlayerThreeColor" style="top:70%;" onchange="SetBoxColor(this.id)">
+							<!-- dynamic -->
+						</select>
+					</div>
+					<div class="PlayerBox" id="PlayerFourBox" style="border-color:yellow;right:13%;top:42%;">
+						<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business Four</div>
+						<textarea disabled maxlength=10 id="PlayerFourName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
+						<select class="TwoColumnFirst" id="PlayerFourStatus" style="top:70%;">
+							<option selected="selected">Open</option>
+							<option>Closed</option>
+						</select>
+						<select class="TwoColumnSecond" id="PlayerFourColor" style="top:70%;" onchange="SetBoxColor(this.id)">
+							<!-- dynamic -->
+						</select>
+					</div>
+					<div class="PlayerBox" id="PlayerFiveBox" style="border-color:black;left:13%;top:62%;">
+						<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business Five</div>
+						<textarea disabled maxlength=10 id="PlayerFiveName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
+						<select class="TwoColumnFirst" id="PlayerFiveStatus" style="top:70%;">
+							<option selected="selected">Open</option>
+							<option>Closed</option>
+						</select>
+						<select class="TwoColumnSecond" id="PlayerFiveColor" style="top:70%;" onchange="SetBoxColor(this.id)">
+							<!-- dynamic -->
+						</select>
+					</div>
+					<div class="PlayerBox" id="PlayerSixBox" style="border-color:white;right:13%;top:62%;">
+						<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business Six</div>
+						<textarea disabled maxlength=10 id="PlayerSixName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
+						<select class="TwoColumnFirst" id="PlayerSixStatus" style="top:70%;">
+							<option selected="selected">Open</option>
+							<option>Closed</option>
+						</select>
+						<select class="TwoColumnSecond" id="PlayerSixColor" style="top:70%;" onchange="SetBoxColor(this.id)">
+							<!-- dynamic -->
+						</select>
+					</div>
+					<button class="Standard" onclick="goToCreateGame()" style="left:16%;top:82%;width:28%;font-size:20px">Back</button>
+					<button id="begin-game-button" class="Standard" onclick="BeginGame()" style="right:16%;top:82%;width:28%;font-size:20px">Start Game</button>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

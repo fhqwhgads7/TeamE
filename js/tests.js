@@ -1,4 +1,5 @@
 test("new Product can be instantiated", function() {
+	var someGame = new Game();
     var newProductName = "new Product name";
     var newProduct = Product(null, newProductName, 'Product Category', 'Product Sub-Category', 'Player Color');
 
@@ -94,16 +95,5 @@ test("patenting functions work properly", function(){
 	equal(doIPayRoyalties(Product_3_1, testGame.PatentTracker), -1, "No one gets royalties.");
 	equal(doIPayRoyalties(Product_3_2, testGame.PatentTracker), -1, "No one gets royalties.");
 	equal(doIPayRoyalties(Product_3_3, testGame.PatentTracker), PlayerOne.GlobalID, "Player One gets royalties.");
-	
-});
-
-test("Music Plays", function(){
-	var testGame = new Game("2947");
-	expect(0);
-	//bgmPlayer();
-	//testGame.bgmPlayer();
-	
-	
-	//how do i test?
 	
 });

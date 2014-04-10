@@ -52,12 +52,6 @@ function GlobalInitialize(){
 	});
 } 
 function noSound(){}
-function GameObject(name){
-	this.Name=name;
-	this.LoadGame=function(id){
-		alert("you selected to load "+id+" game!");
-	}
-}
 function SwitchToPage(page){
 	$("#ContentContainer").css("top","100px");
 	$("#ContentContainer").css("opacity","0.0");
@@ -142,7 +136,7 @@ var GameSounds={
 }
 function playSound(sound){
 	if (localStorage.getItem("SFXMute")!="Muted"){
-		SFXVolume = parseInt(localStorage.getItem("SFXVolume"));
+		var SFXVolume = parseInt(localStorage.getItem("SFXVolume"));
 		if (isNaN(SFXVolume))
 			SFXVolume = 50;
 		var theSound = new Audio(sound);
@@ -236,6 +230,7 @@ function Player(game,name,type,color){
 	newPlayer.Money=2000;
 	newPlayer.LastDisplayedMoney=newPlayer.Money;
 	newPlayer.TriggeredEvents=new Array();
+	newPlayer.isHost=false;
 	newPlayer.hasMadeProductThisTurn = false;
 	if(game != null){
 		newPlayer.ParentGame=game;

@@ -764,6 +764,7 @@ function DisplayNewRoundEvent(){
 }
 function NewRoundCalc(){
 	RandomEventSelector();
+	DecrementCategoryChanges();
 	for(var i=0;i<TheGame.Players.length;i++){
 		var Ply=TheGame.Players[i];
 		if(Ply.NumProducts>0){
@@ -853,23 +854,23 @@ function NewRoundCalc(){
 		$("#ControlLock").hide();
 	RandomEventIterator();
 	UpdatePlayerDisplay();
-	DecrementCategoryChanges();
 	if(CurrentlySelectedProduct!=null){
 		UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
 	}
 }
 function DecrementCategoryChanges(){
 	for (SubCat in SubCategoryAttributes){
-		if (SubCat[3] == 0)
-			SubCat[3] = 0.1;
+		if (SubCategoryAttributes[SubCat][3] == 0)
+			SubCategoryAttributes[SubCat][3] = 0.1;
 		else{
-			if (Math.round(SubCat[3]*10)/10 > 1)
-				SubCat[3] -= 0.1;
-			else if (Math.round(SubCat[3]*10)/10 < 1)
-				SubCat[3] += 0.1;
+			if (SubCategoryAttributes[SubCat][3] > 1)
+				SubCategoryAttributes[SubCat][3] -= 0.1;
+			else if (SubCategoryAttributes[SubCat][3]*10 < 1)
+				SubCategoryAttributes[SubCat][3] += 0.1;
+			SubCategoryAttributes[SubCat][3] = Math.round(SubCategoryAttributes[SubCat][3]*10)/10;
 		}
-		if (SubCat[4] > 0)
-			SubCat[4]--;
+		if (SubCategoryAttributes[SubCat][4] > 0)
+			SubCategoryAttributes[SubCat][4]--;
 	}
 	if (Math.round(TotalPayoutRate*10)/10 > 1)
 		TotalPayoutRate -= 0.1;

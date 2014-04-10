@@ -290,9 +290,3 @@ function Game(id){
 	}
 	return newGame;
 }
-//$(document).on('mousemove',function(e){
-//	$("#ContentContainer").css({
-//	   left:-e.pageX/100+3,
-//	   top:-e.pageY/100+2
-//	});
-//});

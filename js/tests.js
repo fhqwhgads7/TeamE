@@ -99,7 +99,7 @@ test("patenting functions work properly", function(){
 
 test("Music Plays", function(){
 	var testGame = new Game("2947");
-	bgmPlayer();
+	//bgmPlayer();
 	//testGame.bgmPlayer();
 	
 	

@@ -99,10 +99,11 @@ test("patenting functions work properly", function(){
 
 test("Music Plays", function(){
 	var testGame = new Game("2947");
+	expect(0);
 	//bgmPlayer();
 	//testGame.bgmPlayer();
 	
 	
 	//how do i test?
 	
-}
+});

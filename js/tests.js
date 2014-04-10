@@ -96,3 +96,13 @@ test("patenting functions work properly", function(){
 	equal(doIPayRoyalties(Product_3_3, testGame.PatentTracker), PlayerOne.GlobalID, "Player One gets royalties.");
 	
 });
+
+test("Music Plays", function(){
+	var testGame = new Game("2947");
+	bgmPlayer();
+	//testGame.bgmPlayer();
+	
+	
+	//how do i test?
+	
+}

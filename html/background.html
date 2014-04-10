@@ -73,67 +73,6 @@
 			TheBGM.loop = true;
 			TheBGM.play();
 		}
-		function bgmPlayer(){
-			jQuery(function($) {
-
-				var supportsAudio = !!document.createElement('audio').canPlayType;
-				if(supportsAudio) {
-					var playing = false;
-					mediaPath = '/assets/',
-					extension = '.mp3',
-					tracks = [
-						{"track":1,"name":"Track 1","file":"1"},
-						{"track":2,"name":"Track 2","file":"2"},
-						{"track":3,"name":"Track 3","file":"3"},
-					],
-					trackCount = tracks.length,
-					index = Math.floor(Math.random()*trackCount),
-					npAction = $('#npAction'),
-					npTitle = $('#npTitle'),
-					audio = $('#audio1').bind('play', function() {
-						playing = true;
-						npAction.text('Now Playing:');
-					}).bind('pause', function() {
-						playing = false;
-						npAction.text('Paused:');
-					}).bind('ended', function() {
-						npAction.text('Paused:');
-						
-						var curIndex = index;
-						
-						do{
-						
-							index = Math.floor(Math.random()*trackCount)
-						
-						}while(index == curIndex);
-						
-						loadTrack(index);
-							audio.play();
-						
-						
-					}).get(0),
-					loadTrack = function(id) {
-						npTitle.text(tracks[id].name);
-						index = id;
-						audio.src = tracks[id].file + extension;
-					},
-					playTrack = function(id) {
-						loadTrack(id);
-						audio.play();
-					};
-
-					if(audio.canPlayType('audio/ogg')) {
-						extension = '.ogg';
-					}
-					if(audio.canPlayType('audio/mpeg')) {
-						extension = '.mp3';
-					}
-					loadTrack(index);
-					audio.play();
-				}
-			});
-		}
-		
 	</script>
 	
 	<style>

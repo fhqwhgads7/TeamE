@@ -12,6 +12,8 @@ function VI_Begin(ply){
 	VI_Logic();
 }
 function VI_Logic(){
+	//ToDo: make so can close alerts at beginning of turn
+	//ToDo: make so can choose product categories
 	if(self.VIMemory.NumQA==0){
 		VI_Support_MoreEmployees();
 	}
@@ -20,16 +22,12 @@ function VI_Logic(){
 	}else{
 		self.VIMemory.Products.forEach(function(prod){
 			var Id;
-			alert("looking for "+prod.toString());
 			$(".ProductDisplayItem").each(function(ind,val){
-				alert("clicking on "+ind.toString()+" "+val.toString());
 				$(this).trigger("click");
-				if($("#ProdDisplayName").text()==prod){
+				if($("#ProdDisplayName").text()==prod[0]){
 					Id=$(this).attr("id");
-					alert("yeah this is the one");
 				}
 			});
-			alert("totally man, we found "+Id.toString());
 			ActionQue.push([Id,null,200]);
 			// now for product logic;
 			if(Math.random()<0.33){
@@ -37,7 +35,7 @@ function VI_Logic(){
 			}
 		});
 	}
-	if(Math.random()<0.2){
+	if(Math.random()<0.1){
 		VI_Support_NewProduct();
 	}
 	if(Math.random()<0.1){

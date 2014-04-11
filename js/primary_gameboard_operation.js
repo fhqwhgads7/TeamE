@@ -131,6 +131,9 @@ function NewGameInitialize(){
 	setTimeout(DisplayNewRoundEvent,1);
 	$("#MainBoard").hide();
 	setTimeout(Appear,750);
+	setTimeout(function(){
+		TheGame.CurrentPlayer.TurnInit();
+	},2000);
 
 }
 function LoadGameInitialize(gameName){
@@ -713,9 +716,10 @@ function CycleTurn(){
 	}
 	setTimeout(function(){
 		TheGame.CurrentPlayer.TurnInit();
-	},1250)
+	},1250);
 }
 function DisplayNewRoundEvent(){
+	$("#ControlLock").hide();
 	var Num=TheGame.CurrentRound+1;
 	$('.Standard').attr("disabled", true);
 	if(Num<=TheGame.Settings.NumberOfRounds){
@@ -848,10 +852,12 @@ function NewRoundCalc(){
 		Ply.Money=Ply.Money+Net;
 	}
 	TheGame.CurrentRound=TheGame.CurrentRound+1;
-	if (TheGame.CurrentPlayer.Type=="Computer")
+	if (TheGame.CurrentPlayer.Type=="Computer"){
 		$("#ControlLock").show();
-	else
+	}
+	else {
 		$("#ControlLock").hide();
+	}
 	RandomEventIterator();
 	UpdatePlayerDisplay();
 	if(CurrentlySelectedProduct!=null){

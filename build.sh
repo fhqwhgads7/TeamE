@@ -1,1 +1,1 @@
-phantomjs js/run-qunit.js html/test.html
+phantomjs js/run-qunit.js html/test.html | sed '/<\/testsuites>/q'

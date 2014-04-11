@@ -141,8 +141,7 @@
 			}
 		</script>
 		<style>
-			#GameBoardCircle
-			{
+			#GameBoardCircle{
 				background-image:url('../images/gameboard_circle.png');
 				position:absolute;
 				top:0%;
@@ -152,8 +151,7 @@
 				webkit-transform-origin:50% 50%;
 				moz-transform-origin:50% 50%;
 			}
-			#GameBoardCenter
-			{
+			#GameBoardCenter{
 				background-image:url('../images/gameboard_center.png');
 				position:absolute;
 				top:0%;
@@ -171,6 +169,9 @@
 				border-width:8px;
 				border-color:gray;
 				background-color:rgba(0,0,0,.8);
+			}
+			#ProductWindow:hover{
+				background:rgba(30,30,30,.75);
 			}
 			.CashAlert{
 				font-family:arial;
@@ -238,7 +239,7 @@
 				<!--<marquee id="GameAdvice" scrollamount="20" onmouseover="this.scrollAmount=0;" onmouseout="this.scrollAmount=20;">
 				</marquee>-->
 				
-					<div class="PlayerBox" id="CurPlyBox" style="border-color:grey;width:25%;left:2%;top:4%;overflow:hidden;">
+					<div class="PlayerBox" id="CurPlyBox" style="border-color:grey;width:25%;left:2%;top:5%;overflow:hidden;">
 						<div class="StandardText" id="CurPlyName" style="font-size:16px;margin:0px;width:100%;top:5%;">nil</div>
 						<div class="StandardText" style="font-size:18px;left:8%;top:35%;color:rgb(160,160,160)">$<span id="CurPlyMoney" style="color:white">nil</span><sup style="font-size:8px">.00</sup></div>
 						

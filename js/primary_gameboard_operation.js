@@ -934,7 +934,7 @@ function PatentTracker(){
 	newPatentTracker.Records = [];
 	
 	for (Item in newPatentTracker.Categories) {
-		newPatentTracker.Records.push([PatentTracker.Categories[Item], null, null]);
+		newPatentTracker.Records.push([newPatentTracker.Categories[Item], null, null]);
 	}
 	
 	return newPatentTracker;

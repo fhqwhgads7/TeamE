@@ -39,16 +39,20 @@ function GlobalInitialize(){
 		},333);
 	}
 	$(":button.Standard").mouseenter( function(){
-		if (this.getAttribute("onmouseover") == null)
+		if (!(this.getAttribute("onmouseover"))){
 			playSound(GameSounds.ButtonHover);
-		else if (((this.getAttribute("onmouseover")).toString().indexOf("playSound") <= -1) && ((this.getAttribute("onmouseover")).toString().indexOf("noSound") <= -1))
+		}
+		else if (((this.getAttribute("onmouseover")).toString().indexOf("playSound") <= -1) && ((this.getAttribute("onmouseover")).toString().indexOf("noSound") <= -1)){
 			playSound(GameSounds.ButtonHover);
+		}
 	});
 	$(":button.Standard").click( function(){
-		if (this.getAttribute("onclick") == null)
+		if (!(this.getAttribute("onclick"))){
 			playSound(GameSounds.ButtonSelect);
-		else if (((this.getAttribute("onclick")).toString().indexOf("playSound") <= -1) && ((this.getAttribute("onclick")).toString().indexOf("noSound") <= -1))
+		}
+		else if (((this.getAttribute("onclick")).toString().indexOf("playSound") <= -1) && ((this.getAttribute("onclick")).toString().indexOf("noSound") <= -1)){
 			playSound(GameSounds.ButtonSelect);
+		}
 	});
 } 
 function noSound(){}
@@ -75,7 +79,7 @@ var PlayerColors={
 	Brown:"rgb(175,50,30)",
 	White:"rgb(255,255,255)",
 	Black:"rgb(50,50,50)"
-}
+};
 var NumberNameTable={
 	1:"One",
 	2:"Two",
@@ -83,7 +87,7 @@ var NumberNameTable={
 	4:"Four",
 	5:"Five",
 	6:"Six"
-}
+};
 var Tips=[
 	"Innovation requires taking risks.",
 	"The more risks you take, the higher your chances of success will be.",
@@ -133,12 +137,13 @@ var GameSounds={
 	Wrong_BAD: '../sounds/sfx/wrong_3.wav',
 	GameOver: '../sounds/sfx/gameover.wav',
 	MinorFail: '../sounds/sfx/minor_fail.wav'
-}
+};
 function playSound(sound){
-	if (localStorage.getItem("SFXMute")!="Muted"){
-		var SFXVolume = parseInt(localStorage.getItem("SFXVolume"));
-		if (isNaN(SFXVolume))
+	if (localStorage.getItem("SFXMute")!=="Muted"){
+		var SFXVolume = parseInt(localStorage.getItem("SFXVolume"), 10);
+		if (isNaN(SFXVolume)){
 			SFXVolume = 50;
+		}
 		var theSound = new Audio(sound);
 		theSound.volume = SFXVolume/100;
 		theSound.play();
@@ -146,28 +151,23 @@ function playSound(sound){
 }
 function getTimeOfDay(x){
 	timeOfDay = "";
-    if(x>=5 && x<9)
-	{
+    if(x>=5 && x<9) {
         $("#MainBackground").css("background-image", 'url(../images/background_morning_1.jpg)');
 		timeOfDay = "Morning";
 	}
-    else if(x>=9 && x<15)
-	{
+    else if(x>=9 && x<15) {
         $("#MainBackground").css("background-image", 'url(../images/background_noon_1.jpg)');
 		timeOfDay = "Noon";
     }
-    else if(x>=15 && x<19)
-	{
+    else if(x>=15 && x<19) {
         $("#MainBackground").css("background-image", 'url(../images/background_afternoon_1.jpg)');
 		timeOfDay = "Afternoon";
     }
-    else if(x>=19 && x<22)
-	{
+    else if(x>=19 && x<22) {
         $("#MainBackground").css("background-image", 'url(../images/background_evening_1.jpg)');
 		timeOfDay = "Evening";
     }
-    else
-	{
+    else {
         $("#MainBackground").css("background-image", 'url(../images/background_night_1.jpg)');
 		timeOfDay = "Night";
     }                   
@@ -181,7 +181,7 @@ function changeCurrentBGM(theSong){
 
 //-- CLASS DEFINITIONS --//
 function Product(player,name,category,sub,color){
-	var newProduct=new Object();
+	var newProduct={};
 	newProduct.ClassName="PRODUCT";
 	newProduct.Name=name;
 	newProduct.Category=category;
@@ -190,7 +190,7 @@ function Product(player,name,category,sub,color){
 	newProduct.IdeaStrength=0;
 	newProduct.DesignStrength=0;
 	newProduct.BuildStrength=0;
-	newProduct.TestingStrength=0
+	newProduct.TestingStrength=0;
 	newProduct.Volatility=1; //The chance of the product breaking (1=100%)
 	newProduct.Phase="nil";
 	newProduct.turnsInSamePhase=0;
@@ -199,7 +199,7 @@ function Product(player,name,category,sub,color){
 	newProduct.hasPrototype=false;
 	newProduct.readyToDeploy=false;
 	newProduct.isANewProduct=true; //This is for patenting-related reasons.
-	if(player != null){
+	if(player){
 		player.Products.push(newProduct);
 		newProduct.Number=player.Products.length-1;
 		newProduct.OwnerNumber=player.Number;
@@ -213,40 +213,41 @@ function Product(player,name,category,sub,color){
 	newProduct.DisplayItemID="nil";
 	newProduct.toString = function () {
 		return newProduct.ClassName+" "+this.GlobalID+": "+this.Name+", "+this.Owner.Name+", "+this.Category+", "+this.SubCategory+", "+this.Color;
-	}
+	};
 	return newProduct;
 }
 function Player(game,name,type,color){
-	var newPlayer=new Object();
+	var newPlayer={};
 	newPlayer.ClassName="PLAYER";
 	newPlayer.Name=name;
 	newPlayer.Color=color;
 	newPlayer.Type=type;
-	newPlayer.Products=new Array();
+	newPlayer.Products=[];
 	newPlayer.NumProducts=0;
 	newPlayer.NumDevs=0;
 	newPlayer.NumQA=0;
 	newPlayer.NumCreative=0;
 	newPlayer.Money=2000;
 	newPlayer.LastDisplayedMoney=newPlayer.Money;
-	newPlayer.TriggeredEvents=new Array();
+	newPlayer.TriggeredEvents=[];
 	newPlayer.isHost=false;
 	newPlayer.hasMadeProductThisTurn = false;
-	if(game != null){
+	if(game){
 		newPlayer.ParentGame=game;
 		game.Players.push(newPlayer);
 		game.NumPlayers=game.Players.length;
 		newPlayer.Number=game.NumPlayers-1;
 		newPlayer.GlobalID=newPlayer.Number;
-	}else{
+	}
+	else{
 		alert("Created player without a parent game!");
 	}
 	newPlayer.toString = function () {
 		return newPlayer.ClassName+" "+newPlayer.GlobalID+": "+newPlayer.Name+", "+newPlayer.Type+", "+newPlayer.Color;
-	}
-	if(newPlayer.Type=="Computer"){
-		newPlayer.VIMemory=new Object();
-		newPlayer.VIMemory.Products=new Array();
+	};
+	if(newPlayer.Type==="Computer"){
+		newPlayer.VIMemory={};
+		newPlayer.VIMemory.Products=[];
 		newPlayer.VIMemory.Money=2000;
 		newPlayer.VIMemory.Name=name;
 		newPlayer.VIMemory.Color=color;
@@ -255,33 +256,33 @@ function Player(game,name,type,color){
 		newPlayer.VIMemory.NumCreative=0;
 	}
 	newPlayer.TurnInit=function(){
-		if(newPlayer.Type=="Computer"){
+		if(newPlayer.Type==="Computer"){
 			VI_Begin(newPlayer);
 		}
-	}
+	};
 	return newPlayer;
 }
 function Game(id){
-	var newGame=new Object();
+	var newGame={};
 	newGame.ClassName="GAME_OBJECT";
 	newGame.ID=id;
-	newGame.Players=new Array();
+	newGame.Players=[];
 	newGame.NumPlayers=0;
-	newGame.PlayerProducts=new Array();
+	newGame.PlayerProducts=[];
 	newGame.CurrentPlayer=null;
 	newGame.CurrentPlayerNum=0;
 	newGame.CurrentRound=0;
 	newGame.PatentTracker=null;
-	newGame.GameType;
+	newGame.GameType="nil";
 	newGame.Settings={
 		Difficulty:null,
 		CPUIntelligence:null,
 		PatentingEnabled:null,
 		NumberOfRounds:null
-	}
+	};
 	newGame.GameState="UNINITIALIZED"; // this game-state is going to become very important when we start the networking
 	newGame.toString=function(){
 		return newGame.ClassName+" "+this.ID.toString();
-	}
+	};
 	return newGame;
 }

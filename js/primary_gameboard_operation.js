@@ -19,10 +19,10 @@ var BaseCosts={
 	Prototype:230,
 	PostDepBugCost:100,
 	Deployment:370
-}
+};
 var BasePayouts={
 	DayJobEachTurn:100
-}
+};
 var ProductPhases={
 	Idea:"Idea",
 	Design:"Design",
@@ -33,7 +33,7 @@ var ProductPhases={
 	Deployment:"Deployment",
 	PostDepTesting:"PostDeploymentTesting",
 	Maintenance:"Maintenance"
-}
+};
 var PhasePositions={
 	Idea:[270+225*Math.cos(13*Math.PI/8),270+225*Math.sin(13*Math.PI/8)], //[350,50],
 	Design:[270+225*Math.cos(15*Math.PI/8),270+225*Math.sin(15*Math.PI/8)], //[480,180],
@@ -44,7 +44,7 @@ var PhasePositions={
 	Deployment:[270+225*Math.cos(9*Math.PI/8),270+225*Math.sin(9*Math.PI/8)], //[60,180],
 	PostDeploymentTesting:[270+225*Math.cos(11*Math.PI/8),270+225*Math.sin(11*Math.PI/8)], //[190,50],
 	Maintenance:[270,270]
-}
+};
 //Format is: Name, Initial Description, AreaOfEffect, Scale, Type, Value, Picture, Likeliness, and OccurrenceInterval (With a counter)
 //0  Name is a self-explanatory string
 //1  Initial description is what goes at the beginning of the smaller text in the random event modal.
@@ -67,7 +67,7 @@ var RandomEvents=[
 	["Recession!","The economy looks to be in bad shape right now.","AllPlayers",-9,"PayoutRateChange_All",0.1,"recession", 0.1, 40, 3],
 	["Going green!","Whether it's for the trees or against these devices...","AllPlayers",-1,"PayoutRateChange_Printer",0.7,"tree", 0.8, 9, 3],
 	["Grant!","Someone with high authority seems to like what you are doing.","OnePlayer",10,"CashChange",100000,"cash", 0.2, 60, 3]
-]
+];
 var ProductCategories={
 	Energy:["Hydroelectric","Solar","Fossil Fuel","Wind"],
 	Transportation:["Space","Air","Land","Sea"],
@@ -75,7 +75,7 @@ var ProductCategories={
 	Software:["Communication","Office Program","Video Game","Web Application"],
 	Houseware:["Cleaning","Furniture","Kitchen","Barbecue"],
 	Other:["School","Shoes","Musical","Key Holder"]
-}
+};
 //The attributes are, in order: Volatility multiplier (Index 0), Prototype Cost multiplier (Index 1), and Idea Strength increase multiplier (Index 2)
 //Also include are Payout multipliers (Index 3) and TurnsShutdown (Index 4), for events
 var SubCategoryAttributes={
@@ -106,11 +106,13 @@ var SubCategoryAttributes={
 };
 function GameInitialize(){
 	var doILoadGame = localStorage.getItem("LoadingAGame");
-	if (doILoadGame != "null")
+	if (doILoadGame !== "null"){
 		LoadGameInitialize(doILoadGame);
-	else
+	}
+	else{
 		NewGameInitialize();
-	TheGame.GameState = "ACTIVE"
+	}
+	TheGame.GameState = "ACTIVE";
 }
 function NewGameInitialize(){
 	var GameCreationInfo=JSON.parse(localStorage.getItem("TheBrandNewGame"));
@@ -118,14 +120,14 @@ function NewGameInitialize(){
 	TransferGameStartupInfo(GameCreationInfo,TheGame);
 	TheGame.CurrentPlayer=TheGame.Players[TheGame.CurrentPlayerNum];
 	TheGame.CurrentPlayerNum=TheGame.CurrentPlayer.Number;
-	if (TheGame.Settings.PatentingEnabled=="On"){
+	if (TheGame.Settings.PatentingEnabled==="On"){
 		TheGame.PatentTracker = new PatentTracker();
 	}
 	UpdatePlayerDisplay();
 	PopulateNewProdCategories();
-	setInterval("TipThink();",10);
-	if (TheGame.GameType=="Local"){
-		setInterval("SaveThink();",1000);
+	setInterval(function(){TipThink();},10);
+	if (TheGame.GameType==="Local"){
+		setInterval(function(){SaveThink();},1000);
 		localStorage.setItem("LoadingAGame", "LastSavedGame");
 	}
 	setTimeout(DisplayNewRoundEvent,1);
@@ -138,8 +140,9 @@ function NewGameInitialize(){
 }
 function LoadGameInitialize(gameName){
 	TheGame = CircularJSON.parse(localStorage.getItem("LastSavedGame"));
-	if (!TheGame)
+	if (!TheGame){
 		NewGameInitialize();
+	}
 	else{
 		//This code includes logic to recreate each object's particular functions, as even Circular-JSON loses sight of them.
 		//Luckily there are only four such lines that are needed.
@@ -147,10 +150,10 @@ function LoadGameInitialize(gameName){
 		SubCategoryAttributes = TheGame.SubCategoryAttributes;
 		RandomEvents = TheGame.RandomEvents;
 		TheGame.toString = function () { return this.ClassName + " " + this.ID.toString(); };
-		for (q = 0; q < TheGame.Players.length; q++) {
+		for (var q = 0; q < TheGame.Players.length; q++) {
 			TheGame.Players[q].toString = function () { return this.ClassName+" "+this.GlobalID+": "+this.Name+", "+this.Type+", "+this.Color; };
-			TheGame.Players[q].TurnInit = function () { if (this.Type=="Computer") { VI_Begin(this); } };
-			for (j = 0; j < TheGame.Players[q].Products.length; j++) {
+			TheGame.Players[q].TurnInit = function () { if (this.Type==="Computer") { VI_Begin(this); } };
+			for (var j = 0; j < TheGame.Players[q].Products.length; j++) {
 				TheGame.Players[q].Products[j].toString = function () { return this.ClassName+" "+this.GlobalID+": "+this.Name+", "+this.Owner.Name+", "+this.Category+", "+this.SubCategory+", "+this.Color; };
 				RecreateProductDisplay(TheGame.Players[q].Products[j]);
 			}
@@ -159,23 +162,24 @@ function LoadGameInitialize(gameName){
 		TheGame.CurrentPlayerNum=TheGame.CurrentPlayer.Number;
 		UpdatePlayerDisplay();
 		PopulateNewProdCategories();
-		for (i=0; i<TheGame.CurrentPlayer.Products.length; i++){
+		for (var i=0; i<TheGame.CurrentPlayer.Products.length; i++){
 			$("#ProductDisplayItem_" + TheGame.CurrentPlayer.Products[i].GlobalID).css("z-index",2);
 		}
-		if (TheGame.Settings.NumberOfRounds-TheGame.CurrentRound <= 5)
+		if (TheGame.Settings.NumberOfRounds-TheGame.CurrentRound <= 5){
 			changeCurrentBGM("TimeRunningOut");
+		}
 		$("#RoundNumberDisplay").text("ROUND " + TheGame.CurrentRound.toString());
 		$("#new-product-button").attr("disabled",(TheGame.CurrentPlayer.hasMadeProductThisTurn));
 		var Elem=document.getElementById("TipSpan");
 		var welcomeBackMessage = "Welcome back to the stage of Entrepreneurship!";
 		if (TheGame.CurrentRound >= TheGame.Settings.NumberOfRounds/2){
-			welcomeBackMessage = "We missed you."
+			welcomeBackMessage = "We missed you.";
 		}
 		Elem.style.left=BOARD_WIDTH.toString()+"px";
 		Elem.innerHTML=welcomeBackMessage;
-		setInterval("TipThink();",10);
-		if (TheGame.GameType=="Local"){
-			setInterval("SaveThink();",1000);
+		setInterval(function(){TipThink();},10);
+		if (TheGame.GameType==="Local"){
+			setInterval(function(){SaveThink();},1000);
 		}
 		setTimeout(function(){
 			TheGame.CurrentPlayer.TurnInit();
@@ -206,7 +210,7 @@ function TransferGameStartupInfo(from,to){
 			new Player(to,Ply.Name,Ply.Type,Ply.Color);
 		}
 	}
-	to.Settings={}
+	to.Settings={};
 	to.Settings.Difficulty=from.Options.GameDifficulty;
 	to.Settings.CPUIntelligence=from.Options.CPUIntelligence;
 	to.Settings.PatentingEnabled=from.Options.PatentingEnabled;
@@ -216,19 +220,23 @@ function TransferGameStartupInfo(from,to){
 function GetDifficultyConstant(difficulty){
 	var returnValue = 0;
 	
-	if (difficulty == "EASY")
-		returnValue = 1
-	else if (difficulty == "NORMAL")
+	if (difficulty === "EASY"){
+		returnValue = 1;
+	}
+	else if (difficulty === "NORMAL"){
 		returnValue = 2;
-	else if (difficulty == "HARD")
+	}
+	else if (difficulty === "HARD"){
 		returnValue = 3;
-	else
+	}
+	else{
 		returnValue = 4;
+	}
 	
 	return returnValue;
 }
 function UpdatePlayerDisplay(){
-	var OldCash=parseInt($("#CurPlyMoney").html());
+	var OldCash=parseInt($("#CurPlyMoney").html(), 10);
 	var OldName=$("#CurPlyName").html;
 	var Ply=TheGame.CurrentPlayer;
 	var MainBox=$("#CurPlyBox");
@@ -256,7 +264,7 @@ function SelectProductCategory(){
 	SubSel.children().remove();
 	var Cat=Sel.val();
 	for(var i=0;i<ProductCategories[Cat].length;i++){
-		SubSel.append('<option>'+ProductCategories[Cat][i]+'</option>')
+		SubSel.append('<option>'+ProductCategories[Cat][i]+'</option>');
 	}
 	SubSel.selectedIndex=0;
 }
@@ -342,17 +350,20 @@ function removeProduct(prod){
 	if (prod) {
 		playSound(GameSounds.LoseMoney);
 		$("#ProductWindow").hide();
-		if (isThisProductPatented(prod, TheGame))
+		if (isThisProductPatented(prod, TheGame)){
 			removePatentFromRecords(prod, TheGame);
-		if (prod == CurrentlySelectedProduct)
+		}
+		if (prod === CurrentlySelectedProduct){
 			CurrentlySelectedProduct = null;
+		}
 		$("#ProductDisplayItem_"+prod.GlobalID).css('opacity', '0');
 		$("#ProductDisplayItem_"+prod.GlobalID).css('transition', '500ms ease-out');
 		setTimeout(function(){
 			$("div").remove("#ProductDisplayItem_"+prod.GlobalID);
 		},500);
-		if (prod.justStarted)
+		if (prod.justStarted){
 			TheGame.CurrentPlayer.hasMadeProductThisTurn = false;
+		}
 		prod.Owner.Products.splice(prod.Owner.Products.indexOf(prod), 1);
 		TheGame.Players[TheGame.CurrentPlayerNum].NumProducts = TheGame.Players[TheGame.CurrentPlayerNum].Products.length;
 		UpdatePlayerProductDisplayPosition(prod.Owner);
@@ -377,10 +388,10 @@ function removeMultipleProducts(HitList) {
 }
 
 function GetProductsInSamePhase(prod){
-	var ProdsInSameSpot = new Array();
+	var ProdsInSameSpot = [];
 	
 	for (i = 0; i < prod.Owner.Products.length; i++){
-		if (prod.Owner.Products[i].Phase == prod.Phase){
+		if (prod.Owner.Products[i].Phase === prod.Phase){
 			ProdsInSameSpot.push(prod.Owner.Products[i]);
 		}
 	}
@@ -389,10 +400,10 @@ function GetProductsInSamePhase(prod){
 }
 
 function GetProductsInThisPhase(ThisPhase, Ply){
-	var ProdsInSameSpot = new Array();
+	var ProdsInSameSpot = [];
 	
 	for (j = 0; j < Ply.Products.length; j++){
-		if (Ply.Products[j].Phase == ThisPhase){
+		if (Ply.Products[j].Phase === ThisPhase){
 			ProdsInSameSpot.push(Ply.Products[j]);
 		}
 	}
@@ -401,7 +412,7 @@ function GetProductsInThisPhase(ThisPhase, Ply){
 }
 
 function UpdatePlayerProductDisplayPosition(Ply){
-	var ProductPhaseArray = new Array();
+	var ProductPhaseArray = [];
 	for (i = 0; i < Ply.Products.length; i++){
 		if (ProductPhaseArray.indexOf(Ply.Products[i].Phase) <= -1) {
 			ProductPhaseArray.push(Ply.Products[i].Phase);
@@ -423,7 +434,7 @@ function UpdateProductListDisplayPosition(ProdList){
 		YOffset = Math.sin(angularIncrement*i);
 		XPos = PhasePositions[TheProd.Phase][0]+XOffset*Magnitude;
 		YPos = PhasePositions[TheProd.Phase][1]+YOffset*Magnitude;
-		Rotation = Math.atan2(-XPos+PhasePositions["Maintenance"][0], YPos-PhasePositions["Maintenance"][1])-Math.PI*Number((TheProd.Phase!="Maintenance") || (ProdList.length>1));
+		Rotation = Math.atan2(-XPos+PhasePositions.Maintenance[0], YPos-PhasePositions.Maintenance[1])-Math.PI*Number((TheProd.Phase!=="Maintenance") || (ProdList.length>1));
 		
 		var ProdElem=$("#"+"ProductDisplayItem_"+TheProd.GlobalID);
 		ProdElem.css("left",(XPos.toString()+"px"));
@@ -435,19 +446,22 @@ function UpdateProductListDisplayPosition(ProdList){
 
 function EmployeeChange(type,num){
 	
-	var designers = parseInt($("#EmpPopupDes").text());
-	var developers = parseInt($("#EmpPopupDev").text());
-	var testers = parseInt($("#EmpPopupTes").text());
+	var designers = parseInt($("#EmpPopupDes").text(), 10);
+	var developers = parseInt($("#EmpPopupDev").text(), 10);
+	var testers = parseInt($("#EmpPopupTes").text(), 10);
 	
-	if (type=="des"){
-		if (num+designers>=0 && num+designers<=100)
+	if (type==="des"){
+		if (num+designers>=0 && num+designers<=100){
 			$("#EmpPopupDes").text((num+designers).toString());
-	}else if(type=="dev"){
-		if (num+developers>=0 && num+developers<=100)
+		}
+	}else if(type==="dev"){
+		if (num+developers>=0 && num+developers<=100){
 			$("#EmpPopupDev").text((num+developers).toString());
-	}else if(type=="tes"){
-		if (num+testers>=0 && num+testers<=100)
-			$("#EmpPopupTes").text((num+testers).toString());	
+		}
+	}else if(type==="tes"){
+		if (num+testers>=0 && num+testers<=100){
+			$("#EmpPopupTes").text((num+testers).toString());
+		}
 	}
 }
 function InitiateEmpPopupDisplays(){
@@ -458,16 +472,19 @@ function InitiateEmpPopupDisplays(){
 }
 function HireTheEmployees(){
 	var ply = TheGame.CurrentPlayer;
-	var designers = parseInt($("#EmpPopupDes").text());
-	var developers = parseInt($("#EmpPopupDev").text());
-	var testers = parseInt($("#EmpPopupTes").text());
+	var designers = parseInt($("#EmpPopupDes").text(), 10);
+	var developers = parseInt($("#EmpPopupDev").text(), 10);
+	var testers = parseInt($("#EmpPopupTes").text(), 10);
 	
-	if (designers > ply.NumCreative)
+	if (designers > ply.NumCreative){
 		ply.Money-=(designers-ply.NumCreative)*BaseCosts.HireCreative;
-	if (developers > ply.NumDevs)
+	}
+	if (developers > ply.NumDevs){
 		ply.Money-=(developers-ply.NumDevs)*BaseCosts.HireDev;
-	if (testers > ply.NumQA)
+	}
+	if (testers > ply.NumQA){
 		ply.Money-=(testers-ply.NumQA)*BaseCosts.HireQA;
+	}
 		
 	ply.NumCreative=designers;
 	ply.NumDevs=developers;
@@ -481,17 +498,17 @@ function UpdateCurProdDisplay(id){
 		CurrentlySelectedProduct=Prod;
 		$("#ProductWindow").show();
 		$("#ProductWindow").css("border-color",Prod.Owner.Color);
-		if(Prod.OwnerNumber==TheGame.CurrentPlayerNum){
+		if(Prod.OwnerNumber===TheGame.CurrentPlayerNum){
 			$("#CurProdDetailsButton").prop("disabled",false);
 			$("#CurProdRevertButton").prop("disabled",false);
 			var CurPhase=CurrentlySelectedProduct.Phase;
-			if ((CurPhase == ProductPhases.Maintenance) || ((CurPhase == ProductPhases.Prototype && !(Prod.hasPrototype))||(CurPhase == ProductPhases.Deployment && !(Prod.readyToDeploy)))){
+			if ((CurPhase === ProductPhases.Maintenance) || ((CurPhase === ProductPhases.Prototype && !(Prod.hasPrototype))||(CurPhase === ProductPhases.Deployment && !(Prod.readyToDeploy)))){
 				$("#CurProdAdvanceButton").prop("disabled",true);
 			}
 			else{
 				$("#CurProdAdvanceButton").prop("disabled",false);
 			}
-			if (CurPhase == ProductPhases.Idea){
+			if (CurPhase === ProductPhases.Idea){
 				$("#CurProdRevertButton").text("Remove");
 			}
 			else{
@@ -540,50 +557,55 @@ function PopulateDetails(id){
 		$("#DetailsPBS").text(Prod.BuildStrength.toString());
 		$("#DetailsTSS").text(Math.round(Prod.TestingStrength).toString());
 		$("#DetailsCOS").text((Math.round((1-Prod.Volatility)*100)).toString()+"%");
-		if (Prod.hasPrototype)
+		if (Prod.hasPrototype){
 			$("#DetailsHPT").text("Yes");
-		else
+		}
+		else{
 			$("#DetailsHPT").text("No");
-		if (Prod.readyToDeploy)
+		}
+		if (Prod.readyToDeploy){
 			$("#DetailsDPR").text("Yes");
-		else
+		}
+		else{
 			$("#DetailsDPR").text("No");
+		}
 	}
 }
 function GetProdFromDispElemID(id){
 	var NewID=id.replace("ProductDisplayItem_","");
-	NewID=parseInt(NewID);
+	NewID=parseInt(NewID, 10);
 	var Prod=TheGame.PlayerProducts[NewID];
 	return Prod;
 }
 function TryToAdvanceProduct(){
 	var CurPhase=CurrentlySelectedProduct.Phase;
-	if(CurPhase!=ProductPhases.Maintenance)
+	if(CurPhase!==ProductPhases.Maintenance){
 		playSound(GameSounds.AdvanceProduct);
-	if(CurPhase==ProductPhases.Idea){
+	}
+	if(CurPhase===ProductPhases.Idea){
 		CurrentlySelectedProduct.Phase=ProductPhases.Design;
-	}else if(CurPhase==ProductPhases.Design){
+	}else if(CurPhase===ProductPhases.Design){
 		CurrentlySelectedProduct.Phase=ProductPhases.Prototype;
-	}else if(CurPhase==ProductPhases.Prototype){
-		TheGame.CurrentPlayer.Money=TheGame.CurrentPlayer.Money-BaseCosts.Prototype*SubCategoryAttributes[CurrentlySelectedProduct.SubCategory][1];;
+	}else if(CurPhase===ProductPhases.Prototype){
+		TheGame.CurrentPlayer.Money=TheGame.CurrentPlayer.Money-BaseCosts.Prototype*SubCategoryAttributes[CurrentlySelectedProduct.SubCategory][1];
 		CurrentlySelectedProduct.Phase=ProductPhases.PrototypeTesting;
-	}else if(CurPhase==ProductPhases.PrototypeTesting){
+	}else if(CurPhase===ProductPhases.PrototypeTesting){
 		CurrentlySelectedProduct.Phase=ProductPhases.Development;
-	}else if(CurPhase==ProductPhases.Development){
+	}else if(CurPhase===ProductPhases.Development){
 		CurrentlySelectedProduct.Phase=ProductPhases.PreDepTesting;
-	}else if(CurPhase==ProductPhases.PreDepTesting){
+	}else if(CurPhase===ProductPhases.PreDepTesting){
 		CurrentlySelectedProduct.Phase=ProductPhases.Deployment;
-	}else if(CurPhase==ProductPhases.Deployment){
+	}else if(CurPhase===ProductPhases.Deployment){
 		TheGame.CurrentPlayer.Money=TheGame.CurrentPlayer.Money-BaseCosts.Deployment;
 		CurrentlySelectedProduct.Phase=ProductPhases.PostDepTesting;
-	}else if(CurPhase==ProductPhases.PostDepTesting){
+	}else if(CurPhase===ProductPhases.PostDepTesting){
 		CurrentlySelectedProduct.Phase=ProductPhases.Maintenance;
-	}else if(CurPhase==ProductPhases.Maintenance){
+	}else if(CurPhase===ProductPhases.Maintenance){
 		playSound(GameSounds.Wrong_Low);
 	}
 	
 	//This if-block is for patenting reasons.
-	if (CurrentlySelectedProduct.isANewProduct && CurrentlySelectedProduct.Phase==ProductPhases.Maintenance){
+	if (CurrentlySelectedProduct.isANewProduct && CurrentlySelectedProduct.Phase===ProductPhases.Maintenance){
 		CurrentlySelectedProduct.isANewProduct = false;
 	}
 	
@@ -595,29 +617,29 @@ function TryToAdvanceProduct(){
 function TryToRevertProduct(){
 	var CurPhase=CurrentlySelectedProduct.Phase;
 	var removeCheck = false;
-	if(CurPhase!=ProductPhases.Idea){playSound(GameSounds.MinorFail);}
-	if(CurPhase==ProductPhases.Idea){
+	if(CurPhase!==ProductPhases.Idea){playSound(GameSounds.MinorFail);}
+	if(CurPhase===ProductPhases.Idea){
 		ShowRemoveDialog();
 		removeCheck = true;
-	}else if(CurPhase==ProductPhases.Design){
+	}else if(CurPhase===ProductPhases.Design){
 		CurrentlySelectedProduct.Phase=ProductPhases.Idea;
 		CurrentlySelectedProduct.DesignStrength=0;
-	}else if(CurPhase==ProductPhases.Prototype){
+	}else if(CurPhase===ProductPhases.Prototype){
 		CurrentlySelectedProduct.Phase=ProductPhases.Design;
-	}else if(CurPhase==ProductPhases.PrototypeTesting){
+	}else if(CurPhase===ProductPhases.PrototypeTesting){
 		CurrentlySelectedProduct.Phase=ProductPhases.Prototype;
-	}else if(CurPhase==ProductPhases.Development){
+	}else if(CurPhase===ProductPhases.Development){
 		CurrentlySelectedProduct.Phase=ProductPhases.PrototypeTesting;
 		CurrentlySelectedProduct.BuildStrength=0;
-	}else if(CurPhase==ProductPhases.PreDepTesting){
+	}else if(CurPhase===ProductPhases.PreDepTesting){
 		CurrentlySelectedProduct.Phase=ProductPhases.Development;
-	}else if(CurPhase==ProductPhases.Deployment){
+	}else if(CurPhase===ProductPhases.Deployment){
 		CurrentlySelectedProduct.Phase=ProductPhases.PreDepTesting;
 		TheGame.CurrentPlayer.Money=TheGame.CurrentPlayer.Money-BaseCosts.Deployment/2;
-	}else if(CurPhase==ProductPhases.PostDepTesting){
+	}else if(CurPhase===ProductPhases.PostDepTesting){
 		CurrentlySelectedProduct.Phase=ProductPhases.Deployment;
 		TheGame.CurrentPlayer.Money=TheGame.CurrentPlayer.Money-BaseCosts.Deployment/2;
-	}else if(CurPhase==ProductPhases.Maintenance){
+	}else if(CurPhase===ProductPhases.Maintenance){
 		CurrentlySelectedProduct.Phase=ProductPhases.PostDepTesting;
 	}
 	if (!removeCheck){
@@ -632,7 +654,7 @@ function VisualCashAlert(){
 	var Amt=Ply.Money-Ply.LastDisplayedMoney;
 	var theNumber = NumberNameTable[TheGame.CurrentPlayerNum+1];
 	if(!ShowCashAlert){return;}
-	if(Amt==0){return;}
+	if(Amt===0){return;}
 	var Elem=$("#Cash"+theNumber);
 	var Str="";
 	var Col="";
@@ -669,7 +691,7 @@ function PopulateScoreboard(){
 	for(PlyNum in TheGame.Players){
 		var Ply=TheGame.Players[PlyNum];
 		var Str="";
-		if(PlyNum==0){Str="PlyOne";}else if(PlyNum==1){Str="PlyTwo";}else if(PlyNum==2){Str="PlyThree";}else if(PlyNum==3){Str="PlyFour";}else if(PlyNum==4){Str="PlyFive";}else if(PlyNum==5){Str="PlySix";}
+		if(PlyNum===0){Str="PlyOne";}else if(PlyNum===1){Str="PlyTwo";}else if(PlyNum===2){Str="PlyThree";}else if(PlyNum===3){Str="PlyFour";}else if(PlyNum===4){Str="PlyFive";}else if(PlyNum===5){Str="PlySix";}
 		$("#"+Str+"ScbdBox").show();
 		$("#"+Str+"ScbdBox").css("border-color",Ply.Color);
 		$("#"+Str+"ScbdName").html(Ply.Name);
@@ -693,16 +715,18 @@ function CycleTurn(){
 		TheGame.CurrentPlayer=TheGame.Players[TheGame.CurrentPlayerNum];
 		$("#CurProdAdvanceButton").prop("disabled",true);
 		$("#CurProdRevertButton").prop("disabled",true);
-		if(CurrentlySelectedProduct!=null){
+		if(CurrentlySelectedProduct){
 			UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayElemID);
 		}
 		if(WillGo){
 			DisplayNewRoundEvent();
 		}else{
-			if (TheGame.CurrentPlayer.Type=="Computer")
+			if (TheGame.CurrentPlayer.Type==="Computer"){
 				$("#ControlLock").show();
-			else
+			}
+			else{
 				$("#ControlLock").hide();
+			}
 			TriggeredEventIterator(TheGame.CurrentPlayer.TriggeredEvents);
 			for (i=0; i<TheGame.CurrentPlayer.Products.length; i++){
 				$("#ProductDisplayItem_" + TheGame.CurrentPlayer.Products[i].GlobalID).css("z-index",2);
@@ -711,7 +735,8 @@ function CycleTurn(){
 			$("#ProductWindow").hide();
 			UpdatePlayerDisplay();
 		}
-	}else{
+	}
+	else{
 		DisplayNewRoundEvent();
 	}
 	setTimeout(function(){
@@ -723,8 +748,9 @@ function DisplayNewRoundEvent(){
 	var Num=TheGame.CurrentRound+1;
 	$('.Standard').attr("disabled", true);
 	if(Num<=TheGame.Settings.NumberOfRounds){
-		if (TheGame.Settings.NumberOfRounds-Num <= 5)
+		if (TheGame.Settings.NumberOfRounds-Num <= 5){
 			changeCurrentBGM("TimeRunningOut");
+		}
 		var Elem=document.getElementById("MainBoard");
 		Elem.style.transition="left .75s ease-out";
 		Elem.style.left="800px";
@@ -774,7 +800,7 @@ function NewRoundCalc(){
 		if(Ply.NumProducts>0){
 			for(var j=0;j<Ply.Products.length;j++){
 				var Prod=Ply.Products[j];
-				if (Prod.Phase != Prod.PhaseAtStartOfTurn){
+				if (Prod.Phase !== Prod.PhaseAtStartOfTurn){
 					Prod.turnsInSamePhase=0;
 				}
 				Prod.PhaseAtStartOfTurn = Prod.Phase;
@@ -784,35 +810,35 @@ function NewRoundCalc(){
 				}
 				var numOnSameSpot = 0;
 				for (k = 0; k<Ply.Products.length; k++){
-					if (Prod.Phase == Ply.Products[k].Phase){
+					if (Prod.Phase === Ply.Products[k].Phase){
 						numOnSameSpot++;
 					}
 				}
-				if(Prod.Phase==ProductPhases.Idea){
+				if(Prod.Phase===ProductPhases.Idea){
 					Prod.IdeaStrength=Prod.IdeaStrength+Math.ceil(SubCategoryAttributes[Prod.SubCategory][2]*60*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty)))/(numOnSameSpot+Prod.turnsInSamePhase));
 					MoveItSoon(Ply, Prod);
-				}else if(Prod.Phase==ProductPhases.Design){
+				}else if(Prod.Phase===ProductPhases.Design){
 					EmployeeReductionCheck("des", Ply, Prod);
 					Prod.DesignStrength=Prod.DesignStrength+Math.ceil(20*Ply.NumCreative*(Math.log(3)/Math.log(3+Ply.NumCreative))/(numOnSameSpot+Prod.turnsInSamePhase));
-				}else if(Prod.Phase==ProductPhases.Prototype){
+				}else if(Prod.Phase===ProductPhases.Prototype){
 					Prod.hasPrototype=true;
-				}else if(Prod.Phase==ProductPhases.PrototypeTesting){
+				}else if(Prod.Phase===ProductPhases.PrototypeTesting){
 					EmployeeReductionCheck("tes", Ply, Prod);
 					Prod.DesignStrength=Prod.DesignStrength+Math.ceil(Ply.NumQA*12*(Math.log(3)/Math.log(3+Ply.NumQA))/(numOnSameSpot+Prod.turnsInSamePhase));
 					Prod.TestingStrength+=(Prod.DesignStrength*0.1*Ply.NumQA*(Math.log(3)/Math.log(3+Ply.NumQA))/(numOnSameSpot+Prod.turnsInSamePhase));
-				}else if(Prod.Phase==ProductPhases.Development){
+				}else if(Prod.Phase===ProductPhases.Development){
 					EmployeeReductionCheck("dev", Ply, Prod);
 					Prod.BuildStrength=Prod.BuildStrength+Math.ceil(20*Ply.NumDevs*(Math.log(3)/Math.log(3+Ply.NumDevs))/(numOnSameSpot+Prod.turnsInSamePhase));
-				}else if(Prod.Phase==ProductPhases.PreDepTesting){
+				}else if(Prod.Phase===ProductPhases.PreDepTesting){
 					EmployeeReductionCheck("tes", Ply, Prod);
 					Prod.BuildStrength=Prod.BuildStrength+Math.ceil(Ply.NumQA*12*(Math.log(3)/Math.log(3+Ply.NumCreative))/(numOnSameSpot+Prod.turnsInSamePhase));
 					Prod.TestingStrength+=(Prod.BuildStrength*0.1*Ply.NumQA*(Math.log(3)/Math.log(3+Ply.NumCreative))/(numOnSameSpot+Prod.turnsInSamePhase));
-				}else if(Prod.Phase==ProductPhases.Deployment){
+				}else if(Prod.Phase===ProductPhases.Deployment){
 					Prod.readyToDeploy=true;
-				}else if(Prod.Phase==ProductPhases.PostDepTesting){
+				}else if(Prod.Phase===ProductPhases.PostDepTesting){
 					EmployeeReductionCheck("tes", Ply, Prod);
 					Prod.TestingStrength+=Math.ceil(0.05*(Prod.DesignStrength+Prod.BuildStrength)*Ply.NumQA*(Math.log(3)/Math.log(3+Ply.NumCreative))/(numOnSameSpot+Prod.turnsInSamePhase));
-				}else if(Prod.Phase==ProductPhases.Maintenance){
+				}else if(Prod.Phase===ProductPhases.Maintenance){
 					var Broken = DoesItBreak(Prod);
 					if (Broken>0){
 						var Damages = Math.ceil((BaseCosts.PostDepBugCost)+getMonetaryValue(Prod)*Broken);
@@ -821,7 +847,7 @@ function NewRoundCalc(){
 						Prod.TestingStrength+=(Prod.DesignStrength+Prod.BuildStrength);
 					}
 				}
-				Prod.Volatility = 1/(1+.1*Prod.TestingStrength*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty))));
+				Prod.Volatility = 1/(1+0.1*Prod.TestingStrength*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty))));
 			}
 		}
 	}
@@ -833,11 +859,11 @@ function NewRoundCalc(){
 		}else{
 			for(var j=0;j<Ply.Products.length;j++){
 				var Prod=Ply.Products[j];
-				if(Prod.Phase==ProductPhases.Maintenance && (SubCategoryAttributes[Prod.SubCategory][4] <= 0)){
+				if(Prod.Phase===ProductPhases.Maintenance && (SubCategoryAttributes[Prod.SubCategory][4] <= 0)){
 					var earnings = Math.round(getMonetaryValue(Prod)*SubCategoryAttributes[Prod.SubCategory][3]*TotalPayoutRate*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty))));
 					if (TheGame.PatentTracker){
 						patentOwnerID = doIPayRoyalties(Prod, TheGame.PatentTracker);
-						if (patentOwnerID != -1)
+						if (patentOwnerID !== -1)
 						{
 							cashOwed = Math.round(earnings/10);
 							earnings -= cashOwed;
@@ -852,7 +878,7 @@ function NewRoundCalc(){
 		Ply.Money=Ply.Money+Net;
 	}
 	TheGame.CurrentRound=TheGame.CurrentRound+1;
-	if (TheGame.CurrentPlayer.Type=="Computer"){
+	if (TheGame.CurrentPlayer.Type==="Computer"){
 		$("#ControlLock").show();
 	}
 	else {
@@ -860,26 +886,31 @@ function NewRoundCalc(){
 	}
 	RandomEventIterator();
 	UpdatePlayerDisplay();
-	if(CurrentlySelectedProduct!=null){
+	if(CurrentlySelectedProduct){
 		UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
 	}
 }
 function DecrementCategoryChanges(){
 	for (SubCat in SubCategoryAttributes){
-		if (SubCategoryAttributes[SubCat][3] == 0)
+		if (SubCategoryAttributes[SubCat][3] === 0){
 			SubCategoryAttributes[SubCat][3] = 0.1;
+		}
 		else{
-			if (SubCategoryAttributes[SubCat][3] > 1)
+			if (SubCategoryAttributes[SubCat][3] > 1){
 				SubCategoryAttributes[SubCat][3] -= 0.1;
-			else if (SubCategoryAttributes[SubCat][3]*10 < 1)
+			}
+			else if (SubCategoryAttributes[SubCat][3]*10 < 1){
 				SubCategoryAttributes[SubCat][3] += 0.1;
+			}
 			SubCategoryAttributes[SubCat][3] = Math.round(SubCategoryAttributes[SubCat][3]*10)/10;
 		}
-		if (SubCategoryAttributes[SubCat][4] > 0)
+		if (SubCategoryAttributes[SubCat][4] > 0){
 			SubCategoryAttributes[SubCat][4]--;
+		}
 	}
-	if (Math.round(TotalPayoutRate*10)/10 > 1)
+	if (Math.round(TotalPayoutRate*10)/10 > 1){
 		TotalPayoutRate -= 0.1;
+	}
 	else if (Math.round(TotalPayoutRate*10)/10 < 1){
 		TotalPayoutRate += 0.1;
 	}
@@ -889,90 +920,62 @@ function Appear(){
 	ShowCashAlert=true;
 }
 
-//A function for a game to create a tracker of Patents.
-function PatentTracker()
-{
-	//Creates a PatentTracker object and declares variables for it.
-	var PatentTracker = new Object();
-	PatentTracker.ClassName = "PATENTTRACKER";
-	PatentTracker.Categories = new Array();
-	PatentTracker.numPatents = 0;
+function PatentTracker(){
+	var newPatentTracker = {};
+	newPatentTracker.ClassName = "PATENTTRACKER";
+	newPatentTracker.Categories = [];
+	newPatentTracker.numPatents = 0;
 	
-	//Creates a 1D array out of the 2D Array of the Product categories.
 	for(Item in ProductCategories){
 		for (SubItem in ProductCategories[Item]){
-			PatentTracker.Categories.push(ProductCategories[Item][SubItem]);
+			newPatentTracker.Categories.push(ProductCategories[Item][SubItem]);
 		}
 	}
-	//Declares a record-keeping array using the 1D Array of the Product categories.
-	PatentTracker.Records = new Array();
+	newPatentTracker.Records = [];
 	
-	//The idea is this:
-	//For each element in the records array, element 0 is the category,
-	//and element 1 is the player who holds the patent for that category.
-	//Initially, element 1 is null, because no one /starts/ with a patent.
-	for (Item in PatentTracker.Categories)
-	{
-		PatentTracker.Records.push([PatentTracker.Categories[Item], null, null]);
+	for (Item in newPatentTracker.Categories) {
+		newPatentTracker.Records.push([PatentTracker.Categories[Item], null, null]);
 	}
 	
-	return PatentTracker;
+	return newPatentTracker;
 }
 
-//A function that aids in buying a patent for a particular product subcategory
 function TryToBuyPatent(product, game)
 {
-	//The amount needed to buy a patent is hardcoded for now.
-	//Other factors will determine how much the product patent is worth, such as the category and the product's overall strength.
-	
 	var cost = 2000;
-	//The default message. Changes if the patent purchase fails.
-	var patentMessage = "Product " + product.Name + " was successfully patented!"
+	var patentMessage = "Product " + product.Name + " was successfully patented!";
 	
-	//This variable has two purposes:
-	//First to help determine if a product subcategory is patented already
-	//Second to help add a player to the patent records if the purchase succeeds
 	var categoryIndex = game.PatentTracker.Categories.indexOf(product.SubCategory);
 	
 	var isPatentedAlready = isThisCategoryPatented(product, game);
-	//Product subcategory cannot be patented already.
-	var inPatentableCategory = true
-	//Patent must be statutory, or the type of product must be able to be patented. Currently, it holds true for all categories.
+	var inPatentableCategory = true;
 	var preMaintenance = product.isANewProduct;
-	//Product can't already be on the market.
 	var wellBuiltEnough = getMonetaryValue(product) >= 1000;
-	//It has to be a well developed product.
 	var hasTheMoney = (game.CurrentPlayer.Money >= cost);
-	//Player needs the money for the patent.
 	
-	//Series of if-statements to either determine the failure message or purchase the patent.
-	if (isPatentedAlready)
-	{
+	if (isPatentedAlready) {
 		patentOwner = game.PatentTracker.Records[categoryIndex][1];
 		
-		if (patentOwner == game.CurrentPlayer.GlobalID)
+		if (patentOwner === game.CurrentPlayer.GlobalID) {
 			patentMessage = "You've already purchased a patent for this type of product!";
-		else
+		}
+		else{
 			patentMessage = "Player " + (patentOwner+1).toString() + ": " + game.Players[patentOwner].Name + " already has the patent for " + product.SubCategory + " products!";
+		}
 	}
-	else if (!inPatentableCategory)
-	{
+	else if (!inPatentableCategory) {
 		patentMessage = product.SubCategory + "-type products cannot be patented!";
 	}
-	else if (!preMaintenance)
-	{
+	else if (!preMaintenance) {
 		patentMessage = "This product has already been on the market!";
 	}
-	else if (!wellBuiltEnough)
-	{
+	else if (!wellBuiltEnough) {
 		patentMessage = "Your product isn't impressive enough just yet!";
 	}
-	else if (!hasTheMoney)
-	{
+	else if (!hasTheMoney) {
 		patentMessage = "You are $" + (cost - game.CurrentPlayer.Money).toString() + " short!";
 	}
-	else
-	{
+	else {
 		game.CurrentPlayer.Money -= cost;
 		game.PatentTracker.Records[categoryIndex][1] = game.CurrentPlayer.GlobalID;
 		game.PatentTracker.Records[categoryIndex][2] = product.GlobalID;
@@ -981,38 +984,27 @@ function TryToBuyPatent(product, game)
 		UpdateCurProdDisplay(product.DisplayItemID);
 	}
 	
-	//Returns the function completion message.
 	return patentMessage;
 }
 
-//A function to check if a product's been patented already
-function isThisCategoryPatented(prod, game)
-{
-	return game.PatentTracker.Records[(game.PatentTracker.Categories.indexOf(prod.SubCategory))][1] != null;
+function isThisCategoryPatented(prod, game){
+	return !!(game.PatentTracker.Records[(game.PatentTracker.Categories.indexOf(prod.SubCategory))][1]);
 }
-//A function to check if this particular product is patented
-function isThisProductPatented(prod, game)
-{
-	return game.PatentTracker.Records[(game.PatentTracker.Categories.indexOf(prod.SubCategory))][2] == prod.GlobalID;
+function isThisProductPatented(prod, game){
+	return game.PatentTracker.Records[(game.PatentTracker.Categories.indexOf(prod.SubCategory))][2] === prod.GlobalID;
 }
-//A function that removes a patent of a product category
 function removePatentFromRecords(product, game){
 	var categoryIndex = game.PatentTracker.Categories.indexOf(product.SubCategory);
 	game.PatentTracker.Records[categoryIndex][1] = null;
 	game.PatentTracker.Records[categoryIndex][2] = null;
 }
 
-//A function to help with message displaying regarding patents.
-//It sets the message title, the message, and sometimes a helpful tip depending on the failure.
-function PatentMessageDisplay(theMessage)
-{
+function PatentMessageDisplay(theMessage){
 	UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
 	
-	//Sets the main message.
 	$("#PatentText").text(theMessage);
 	var theSound = GameSounds.Event;
 	
-	//Sets the type of message.
 	if (theMessage.indexOf("successfully") > -1){
 		$("#PatentTitle").text("SUCCESS!");
 	}
@@ -1021,7 +1013,6 @@ function PatentMessageDisplay(theMessage)
 		theSound = GameSounds.Wrong_BAD;
 	}
 	
-	//Sets and reveals a tip if applicable.
 	if (theMessage.indexOf("successfully") > -1){
 		$("#PatentTip").text("Now you earn revenue off of other players with the same type of product!");
 		$("#PatentTip").show();
@@ -1040,19 +1031,12 @@ function PatentMessageDisplay(theMessage)
 	playSound(theSound);
 }
 
-//A function that helps handle the payment of royalties to players who own patents
-//It takes in a product and checks if that type of product has been patented by someone besides the owner of said product
-//It returns -1 if no royalties need to be paid
-
 function doIPayRoyalties(product, patentTracker)
 {
-	//Initializes a return value variable and an index variable.
 	var patentOwnerID = -1;
 	var index = patentTracker.Categories.indexOf(product.SubCategory);
 	
-	//If another player owns that patent, set the return value to their ID
-	if ((product.Owner.GlobalID != patentTracker.Records[index][1]) && patentTracker.Records[index][1] != null)
-	{
+	if ((product.Owner.GlobalID !== patentTracker.Records[index][1]) && patentTracker.Records[index][1]) {
 		patentOwnerID = patentTracker.Records[index][1];
 	}
 	
@@ -1060,21 +1044,25 @@ function doIPayRoyalties(product, patentTracker)
 }
 
 function RandomEventSelector(){
-	var IterateThroughThese = new Array();
+	var IterateThroughThese = [];
 	var difficultyOffset = 2;
-	if (TheGame.Settings.Difficulty=="EASY")
+	if (TheGame.Settings.Difficulty==="EASY"){
 		difficultyOffset = 5;
-	else if (TheGame.Settings.Difficulty=="HARD")
+	}
+	else if (TheGame.Settings.Difficulty==="HARD"){
 		difficultyOffset = -2;
-	else if (TheGame.Settings.Difficulty=="LUNATIC")
+	}
+	else if (TheGame.Settings.Difficulty==="LUNATIC"){
 		difficultyOffset = -5;
+	}
 	for (j = 0; j < (Math.log(TheGame.CurrentRound+6)/Math.log(10)); j++)
 	{
 		var theValue = Math.floor(Math.random()*11-5) + difficultyOffset;
 		for (i=0; i < RandomEvents.length; i++){
-			if (RandomEvents[i][9] > 0)
+			if (RandomEvents[i][9] > 0){
 				RandomEvents[i][9] = RandomEvents[i][9] - 1;
-			if (theValue == RandomEvents[i][3]) {
+			}
+			if (theValue === RandomEvents[i][3]) {
 				if (IterateThroughThese.indexOf(RandomEvents[i]) < 0) {
 					if ((RandomEvents[i][9] <= 0) && (RandomEvents[i][7] >= Math.random())){
 						IterateThroughThese.push(RandomEvents[i]);
@@ -1103,12 +1091,14 @@ function RandomEventIterator(){
 		var Value=Event[5];
 		var Target;
 		
-		if (AreaOfEffect=="OnePlayer")
+		if (AreaOfEffect==="OnePlayer"){
 			Target=TheGame.Players[Math.floor(Math.random()*TheGame.Players.length)];
-		else
+		}
+		else{
 			Target=TheGame.Players;
+		}
 		
-		if (Action=="CashChange") {
+		if (Action==="CashChange") {
 			if (Array.isArray(Target)) {
 				Desc+="All players receive $" + Value.toString() + "!";
 				for (i = 0; i < Target.length; i++) {
@@ -1121,10 +1111,12 @@ function RandomEventIterator(){
 			}
 		}
 		else if (Action.indexOf("PayoutRateChange") > -1) {
-			if (Value < 1)
+			if (Value < 1){
 				Desc+="Revenue is reduced to " + Math.round(Value*100) + "%";
-			else
+			}
+			else{
 				Desc+="Revenue is " + Math.round((Value-1)*100) + "% more than normal";
+			}
 			if (Action.indexOf("_All") > -1) {
 				Desc+=" all around!";
 				TotalPayoutRate = Value;
@@ -1149,13 +1141,15 @@ function RandomEventIterator(){
 				}
 				Desc+=effectedCat + " products stop generating revenue for the next ";
 			}
-			if (Value > 1)
+			if (Value > 1){
 				Desc+=Value.toString() + " turns!";
-			else
-				Desc+=" turn!"
+			}
+			else{
+				Desc+=" turn!";
+			}
 		}
-		else if (Action == "AssetDestruction") {
-			var toBeRemoved = new Array();
+		else if (Action === "AssetDestruction") {
+			var toBeRemoved = [];
 			if (Array.isArray(Target)) {
 				for (i = 0; i < Target.length; i++) {
 					var numProd = 0;
@@ -1163,8 +1157,9 @@ function RandomEventIterator(){
 					if (Target[i].Products.length > 0) {
 						for (i = 0; (numProd<Value && numProd<Target.Products.length && (tries<2*Value)); i++) {
 							i=(i%(Target.Products.length));
-							if (i == 0)
+							if (i === 0){
 								tries++;
+							}
 							if ((Math.random()*2*tries)>1.5){
 								numProd++;
 								toBeRemoved.push(Target.Products[i]);
@@ -1173,8 +1168,9 @@ function RandomEventIterator(){
 					}
 				}
 				Desc+="All players have lost up to " + Value.toString() + " product";
-				if (Value != 1)
-					Desc+= "s"
+				if (Value !== 1){
+					Desc+= "s";
+				}
 				Desc+="!";
 			}
 			else {
@@ -1183,23 +1179,28 @@ function RandomEventIterator(){
 				if (Target.Products.length > 0) {
 					for (i = 0; (numProd<Value && numProd<Target.Products.length && (tries<2*Value)); i++) {
 						i=(i%(Target.Products.length));
-						if (i == 0)
+						if (i === 0){
 							tries++;
+						}
 						if ((Math.random()*2*tries)>1.5){
 							numProd++;
 							toBeRemoved.push(Target.Products[i]);
 						}
 					}
 				}
-				if (numProd > 1)
+				if (numProd > 1){
 					Desc+="Player " + Target.Name + " has lost " + numProd.toString() + " products!";
-				else if (numProd > 0)
+				}
+				else if (numProd > 0){
 					Desc+="Player " + Target.Name + " has lost a product!";
-				else
-					Desc+="Player " + Target.Name + " luckily did not lose anything!"
+				}
+				else{
+					Desc+="Player " + Target.Name + " luckily did not lose anything!";
+				}
 			}
-			if (toBeRemoved.length > 0)
+			if (toBeRemoved.length > 0){
 				removeMultipleProducts(toBeRemoved);
+			}
 		}
 		$("#EventTitle").text(Msg);
 		$("#EventDesc").text(Desc);
@@ -1208,8 +1209,9 @@ function RandomEventIterator(){
 		RandomEventsToIterate.splice(0,1);
 		UpdatePlayerDisplay();
 	}
-	else
+	else{
 		TriggeredEventIterator(TheGame.CurrentPlayer.TriggeredEvents);
+	}
 }
 
 //Function that determines a product's worth
@@ -1237,35 +1239,41 @@ function EmployeeReductionCheck(employeeType, Ply, prod){
 	var messagePart;
 	if (prod.turnsInSamePhase >= 8){
 		numLost=Math.ceil(Math.random()*3);
-		if (employeeType=="des"){
-			if (numLost > Ply.NumCreative)
+		if (employeeType==="des"){
+			if (numLost > Ply.NumCreative){
 				numLost = Ply.NumCreative;
+			}
 			Ply.NumCreative-=numLost;
 			messagePart = numLost.toString() + " of your designers just quit!";
 		}
-		else if (employeeType=="dev"){
-			if (numLost > Ply.NumDev)
+		else if (employeeType==="dev"){
+			if (numLost > Ply.NumDev){
 				numLost = Ply.NumDev;
+			}
 			Ply.NumDev-=numLost;
 			messagePart = numLost.toString() + " of your developers just quit!";
 		}
-		else if (employeeType=="tes"){
-			if (numLost > Ply.NumQA)
+		else if (employeeType==="tes"){
+			if (numLost > Ply.NumQA){
 				numLost = Ply.NumQA;
+			}
 			Ply.NumQA-=numLost;
 			messagePart = numLost.toString() + " of your testers just quit!";
 		}
-		if (numLost > 0)
+		if (numLost > 0){
 			Ply.TriggeredEvents.push(function(){
 				EventFlash();
 				TriggeredEventDisplay("Your " + prod.Name + " has been in the same phase for too long! " + messagePart, GameSounds.Event, "employeeloss");
 				UpdatePlayerDisplay();
 			});
-		else
+		}
+		else{
 			MoveItSoon(Ply, prod);
+		}
 	}
-	else
+	else{
 		MoveItSoon(Ply, prod);
+	}
 }
 //Product is so horribly broken that it gets removed from the board
 function IsItSoBadItGetsRemoved(Ply, Prod, AmountLost) {
@@ -1321,11 +1329,11 @@ function FinishGame(){
 		}else{
 			for(var j=0;j<Ply.Products.length;j++){
 				var Prod=Ply.Products[j];
-				if(Prod.Phase==ProductPhases.Maintenance && (SubCategoryAttributes[Prod.SubCategory][4] <= 0)){
+				if(Prod.Phase===ProductPhases.Maintenance && (SubCategoryAttributes[Prod.SubCategory][4] <= 0)){
 					var earnings = Math.round(getMonetaryValue(Prod)*SubCategoryAttributes[Prod.SubCategory][3]*TotalPayoutRate*(1.4-0.2*(GetDifficultyConstant(TheGame.Settings.Difficulty))));
 					if (TheGame.PatentTracker){
 						patentOwnerID = doIPayRoyalties(Prod, TheGame.PatentTracker);
-						if (patentOwnerID != -1)
+						if (patentOwnerID !== -1)
 						{
 							cashOwed = Math.round(earnings/10);
 							earnings -= cashOwed;
@@ -1357,12 +1365,12 @@ function GameOverDisplay(){
 
 //Function that ends the game.
 function GetFinalResults(){
-	var Plyr = new Object();
+	var Plyr = {};
 	
 	for(PlyNum in TheGame.Players){
 		var Ply=TheGame.Players[PlyNum];
 					
-		Plyr[PlyNum]=new Object();
+		Plyr[PlyNum]={};
 		Plyr[PlyNum].Name=Ply.Name;
 		Plyr[PlyNum].Money=Ply.Money;
 		Plyr[PlyNum].Color=Ply.Color;

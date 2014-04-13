@@ -38,6 +38,7 @@
 				Parse.User.logIn(inputUsername, inputPassword, {
 					success: function(user) {
 						alert("You have been logged in!");
+						SwitchToPage("title.html");
 					},
 					error: function(user, error) {
 						alert(error.message);

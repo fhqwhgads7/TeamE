@@ -988,7 +988,7 @@ function TryToBuyPatent(product, game)
 }
 
 function isThisCategoryPatented(prod, game){
-	return !!(game.PatentTracker.Records[(game.PatentTracker.Categories.indexOf(prod.SubCategory))][1]);
+	return (game.PatentTracker.Records[(game.PatentTracker.Categories.indexOf(prod.SubCategory))][1] !== null);
 }
 function isThisProductPatented(prod, game){
 	return game.PatentTracker.Records[(game.PatentTracker.Categories.indexOf(prod.SubCategory))][2] === prod.GlobalID;
@@ -1300,7 +1300,9 @@ function TriggeredEventDisplay(message, sound, picture) {
 //Iterates through triggered events recursively.
 function TriggeredEventIterator(TheTriggeredEvents){
 	if (TheTriggeredEvents.length > 0){
-		TheTriggeredEvents[0]();
+		if (TheTriggeredEvents[0] !== null){
+			TheTriggeredEvents[0]();
+		}
 		TheTriggeredEvents.splice(0,1);
 	}
 }

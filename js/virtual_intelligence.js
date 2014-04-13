@@ -20,11 +20,13 @@ function VI_Begin(ply){
 }
 function VI_Logic(){
 	//ToDo: CPU intelligence is currently more of an aggressiveness multiplier, rather than actual intelligence. Fix this
+	var MadeProd=false;
 	if(self.VIMemory.NumQA==0){
 		VI_Support_MoreEmployees();
 	}
 	if(self.VIMemory.Products.length==0){
 		VI_Support_NewProduct();
+		MadeProd=true;
 	}else{
 		self.VIMemory.Products.forEach(function(prod){
 			var Id;
@@ -41,8 +43,10 @@ function VI_Logic(){
 			}
 		});
 	}
-	if(Math.random()<(0.15*Vi_diff_mult)){
-		VI_Support_NewProduct();
+	if(!MadeProd){
+		if(Math.random()<(0.15*Vi_diff_mult)){
+			VI_Support_NewProduct();
+		}
 	}
 	if(Math.random()<(0.1*Vi_diff_mult)){
 		VI_Support_MoreEmployees();

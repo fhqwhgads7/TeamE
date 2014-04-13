@@ -80,6 +80,17 @@
 					$("#SFXSwitcher").css("background-image","url(../images/speaker_muted.png)");
 				}
 			}
+			
+			function PlayerStats(){
+				$("#PopupOverlay").show();
+				$("#Stats").show();	
+				StatsPop();
+			}
+			function HidePlayerStats(){
+				$("#Stats").hide();
+				$("#PopupOverlay").hide();
+				$("#PlyOneScbdBox").show();
+			}			
 		</script>
 		<style>
 			div.OptionsBox{
@@ -149,6 +160,7 @@
 	</head>
 	
 	<body onload="Initialize()">
+		<button class="Standard" onclick="PlayerStats();" style="padding:0.4em 0em;left:82px;top:2px;width:40px;font-size:8px;z-index:2">Stats</button>
 		<button class="Standard" onclick="ShowAudioSettings();" style="padding:0.4em 0em;left:2px;top:2px;width:40px;font-size:8px;z-index:2">Volume</button>
 		<button class="Standard" id="BGMSwitcher" onclick="BGMSwitch();" style="background-position: -1px -1px;background-image:url(../images/muzak_unmuted.png);padding:0em 0em;left:42px;top:2px;width:20px;font-size:14px;z-index:2"><br></button>
 		<button class="Standard" id="SFXSwitcher" onclick="SFXSwitch();" style="background-position: -1px -1px;background-image:url(../images/speaker_unmuted.png);padding:0em 0em;left:62px;top:2px;width:20px;font-size:14px;z-index:2"><br></button>
@@ -172,6 +184,24 @@
 		<div id="Background" style="position:absolute;top:0px;left:0px;width:800px;height:600px;z-index:0;">
 			<iframe src="background.html" style="top:0px;left:0px;width:100%;height:100%;background-color:rgb(128,128,128,0);" frameborder="0" allowtransparency="no" scrolling="no"></iframe>
 		</div>
+		
+		<div class="PopupOverlay" id="PopupOverlay">
+			<div class="Popup" id="Stats" style="left:10%;top:10%;width:80%;height:80%">
+							<div class="StandardText" id="StatsTitle" style="left:10%;top:5%;width:80%;height:80%">Player Stats</div>
+							<div class="StandardText" id="PlyOneStatsName" style="font-size:28px;left:10%;top:20%;width:80%;height:80">nil</div>	
+							<div class="StandardText" style="font-size:28px;left:10%;top:32%;width:80%;height:80%">Total Games Played</div>	
+							<div class="StandardText" id="TotalGamesPlayed" style="font-size:28px;left:10%;top:38%;width:80%;height:80">nil</div>							
+							<div class="StandardText" style="font-size:28px;left:10%;top:44%;width:80%;height:80%">Games Won</div>
+							<div class="StandardText" id="GamesWon" style="font-size:28px;left:10%;top:50%;width:80%;height:80%">nil</div>							
+							<div class="StandardText" style="font-size:28px;left:10%;top:56%;width:80%;height:80%">Winning Percentage</div>
+							<div class="StandardText" id="WinningPercent" style="font-size:28px;left:10%;top:62%;width:80%;height:80%">nil</div>							
+							<div class="StandardText" style="font-size:28px;left:10%;top:68%;width:80%;height:80%">Total Dollars</div>								
+							<div class="StandardText" id="TotalDollars" style="font-size:28px;left:10%;top:74%;width:80%;height:80%">nil</div>															
+                            <button class="Standard" id="StatsClose" onclick="HidePlayerStats()" style="top:87%;left:10%;width:80%;height:10%">Done</button>
+
+            </div>
+		</div>	
+		
 	</body>
 	
 </html>

@@ -126,14 +126,13 @@ function NewGameInitialize(){
 	UpdatePlayerDisplay();
 	PopulateNewProdCategories();
 	setInterval(function(){TipThink();},10);
-	if (TheGame.GameType==="Local"){
-		setInterval(function(){SaveThink();},1000);
-		localStorage.setItem("LoadingAGame", "LastSavedGame");
-	}
 	setTimeout(DisplayNewRoundEvent,1);
 	$("#MainBoard").hide();
 	setTimeout(Appear,750);
 	setTimeout(function(){
+		if (TheGame.GameType==="Local"){
+			localStorage.setItem("LoadingAGame", "LastSavedGame");
+		}
 		TheGame.CurrentPlayer.TurnInit();
 	},2000);
 
@@ -178,9 +177,6 @@ function LoadGameInitialize(gameName){
 		Elem.style.left=BOARD_WIDTH.toString()+"px";
 		Elem.innerHTML=welcomeBackMessage;
 		setInterval(function(){TipThink();},10);
-		if (TheGame.GameType==="Local"){
-			setInterval(function(){SaveThink();},1000);
-		}
 		setTimeout(function(){
 			TheGame.CurrentPlayer.TurnInit();
 		},1250);
@@ -688,10 +684,27 @@ function ResetCashDisplayPos(num){
 	Elem.css("visibility","hidden");
 }
 function PopulateScoreboard(){
-	for(PlyNum in TheGame.Players){
+	for(var PlyNum in TheGame.Players){
 		var Ply=TheGame.Players[PlyNum];
 		var Str="";
-		if(PlyNum===0){Str="PlyOne";}else if(PlyNum===1){Str="PlyTwo";}else if(PlyNum===2){Str="PlyThree";}else if(PlyNum===3){Str="PlyFour";}else if(PlyNum===4){Str="PlyFive";}else if(PlyNum===5){Str="PlySix";}
+		if (PlyNum==="0"){
+			Str="PlyOne";
+		}
+		else if (PlyNum==="1"){
+			Str="PlyTwo";
+		}
+		else if(PlyNum==="2"){
+			Str="PlyThree";
+		}
+		else if(PlyNum==="3"){
+			Str="PlyFour";
+		}
+		else if(PlyNum==="4"){
+			Str="PlyFive";
+		}
+		else if(PlyNum==="5"){
+			Str="PlySix";
+		}
 		$("#"+Str+"ScbdBox").show();
 		$("#"+Str+"ScbdBox").css("border-color",Ply.Color);
 		$("#"+Str+"ScbdName").html(Ply.Name);
@@ -711,8 +724,10 @@ function CycleTurn(){
 			NewPlyNum=0;
 			WillGo=true;
 		}
-		TheGame.CurrentPlayerNum=NewPlyNum;
-		TheGame.CurrentPlayer=TheGame.Players[TheGame.CurrentPlayerNum];
+		if (!WillGo){
+			TheGame.CurrentPlayerNum=NewPlyNum;
+			TheGame.CurrentPlayer=TheGame.Players[TheGame.CurrentPlayerNum];
+		}
 		$("#CurProdAdvanceButton").prop("disabled",true);
 		$("#CurProdRevertButton").prop("disabled",true);
 		if(CurrentlySelectedProduct){
@@ -721,6 +736,9 @@ function CycleTurn(){
 		if(WillGo){
 			DisplayNewRoundEvent();
 		}else{
+			if (TheGame.GameType==="Local"){
+				SaveThisGame("LastSavedGame");
+			}
 			if (TheGame.CurrentPlayer.Type==="Computer"){
 				$("#ControlLock").show();
 			}
@@ -888,6 +906,9 @@ function NewRoundCalc(){
 	UpdatePlayerDisplay();
 	if(CurrentlySelectedProduct){
 		UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
+	}
+	if (TheGame.GameType==="Local"){
+		SaveThisGame("LastSavedGame");
 	}
 }
 function DecrementCategoryChanges(){

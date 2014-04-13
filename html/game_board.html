@@ -40,9 +40,11 @@
 				}
 			}
 			function SaveThink(){
-				if (TheGame)
-					if (TheGame.GameState=="ACTIVE")
+				if (TheGame){
+					if (TheGame.GameState=="ACTIVE"){
 						SaveThisGame("LastSavedGame");
+					}
+				}
 			}
 			function displayNewProductDialog() {
 				$("#PopupOverlay").show();

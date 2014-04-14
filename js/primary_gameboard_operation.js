@@ -255,7 +255,7 @@ function UpdatePlayerDisplay() {
 	$("#CurPlyDsgns").html(Ply.NumCreative.toString());
 	$("#CurPlyDevs").html(Ply.NumDevs.toString());
 	$("#CurPlyTsts").html(Ply.NumQA.toString());
-	setTimeout(VisualCashAlert, 100);
+	VisualCashAlert();//setTimeout(VisualCashAlert, 100);
 }
 function PopulateNewProdCategories() {
 	var Sel = $("#NewProductCategory");
@@ -731,10 +731,8 @@ function CycleTurn() {
 			NewPlyNum = 0;
 			WillGo = true;
 		}
-		if (!WillGo) {
-			TheGame.CurrentPlayerNum = NewPlyNum;
-			TheGame.CurrentPlayer = TheGame.Players[TheGame.CurrentPlayerNum];
-		}
+		TheGame.CurrentPlayerNum = NewPlyNum;
+		TheGame.CurrentPlayer = TheGame.Players[TheGame.CurrentPlayerNum];
 		$("#CurProdAdvanceButton").prop("disabled", true);
 		$("#CurProdRevertButton").prop("disabled", true);
 		if (CurrentlySelectedProduct) {
@@ -743,9 +741,6 @@ function CycleTurn() {
 		if (WillGo) {
 			DisplayNewRoundEvent();
 		} else {
-			if (TheGame.GameType === "Local") {
-				SaveThisGame("LastSavedGame");
-			}
 			if (TheGame.CurrentPlayer.Type === "Computer") {
 				$("#ControlLock").show();
 			} else {
@@ -908,9 +903,6 @@ function NewRoundCalc() {
 	UpdatePlayerDisplay();
 	if (CurrentlySelectedProduct) {
 		UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
-	}
-	if (TheGame.GameType === "Local") {
-		SaveThisGame("LastSavedGame");
 	}
 }
 function DecrementCategoryChanges() {
@@ -1284,6 +1276,9 @@ function TriggeredEventIterator(TheTriggeredEvents) {
 		}
 		TheTriggeredEvents.splice(0, 1);
 	}
+	else if (TheGame.GameType === "Local") {
+		SaveThisGame("LastSavedGame");
+	}
 }
 
 function EventFlash() {
@@ -1300,6 +1295,8 @@ function EventFlash() {
 function FinishGame() {
 	TheGame.GameState = "COMPLETE";
 	ShowCashAlert = false;
+	$("#CurPlyBox").hide();
+	$(".Popup").hide();
 	for (var i = 0; i < TheGame.Players.length; i++) {
 		var Ply = TheGame.Players[i];
 		var Net = 0;

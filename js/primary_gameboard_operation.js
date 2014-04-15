@@ -45,28 +45,33 @@ var PhasePositions = {
 	PostDeploymentTesting : [270 + 225 * Math.cos(11 * Math.PI / 8), 270 + 225 * Math.sin(11 * Math.PI / 8)], 
 	Maintenance : [270, 270]
 };
-//Format is: Name, Initial Description, AreaOfEffect, Scale, Type, Value, Picture, Likeliness, and OccurrenceInterval (With a counter)
-//0  Name is a self-explanatory string
-//1  Initial description is what goes at the beginning of the smaller text in the random event modal.
-//2  AreaOfEffect is a string that determines whether to display to all players or one random player
-//3  Scale is an integer rating between -10 and 10, -10 being the most negative and 10 being the most positive
-//4  Type is a string that labels what kind of event it is
-//5  Value is the parameter necessary for that type of event to execute properly
-//6  Picture is a string for the suffix of the picture file name to be used. Ex. "cash" for event_cash.png. Pics themselves should be 250*250 pngs.
-//7  Likeliness is self-explanatory, but it's a decimal between 0 and 1
-//8  OccurrenceInterval is the number of turns an event has to wait before occurring again
-//9  There's also a counter to help with that. It starts at 3 for all to delay their occurrence in the game.
+function RandomEvent(newName, newMessage, newTarget, newScale, newType, newValue, newPicture, newLikeliness, newOccurrenceInterval){
+	var newRandomEvent = {};
+	newRandomEvent.ClassName="RANDOMEVENT_OBJECT";
+	newRandomEvent.Name = newName;
+	newRandomEvent.Message = newMessage;
+	newRandomEvent.Target = newTarget;
+	newRandomEvent.Scale = newScale;
+	newRandomEvent.Type = newType;
+	newRandomEvent.Value = newValue;
+	newRandomEvent.Picture = newPicture;
+	newRandomEvent.Likeliness = newLikeliness;
+	newRandomEvent.OccurrenceInterval = newOccurrenceInterval;
+	newRandomEvent.TurnsUntilActive = 3;
+	
+	return newRandomEvent;
+}
 var RandomEvents = [
-	["Tax break!", "The IRS is in a good mood!", "AllPlayers", 2, "CashChange", 750, "cash", 0.45, 12, 3],
-	["Explosion!", "A major accident has destroyed a great chunk of your area!", "OnePlayer", -5, "AssetDestruction", 2, "disaster", 0.3, 6, 3],
-	["Stock Market Plummets!", "People are scared to buy new things!", "AllPlayers", -3, "PayoutRateChange_All", 0.5, "stockcrash", 0.4, 10, 3],
-	["Video Game craze!", "A new study was released showing positive effects of gaming!", "AllPlayers", 3, "PayoutRateChange_Video Game", 1.5, "controller", 0.35, 15, 3],
-	["Cyber-security Attack!", "Could Anonymous be at it again?", "AllPlayers", -6, "CategoryShutdown_Software", 2, "cyberattack", 0.1, 5, 3],
-	["All airlines grounded!", "Authorities swear this is just protocol.", "AllPlayers", -4, "SubCategoryShutdown_Air", 1, "airport", 0.2, 20, 3],
-	["Alternative Energy!", "Yet another push for alternative energy sources is picking up steam.", "AllPlayers", 1, "PayoutRateChange_Solar", 1.1, "solarpanel", 0.7, 12, 3],
-	["Recession!", "The economy looks to be in bad shape right now.", "AllPlayers", -9, "PayoutRateChange_All", 0.1, "recession", 0.1, 40, 3],
-	["Going green!", "Whether it's for the trees or against these devices...", "AllPlayers", -1, "PayoutRateChange_Printer", 0.7, "tree", 0.8, 9, 3],
-	["Grant!", "Someone with high authority seems to like what you are doing.", "OnePlayer", 10, "CashChange", 100000, "cash", 0.2, 60, 3]
+	new RandomEvent("Tax break!", "The IRS is in a good mood!", "AllPlayers", 2, "CashChange", 750, "cash", 0.45, 12),
+	new RandomEvent("Explosion!", "A major accident has destroyed a great chunk of your area!", "OnePlayer", -5, "AssetDestruction", 2, "disaster", 0.3, 6),
+	new RandomEvent("Stock Market Plummets!", "People are scared to buy new things!", "AllPlayers", -3, "PayoutRateChange_All", 0.5, "stockcrash", 0.4, 10),
+	new RandomEvent("Video Game craze!", "A new study was released showing positive effects of gaming!", "AllPlayers", 3, "PayoutRateChange_Video Game", 1.5, "controller", 0.35, 15),
+	new RandomEvent("Cyber-security Attack!", "Could Anonymous be at it again?", "AllPlayers", -6, "CategoryShutdown_Software", 2, "cyberattack", 0.1, 5),
+	new RandomEvent("All airlines grounded!", "Authorities swear this is just protocol.", "AllPlayers", -4, "SubCategoryShutdown_Air", 1, "airport", 0.2, 20),
+	new RandomEvent("Alternative Energy!", "Yet another push for alternative energy sources is picking up steam.", "AllPlayers", 1, "PayoutRateChange_Solar", 1.1, "solarpanel", 0.7, 12),
+	new RandomEvent("Recession!", "The economy looks to be in bad shape right now.", "AllPlayers", -9, "PayoutRateChange_All", 0.1, "recession", 0.1, 40),
+	new RandomEvent("Going green!", "Whether it's for the trees or against these devices...", "AllPlayers", -1, "PayoutRateChange_Printer", 0.7, "tree", 0.8, 9),
+	new RandomEvent("Grant!", "Someone with high authority seems to like what you are doing.", "OnePlayer", 10, "CashChange", 100000, "cash", 0.2, 60)
 ];
 var ProductCategories = {
 	Energy : ["Hydroelectric", "Solar", "Fossil Fuel", "Wind"],
@@ -1044,7 +1049,7 @@ function doIPayRoyalties(product, patentTracker) {
 }
 
 function RandomEventSelector() {
-	var IterateThroughThese = [];
+	var IterateThroughThese = new Array();
 	var difficultyOffset = 2;
 	if (TheGame.Settings.Difficulty === "EASY") {
 		difficultyOffset = 5;
@@ -1056,14 +1061,14 @@ function RandomEventSelector() {
 	for (j = 0; j < (Math.log(TheGame.CurrentRound + 6) / Math.log(10)); j++) {
 		var theValue = Math.floor(Math.random() * 11 - 5) + difficultyOffset;
 		for (i = 0; i < RandomEvents.length; i++) {
-			if (RandomEvents[i][9] > 0) {
-				RandomEvents[i][9] = RandomEvents[i][9] - 1;
+			if (RandomEvents[i].TurnsUntilActive > 0) {
+				RandomEvents[i].TurnsUntilActive = RandomEvents[i].TurnsUntilActive - 1;
 			}
-			if (theValue === RandomEvents[i][3]) {
+			if (theValue === RandomEvents[i].Scale) {
 				if (IterateThroughThese.indexOf(RandomEvents[i]) < 0) {
-					if ((RandomEvents[i][9] <= 0) && (RandomEvents[i][7] >= Math.random())) {
+					if ((RandomEvents[i].TurnsUntilActive <= 0) && (RandomEvents[i].Likeliness >= Math.random())) {
 						IterateThroughThese.push(RandomEvents[i]);
-						RandomEvents[i][9] = RandomEvents[i][8];
+						RandomEvents[i].TurnsUntilActive = RandomEvents[i].OccurrenceInterval;
 					}
 				}
 			}
@@ -1077,11 +1082,11 @@ function RandomEventIterator() {
 		playSound(GameSounds.Event);
 		EventFlash();
 		var Event = RandomEventsToIterate[0];
-		var Msg = Event[0];
-		var Desc = Event[1] + " ";
-		var AreaOfEffect = Event[2];
-		var Action = Event[4];
-		var Value = Event[5];
+		var Msg = Event.Name;
+		var Desc = Event.Message + " ";
+		var AreaOfEffect = Event.Target;
+		var Action = Event.Type;
+		var Value = Event.Value;
 		var Target;
 
 		if (AreaOfEffect === "OnePlayer") {
@@ -1185,7 +1190,7 @@ function RandomEventIterator() {
 		}
 		$("#EventTitle").text(Msg);
 		$("#EventDesc").text(Desc);
-		$("#EventImage").attr('src', "../images/events/event_" + Event[6] + ".png");
+		$("#EventImage").attr('src', "../images/events/event_" + Event.Picture + ".png");
 		ShowEventDialog();
 		RandomEventsToIterate.splice(0, 1);
 		UpdatePlayerDisplay();
@@ -1295,8 +1300,7 @@ function EventFlash() {
 function FinishGame() {
 	TheGame.GameState = "COMPLETE";
 	ShowCashAlert = false;
-	$("#CurPlyBox").hide();
-	$(".Popup").hide();
+	$("#ProductWindow").hide();
 	for (var i = 0; i < TheGame.Players.length; i++) {
 		var Ply = TheGame.Players[i];
 		var Net = 0;
@@ -1322,7 +1326,6 @@ function FinishGame() {
 		Net = Net - ((BaseCosts.PayDev * Ply.NumDevs) + (BaseCosts.PayQA * Ply.NumQA) + (BaseCosts.PayCreative * Ply.NumCreative));
 		Ply.Money = Ply.Money + Net;
 	}
-	UpdatePlayerDisplay();
 	GameOverDisplay();
 }
 

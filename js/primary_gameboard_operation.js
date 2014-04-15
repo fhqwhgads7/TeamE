@@ -304,7 +304,7 @@ function createNewProduct() {
 		}, 200);
 		playSound(GameSounds.Wrong_Med);
 	}
-	$("#new-product-button").attr("disabled", (TheGame.CurrentPlayer.hasMadeProductThisTurn));
+	//$("#new-product-button").attr("disabled", (TheGame.CurrentPlayer.hasMadeProductThisTurn));
 }
 function CreateProductDisplay(prod) {
 	var GameBoard = document.getElementById("GameBoardCircle");
@@ -377,9 +377,9 @@ function removeProduct(prod) {
 		}
 		$("#ProductDisplayItem_" + prod.GlobalID).css('opacity', '0');
 		$("#ProductDisplayItem_" + prod.GlobalID).css('transition', '500ms ease-out');
-		setTimeout(function () {
+		//setTimeout(function () {
 			$("div").remove("#ProductDisplayItem_" + prod.GlobalID);
-		}, 500);
+		//}, 500);
 		if (prod.justStarted) {
 			TheGame.CurrentPlayer.hasMadeProductThisTurn = false;
 		}
@@ -1158,9 +1158,11 @@ function RandomEventIterator() {
 							if (j === 0) {
 								tries++;
 							}
-							if ((Math.random() * 2 * tries) > 3.0) {
+							if (Math.random() + tries * 0.05 > 0.85) {
 								numProd++;
-								toBeRemoved.push(Target[i].Products[j]);
+								if (toBeRemoved.indexOf(Target[i].Products[j]) <= -1){
+									toBeRemoved.push(Target[i].Products[j]);
+								}
 							}
 						}
 					}
@@ -1179,9 +1181,11 @@ function RandomEventIterator() {
 						if (i === 0) {
 							tries++;
 						}
-						if ((Math.random() * 2 * tries) > 1.5) {
+						if (Math.random() + tries * 0.05 > 0.85) {
 							numProd++;
-							toBeRemoved.push(Target.Products[i]);
+							if (toBeRemoved.indexOf(Target.Products[i]) <= -1){
+								toBeRemoved.push(Target.Products[i]);
+							}
 						}
 					}
 				}

@@ -304,7 +304,7 @@ function createNewProduct() {
 		}, 200);
 		playSound(GameSounds.Wrong_Med);
 	}
-	$("#new-product-button").attr("disabled", (TheGame.CurrentPlayer.hasMadeProductThisTurn));
+	//$("#new-product-button").attr("disabled", (TheGame.CurrentPlayer.hasMadeProductThisTurn));
 }
 function CreateProductDisplay(prod) {
 	var GameBoard = document.getElementById("GameBoardCircle");

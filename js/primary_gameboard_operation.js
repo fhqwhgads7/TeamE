@@ -66,12 +66,22 @@ var RandomEvents = [
 	new RandomEvent("Explosion!", "A major accident has destroyed a great chunk of your area!", "OnePlayer", -5, "AssetDestruction", 2, "disaster", 0.3, 6),
 	new RandomEvent("Stock Market Plummets!", "People are scared to buy new things!", "AllPlayers", -3, "PayoutRateChange_All", 0.5, "stockcrash", 0.4, 10),
 	new RandomEvent("Video Game craze!", "A new study was released showing positive effects of gaming!", "AllPlayers", 3, "PayoutRateChange_Video Game", 1.5, "controller", 0.35, 15),
+	new RandomEvent("E.T. for the Atari 2600!", "Want to know what happens when a video game is too poorly designed? A crash!", "AllPlayers", -4, "PayoutRateChange_Video Game", 0.1, "et_atari", 0.1, 60),
 	new RandomEvent("Cyber-security Attack!", "Could Anonymous be at it again?", "AllPlayers", -6, "CategoryShutdown_Software", 2, "cyberattack", 0.1, 5),
+	new RandomEvent("Smart phones are in!", "May desktops finally be out? Unlikely, but...", "AllPlayers", 0, "PayoutRateChange_Desktop", 0.6, "smartphone", 0.4, 14),
 	new RandomEvent("All airlines grounded!", "Authorities swear this is just protocol.", "AllPlayers", -4, "SubCategoryShutdown_Air", 1, "airport", 0.2, 20),
+	new RandomEvent("School's out...", "...for summer!!", "AllPlayers", 0, "SubCategoryShutdown_School", 3, "schoolsout", 0.2, 12),
+	new RandomEvent("SOLAR FLARE!", "It's caused a disruption in communication for a while!", "AllPlayers", -2, "SubCategoryShutdown_Communication", 2, "solarflare", 0.4, 30),
 	new RandomEvent("Alternative Energy!", "Yet another push for alternative energy sources is picking up steam.", "AllPlayers", 1, "PayoutRateChange_Solar", 1.1, "solarpanel", 0.7, 12),
+	new RandomEvent("Double decker couch?", "It's caused people to put more faith into the furniture market, at least.", "AllPlayers", 2, "PayoutRateChange_Furniture", 1.3, "legomoviecouch", 0.7, 24),
+	new RandomEvent("Hurricane!", "Dubbed Scrambles the Death Dealer, it is the cause of much destruction!", "AllPlayers", -7, "AssetDestruction", 4, "hurricane", 0.35, 15),
 	new RandomEvent("Recession!", "The economy looks to be in bad shape right now.", "AllPlayers", -9, "PayoutRateChange_All", 0.1, "recession", 0.1, 40),
+	new RandomEvent("HI BILLY MAYS HERE", "TO TALK TO EVERY SINGLE ONE OF YOU ABOUT HOW", "AllPlayers", 3, "PayoutRateChange_Cleaning", 1.4, "billymays", 0.1, 60),
 	new RandomEvent("Going green!", "Whether it's for the trees or against these devices...", "AllPlayers", -1, "PayoutRateChange_Printer", 0.7, "tree", 0.8, 9),
-	new RandomEvent("Grant!", "Someone with high authority seems to like what you are doing.", "OnePlayer", 10, "CashChange", 100000, "cash", 0.2, 60)
+	new RandomEvent("Refinery explosion!", "A recent disaster is serious enough to require government action!", "AllPlayers", -7, "SubCategoryShutdown_Fossil Fuel", 4, "disaster", 0.2, 4),
+	new RandomEvent("Now for meta humor!", "This web-based game is so cool it helps you win!", "AllPlayers", 8, "PayoutRateChange_Web Application", 2.0, "metajoke", 0.3, 60),
+	new RandomEvent("Grant!", "Someone with high authority seems to like what you are doing.", "OnePlayer", 10, "CashChange", 100000, "cash", 0.2, 60),
+	new RandomEvent("HOLY CRAP", "WE LANDED ON MARS!", "AllPlayers", 6, "PayoutRateChange_Space", 1.5, "mars", 0.1, 60)
 ];
 var ProductCategories = {
 	Energy : ["Hydroelectric", "Solar", "Fossil Fuel", "Wind"],
@@ -136,9 +146,6 @@ function NewGameInitialize() {
 	$("#MainBoard").hide();
 	setTimeout(Appear, 750);
 	setTimeout(function () {
-		if (TheGame.GameType === "Local") {
-			localStorage.setItem("LoadingAGame", "LastSavedGame");
-		}
 		TheGame.CurrentPlayer.TurnInit();
 	}, 2000);
 
@@ -204,6 +211,7 @@ function SaveThisGame(gameName) {
 	TheGame.RandomEvents = RandomEvents;
 	var saveMe = CircularJSON.stringify(TheGame);
 	localStorage.setItem(gameName, saveMe);
+	localStorage.setItem("LoadingAGame", gameName);
 }
 function TipThink() {
 	var Elem = document.getElementById("TipSpan");
@@ -1084,6 +1092,7 @@ function RandomEventIterator() {
 		var Event = RandomEventsToIterate[0];
 		var Msg = Event.Name;
 		var Desc = Event.Message + " ";
+		var AllCaps = (Event.Message === Event.Message.toUpperCase());
 		var AreaOfEffect = Event.Target;
 		var Action = Event.Type;
 		var Value = Event.Value;
@@ -1187,6 +1196,9 @@ function RandomEventIterator() {
 			if (toBeRemoved.length > 0) {
 				removeMultipleProducts(toBeRemoved);
 			}
+		}
+		if (AllCaps){
+			Desc = Desc.toUpperCase();
 		}
 		$("#EventTitle").text(Msg);
 		$("#EventDesc").text(Desc);

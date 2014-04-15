@@ -7,6 +7,8 @@
 		<script src="../js/shared.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
 		<script>
+			Parse.initialize("xjUxyY8bghFGuSnM3ptEZkV3BiWOlD3VhkRLt4kz", "iZCS2S7ZuWn9keMoooLaHMlB7HMXpcqD1M60JVjp");
+		
 			localStorage.setItem("BGMMute", "");
 			localStorage.setItem("SFXMute", "");
 			function Initialize(){
@@ -84,12 +86,22 @@
 			function PlayerStats(){
 				$("#PopupOverlay").show();
 				$("#Stats").show();	
-				StatsPop();
+			
 			}
 			function HidePlayerStats(){
 				$("#Stats").hide();
 				$("#PopupOverlay").hide();
 				$("#PlyOneScbdBox").show();
+			}
+			function GetStats(){
+				var FinalStats=Parse.Object.extend("FinalStats");
+				var finalStats=new FinalStats();
+		
+				var playerName=finalStats.get("playerName");
+				var gamesplayed=finalStats.get("gamesplayed");
+				var gameswon=finalStats.get("gameswon");
+				var winpercent=finalStats.get("winpercent");
+				var totaldollars=finalStats.get("totaldollars");				
 			}			
 		</script>
 		<style>

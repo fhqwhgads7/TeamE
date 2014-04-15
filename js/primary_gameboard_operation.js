@@ -1036,7 +1036,7 @@ function doIPayRoyalties(product, patentTracker) {
 	var patentOwnerID = -1;
 	var index = patentTracker.Categories.indexOf(product.SubCategory);
 
-	if ((product.Owner.GlobalID !== patentTracker.Records[index][1]) && patentTracker.Records[index][1]) {
+	if ((product.Owner.GlobalID != patentTracker.Records[index][1]) && (patentTracker.Records[index][1] !== null)) {
 		patentOwnerID = patentTracker.Records[index][1];
 	}
 

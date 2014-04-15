@@ -1153,14 +1153,14 @@ function RandomEventIterator() {
 					var numProd = 0;
 					var tries = 0;
 					if (Target[i].Products.length > 0) {
-						for (i = 0; (numProd < Value && numProd < Target.Products.length && (tries < 2 * Value)); i++) {
-							i = (i % (Target.Products.length));
-							if (i === 0) {
+						for (j = 0; ((numProd < Value) && numProd < Target[i].Products.length && (tries < 2 * Value)); j++) {
+							j = (j % (Target[i].Products.length));
+							if (j === 0) {
 								tries++;
 							}
-							if ((Math.random() * 2 * tries) > 1.5) {
+							if ((Math.random() * 2 * tries) > 3.0) {
 								numProd++;
-								toBeRemoved.push(Target.Products[i]);
+								toBeRemoved.push(Target[i].Products[j]);
 							}
 						}
 					}

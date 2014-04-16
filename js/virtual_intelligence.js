@@ -53,42 +53,49 @@ function VI_CloseThePopUps(){
 }
 function VI_Logic(){
 	//ToDo: CPU intelligence is currently more of an aggressiveness multiplier, rather than actual intelligence. Fix this
-	var MadeProd=false;
-	if(self.VIMemory.NumQA==0){
-		VI_Support_MoreEmployees();
-	}
-	if(self.VIMemory.ProductIDs.length==0){
-		VI_Support_NewProduct();
-		MadeProd=true;
-	}else{
-		self.VIMemory.ProductIDs.forEach(function(prod){
-			var Id;
-			$(".ProductDisplayItem").each(function(ind,val){
-				if($(this).attr("id").substring(19)==prod){
-					$(this).trigger("click");
-					Id=$(this).attr("id");
+	if (!ProductsBeingRemoved) {
+		var MadeProd=false;
+		if(self.VIMemory.NumQA==0){
+			VI_Support_MoreEmployees();
+		}
+		if(self.VIMemory.ProductIDs.length==0){
+			VI_Support_NewProduct();
+			MadeProd=true;
+		}else{
+			self.VIMemory.ProductIDs.forEach(function(prod){
+				var Id;
+				$(".ProductDisplayItem").each(function(ind,val){
+					if($(this).attr("id").substring(19)==prod){
+						$(this).trigger("click");
+						Id=$(this).attr("id");
+					}
+				});
+				if (Id){
+					ActionQue.push([Id,null,200]);
+				}
+				// now for product logic;
+				if(Math.random()<(0.33*Vi_diff_mult)){
+					ActionQue.push(["CurProdAdvanceButton",null,200]);
 				}
 			});
-			if (Id){
-				ActionQue.push([Id,null,200]);
-			}
-			// now for product logic;
-			if(Math.random()<(0.33*Vi_diff_mult)){
-				ActionQue.push(["CurProdAdvanceButton",null,200]);
-			}
-		});
-	}
-	if(!MadeProd && (self.VIMemory.ProductIDs.length < 9)){
-		if(Math.random()<(0.15*Vi_diff_mult)){
-			VI_Support_NewProduct();
 		}
+		if(!MadeProd && (self.VIMemory.ProductIDs.length < 9)){
+			if(Math.random()<(0.15*Vi_diff_mult)){
+				VI_Support_NewProduct();
+			}
+		}
+		if(Math.random()<(0.1*Vi_diff_mult)){
+			VI_Support_MoreEmployees();
+		}
+		setTimeout(function(){
+			VI_Execute();
+		},VI_WAIT_TIME);
 	}
-	if(Math.random()<(0.1*Vi_diff_mult)){
-		VI_Support_MoreEmployees();
+	else {
+		setTimeout(function(){
+			VI_Logic();
+		},500);
 	}
-	setTimeout(function(){
-		VI_Execute();
-	},VI_WAIT_TIME);
 }
 function VI_PerformAction(TheAction){
 	if(TheAction[0]==="FUNC_CALL"){

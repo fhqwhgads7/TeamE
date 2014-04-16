@@ -274,6 +274,7 @@ function Game(id){
 	newGame.CurrentRound=0;
 	newGame.PatentTracker=null;
 	newGame.GameType="nil";
+	newGame.RandomEvents=[];
 	newGame.Settings={
 		Difficulty:null,
 		CPUIntelligence:null,

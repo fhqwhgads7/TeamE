@@ -137,6 +137,9 @@ function NewGameInitialize() {
 	if (TheGame.Settings.PatentingEnabled === "On") {
 		TheGame.PatentTracker = new PatentTracker();
 	}
+	for (var AnEvent in RandomEvents){
+		TheGame.RandomEvents.push(jQuery.extend(true, {}, RandomEvents[AnEvent]));
+	}
 	UpdatePlayerDisplay();
 	PopulateNewProdCategories();
 	setInterval(function () {
@@ -205,10 +208,12 @@ function LoadGameInitialize(gameName) {
 			TheGame.CurrentPlayer.TurnInit();
 		}, 1250);
 	}
+	if (TheGame.CurrentPlayer.Type === "Computer") {
+		$("#ControlLock").show();
+	} 
 }
 function SaveThisGame(gameName) {
 	TheGame.SubCategoryAttributes = SubCategoryAttributes;
-	TheGame.RandomEvents = RandomEvents;
 	var saveMe = CircularJSON.stringify(TheGame);
 	localStorage.setItem(gameName, saveMe);
 	localStorage.setItem("LoadingAGame", gameName);
@@ -369,6 +374,9 @@ function removeProduct(prod) {
 	if (prod) {
 		playSound(GameSounds.LoseMoney);
 		$("#ProductWindow").hide();
+		if (prod.Owner.Type === "Computer"){
+			VI_RemoveProduct(prod.GlobalID);
+		}
 		if (isThisProductPatented(prod, TheGame)) {
 			removePatentFromRecords(prod, TheGame);
 		}
@@ -377,9 +385,9 @@ function removeProduct(prod) {
 		}
 		$("#ProductDisplayItem_" + prod.GlobalID).css('opacity', '0');
 		$("#ProductDisplayItem_" + prod.GlobalID).css('transition', '500ms ease-out');
-		//setTimeout(function () {
+		setTimeout(function () {
 			$("div").remove("#ProductDisplayItem_" + prod.GlobalID);
-		//}, 500);
+		}, 500);
 		if (prod.justStarted) {
 			TheGame.CurrentPlayer.hasMadeProductThisTurn = false;
 		}
@@ -756,7 +764,7 @@ function CycleTurn() {
 		} else {
 			if (TheGame.CurrentPlayer.Type === "Computer") {
 				$("#ControlLock").show();
-			} else {
+			} else{
 				$("#ControlLock").hide();
 			}
 			TriggeredEventIterator(TheGame.CurrentPlayer.TriggeredEvents);
@@ -1065,18 +1073,20 @@ function RandomEventSelector() {
 		difficultyOffset = -2;
 	} else if (TheGame.Settings.Difficulty === "LUNATIC") {
 		difficultyOffset = -5;
+	};
+	for (i = 0; i < TheGame.RandomEvents.length; i++) {
+		if (TheGame.RandomEvents[i].TurnsUntilActive > 0) {
+			TheGame.RandomEvents[i].TurnsUntilActive = TheGame.RandomEvents[i].TurnsUntilActive - 1;
+		}
 	}
 	for (j = 0; j < (Math.log(TheGame.CurrentRound + 6) / Math.log(10)); j++) {
 		var theValue = Math.floor(Math.random() * 11 - 5) + difficultyOffset;
-		for (i = 0; i < RandomEvents.length; i++) {
-			if (RandomEvents[i].TurnsUntilActive > 0) {
-				RandomEvents[i].TurnsUntilActive = RandomEvents[i].TurnsUntilActive - 1;
-			}
-			if (theValue === RandomEvents[i].Scale) {
-				if (IterateThroughThese.indexOf(RandomEvents[i]) < 0) {
-					if ((RandomEvents[i].TurnsUntilActive <= 0) && (RandomEvents[i].Likeliness >= Math.random())) {
-						IterateThroughThese.push(RandomEvents[i]);
-						RandomEvents[i].TurnsUntilActive = RandomEvents[i].OccurrenceInterval;
+		for (i = 0; i < TheGame.RandomEvents.length; i++) {
+			if (theValue === TheGame.RandomEvents[i].Scale) {
+				if (IterateThroughThese.indexOf(TheGame.RandomEvents[i]) < 0) {
+					if ((TheGame.RandomEvents[i].TurnsUntilActive <= 0) && (TheGame.RandomEvents[i].Likeliness >= Math.random())) {
+						IterateThroughThese.push(TheGame.RandomEvents[i]);
+						TheGame.RandomEvents[i].TurnsUntilActive = TheGame.RandomEvents[i].OccurrenceInterval;
 					}
 				}
 			}
@@ -1158,7 +1168,7 @@ function RandomEventIterator() {
 							if (j === 0) {
 								tries++;
 							}
-							if (Math.random() + tries * 0.05 > 0.85) {
+							if (Math.random() > 0.85) {
 								numProd++;
 								if (toBeRemoved.indexOf(Target[i].Products[j]) <= -1){
 									toBeRemoved.push(Target[i].Products[j]);
@@ -1181,7 +1191,7 @@ function RandomEventIterator() {
 						if (i === 0) {
 							tries++;
 						}
-						if (Math.random() + tries * 0.05 > 0.85) {
+						if (Math.random() > 0.85) {
 							numProd++;
 							if (toBeRemoved.indexOf(Target.Products[i]) <= -1){
 								toBeRemoved.push(Target.Products[i]);
@@ -1232,7 +1242,7 @@ function MoveItSoon(Ply, prod) {
 }
 
 function EmployeeReductionCheck(employeeType, Ply, prod) {
-	var numLost;
+	var numLost = 0;
 	var messagePart;
 	if (prod.turnsInSamePhase >= 8) {
 		numLost = Math.ceil(Math.random() * 3);
@@ -1270,7 +1280,7 @@ function EmployeeReductionCheck(employeeType, Ply, prod) {
 }
 
 function IsItSoBadItGetsRemoved(Ply, Prod, AmountLost) {
-	if ((AmountLost >= 1000) || (AmountLost >= getMonetaryValue(Prod))) {
+	if ((AmountLost >= getMonetaryValue(Prod))/2 || getMonetaryValue(Prod) <= 0) {
 		Ply.TriggeredEvents.push(function () {
 			EventFlash();
 			if (Prod) {
@@ -1347,7 +1357,7 @@ function FinishGame() {
 
 function GameOverDisplay() {
 	playSound(GameSounds.GameOver);
-	$("#PopupOverlay").show();
+	$("#GameOverOverlay").show();
 	$("#GameOverTitle").css("top", "200px");
 	setTimeout(function () {
 		$("#FinishGameButton").show();

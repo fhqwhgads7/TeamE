@@ -374,9 +374,6 @@ function removeProduct(prod) {
 	if (prod) {
 		playSound(GameSounds.LoseMoney);
 		$("#ProductWindow").hide();
-		if (prod.Owner.Type === "Computer"){
-			VI_RemoveProduct(prod.GlobalID);
-		}
 		if (isThisProductPatented(prod, TheGame)) {
 			removePatentFromRecords(prod, TheGame);
 		}
@@ -385,14 +382,17 @@ function removeProduct(prod) {
 		}
 		$("#ProductDisplayItem_" + prod.GlobalID).css('opacity', '0');
 		$("#ProductDisplayItem_" + prod.GlobalID).css('transition', '500ms ease-out');
+		TheGame.Players[TheGame.CurrentPlayerNum].NumProducts = TheGame.Players[TheGame.CurrentPlayerNum].Products.length;
 		setTimeout(function () {
 			$("div").remove("#ProductDisplayItem_" + prod.GlobalID);
 		}, 500);
 		if (prod.justStarted) {
 			TheGame.CurrentPlayer.hasMadeProductThisTurn = false;
 		}
+		if (prod.Owner.Type === "Computer"){
+			VI_RemoveProduct(prod.GlobalID);
+		}
 		prod.Owner.Products.splice(prod.Owner.Products.indexOf(prod), 1);
-		TheGame.Players[TheGame.CurrentPlayerNum].NumProducts = TheGame.Players[TheGame.CurrentPlayerNum].Products.length;
 		UpdatePlayerProductDisplayPosition(prod.Owner);
 		UpdatePlayerDisplay();
 	}
@@ -450,27 +450,29 @@ function UpdatePlayerProductDisplayPosition(Ply) {
 }
 
 function UpdateProductListDisplayPosition(ProdList) {
-	var angularIncrement = 2 * (Math.PI) / (ProdList.length);
-	var Magnitude = 25 * Math.log(ProdList.length) / Math.log(3);
-	var scalar = Math.pow(Math.E,  - ((ProdList.length - 1) * 0.1)).toString();
+	if (ProdList.length > 0) {
+		var angularIncrement = 2 * (Math.PI) / (ProdList.length);
+		var Magnitude = 25 * Math.log(ProdList.length) / Math.log(3);
+		var scalar = Math.pow(Math.E,  - ((ProdList.length - 1) * 0.1)).toString();
 
-	for (i = 0; i < ProdList.length; i++) {
-		TheProd = ProdList[i];
-		XOffset = Math.cos(angularIncrement * i);
-		YOffset = Math.sin(angularIncrement * i);
-		XPos = PhasePositions[TheProd.Phase][0] + XOffset * Magnitude;
-		YPos = PhasePositions[TheProd.Phase][1] + YOffset * Magnitude;
-		Rotation = Math.atan2(-XPos + PhasePositions.Maintenance[0], YPos - PhasePositions.Maintenance[1]) - Math.PI * Number((TheProd.Phase !== "Maintenance") || (ProdList.length > 1));
+		for (i = 0; i < ProdList.length; i++) {
+			TheProd = ProdList[i];
+			XOffset = Math.cos(angularIncrement * i);
+			YOffset = Math.sin(angularIncrement * i);
+			XPos = PhasePositions[TheProd.Phase][0] + XOffset * Magnitude;
+			YPos = PhasePositions[TheProd.Phase][1] + YOffset * Magnitude;
+			Rotation = Math.atan2(-XPos + PhasePositions.Maintenance[0], YPos - PhasePositions.Maintenance[1]) - Math.PI * Number((TheProd.Phase !== "Maintenance") || (ProdList.length > 1));
 
-		var ProdElem = $("#" + "ProductDisplayItem_" + TheProd.GlobalID);
-		ProdElem.css("left", (XPos.toString() + "px"));
-		ProdElem.css("top", (YPos.toString() + "px"));
-		ProdElem.css({
-			'webkit-transform' : 'scale(' + scalar + ',' + scalar + ') rotate(' + Rotation.toString() + 'rad)'
-		});
-		ProdElem.css({
-			'transform' : 'scale(' + scalar + ',' + scalar + ') rotate(' + Rotation.toString() + 'rad)'
-		});
+			var ProdElem = $("#" + "ProductDisplayItem_" + TheProd.GlobalID);
+			ProdElem.css("left", (XPos.toString() + "px"));
+			ProdElem.css("top", (YPos.toString() + "px"));
+			ProdElem.css({
+				'webkit-transform' : 'scale(' + scalar + ',' + scalar + ') rotate(' + Rotation.toString() + 'rad)'
+			});
+			ProdElem.css({
+				'transform' : 'scale(' + scalar + ',' + scalar + ') rotate(' + Rotation.toString() + 'rad)'
+			});
+		}
 	}
 }
 

@@ -33,13 +33,15 @@ function VI_CloseThePopUps(){
 	else{
 		if ($("#PopupOverlay").is(":visible")){
 			setTimeout(function(){
-				if ($("#EventDialog").is(":visible")){
-					$("#EventButton").trigger("click");
+				if (!ProductsBeingRemoved){
+					if ($("#EventDialog").is(":visible")){
+						$("#EventButton").trigger("click");
+					}
+					else if ($("#TriggerDialog").is(":visible")){
+						$("#TriggerButton").trigger("click");
+					}
 				}
-				else if ($("#TriggerDialog").is(":visible")){
-					$("#TriggerButton").trigger("click");
-				}
-				VI_CloseThePopUps();
+			VI_CloseThePopUps();
 			},1500);
 		}
 		else{
@@ -55,26 +57,28 @@ function VI_Logic(){
 	if(self.VIMemory.NumQA==0){
 		VI_Support_MoreEmployees();
 	}
-	if(self.VIMemory.Products.length==0){
+	if(self.VIMemory.ProductIDs.length==0){
 		VI_Support_NewProduct();
 		MadeProd=true;
 	}else{
-		self.VIMemory.Products.forEach(function(prod){
+		self.VIMemory.ProductIDs.forEach(function(prod){
 			var Id;
 			$(".ProductDisplayItem").each(function(ind,val){
-				$(this).trigger("click");
-				if($("#ProdDisplayName").text()==prod[0]){
+				if($(this).attr("id").substring(19)==prod){
+					$(this).trigger("click");
 					Id=$(this).attr("id");
 				}
 			});
-			ActionQue.push([Id,null,200]);
+			if (Id){
+				ActionQue.push([Id,null,200]);
+			}
 			// now for product logic;
 			if(Math.random()<(0.33*Vi_diff_mult)){
 				ActionQue.push(["CurProdAdvanceButton",null,200]);
 			}
 		});
 	}
-	if(!MadeProd){
+	if(!MadeProd && (self.VIMemory.ProductIDs.length < 9)){
 		if(Math.random()<(0.15*Vi_diff_mult)){
 			VI_Support_NewProduct();
 		}
@@ -161,16 +165,18 @@ function VI_End_Old(){
 }
 */
 function VI_Support_NewProduct(){
-	var Naem=NAEMS[Math.round(Math.random()*NAEMS.length-1)];
+	var Naem = NAEMS[Math.round(Math.random()*NAEMS.length-1)];
+	var ID = TheGame.PlayerProducts.length;
 	ActionQue.push(["new-product-button",null,200]);
 	ActionQue.push(["NewProdName",Naem,750]);
 	ActionQue.push(["FUNC_CALL",VI_Support_SetCat,150]);
 	ActionQue.push(["FUNC_CALL",VI_Support_SetSubCat,150]);
 	ActionQue.push(["CreateNewProdConfirm",null,500]);
-	self.VIMemory.Products.push([Naem,new Date().getTime(),TheGame.PlayerProducts.length]);
+	self.VIMemory.Products.push([Naem,new Date().getTime(),ID]);
+	self.VIMemory.ProductIDs.push(ID);
 }
 function VI_FindProduct(theGlobalID){
-	var index = -1;
+	/*var index = -1;
 	var i = 0;
 	
 	while (index === -1 && i < self.VIMemory.Products.length){
@@ -180,13 +186,14 @@ function VI_FindProduct(theGlobalID){
 		else{			
 			i++;
 		}
-	}
-	return index;
+	}*/
+	return self.VIMemory.ProductIDs.indexOf(theGlobalID);//index;
 }
 function VI_RemoveProduct(theGlobalID){
 	var indexOfTarget = VI_FindProduct(theGlobalID);
 	if (indexOfTarget !== -1){
-		self.VIMemory.Products.splice(indexOfTarget,1);
+		self.VIMemory.Products.splice(indexOfTarget, 1);
+		self.VIMemory.ProductIDs.splice(indexOfTarget, 1);
 	}
 }
 function VI_Support_MoreEmployees(){

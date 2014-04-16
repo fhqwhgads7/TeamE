@@ -248,6 +248,7 @@ function Player(game,name,type,color){
 	if(newPlayer.Type==="Computer"){
 		newPlayer.VIMemory={};
 		newPlayer.VIMemory.Products=[];
+		newPlayer.VIMemory.ProductIDs=[];
 		newPlayer.VIMemory.Money=2000;
 		newPlayer.VIMemory.Name=name;
 		newPlayer.VIMemory.Color=color;

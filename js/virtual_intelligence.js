@@ -22,7 +22,7 @@ function VI_Begin(ply){
 		if (TheGame.GameState === "ACTIVE") {
 			VI_CloseThePopUps();
 		}
-	},VI_WAIT_TIME);
+	},50+VI_WAIT_TIME*Number(TheGame.Players.indexOf(self)<=0));
 }
 function VI_CloseThePopUps(){
 	if ($("#QuitDialog").is(":visible")){
@@ -58,14 +58,14 @@ function VI_Logic(){
 		if(self.VIMemory.NumQA==0){
 			VI_Support_MoreEmployees();
 		}
-		if(self.VIMemory.ProductIDs.length==0){
+		if(self.Products.length<=0){
 			VI_Support_NewProduct();
 			MadeProd=true;
 		}else{
-			self.VIMemory.ProductIDs.forEach(function(prod){
+			self.Products.forEach(function(prod){
 				var Id;
 				$(".ProductDisplayItem").each(function(ind,val){
-					if($(this).attr("id").substring(19)==prod){
+					if($(this).attr("id").substring(19)==prod.GlobalID){
 						$(this).trigger("click");
 						Id=$(this).attr("id");
 					}
@@ -79,7 +79,7 @@ function VI_Logic(){
 				}
 			});
 		}
-		if(!MadeProd && (self.VIMemory.ProductIDs.length < 9)){
+		if(!MadeProd && (self.Products.length < 9)){
 			if(Math.random()<(0.15*Vi_diff_mult)){
 				VI_Support_NewProduct();
 			}
@@ -143,65 +143,13 @@ function VI_End(){
 		},500/VISpeed);
 	}
 }
-/*
-function VI_End_Old(){
-	setTimeout(function(){
-		var VISpeed=0.5*Vi_diff_mult;
-		var Time=VI_WAIT_TIME;
-		
-		ActionQue.forEach(function(action){
-			Time=Time+action[2]/VISpeed;
-			setTimeout(function(){
-				if(action[0]=="FUNC_CALL"){
-					action[1]();
-				}else{
-					if(action[1]){
-						$("#"+action[0]).val(action[1]);
-					}else{
-						$("#"+action[0]).trigger("click");
-					}
-				}
-			},Time);
-		});
-		setTimeout(function(){
-			ActionQue=[]; // wipe the action que
-			$("#EndTurnBtn").click();
-			$("#ControlLock").hide();
-		},Time+500/VISpeed);
-	},500)
-}
-*/
 function VI_Support_NewProduct(){
 	var Naem = NAEMS[Math.round(Math.random()*NAEMS.length-1)];
-	var ID = TheGame.PlayerProducts.length;
 	ActionQue.push(["new-product-button",null,200]);
 	ActionQue.push(["NewProdName",Naem,750]);
 	ActionQue.push(["FUNC_CALL",VI_Support_SetCat,150]);
 	ActionQue.push(["FUNC_CALL",VI_Support_SetSubCat,150]);
 	ActionQue.push(["CreateNewProdConfirm",null,500]);
-	self.VIMemory.Products.push([Naem,new Date().getTime(),ID]);
-	self.VIMemory.ProductIDs.push(ID);
-}
-function VI_FindProduct(theGlobalID){
-	/*var index = -1;
-	var i = 0;
-	
-	while (index === -1 && i < self.VIMemory.Products.length){
-		if (theGlobalID === self.VIMemory.Products[i][2]){
-			index = i;
-		}
-		else{			
-			i++;
-		}
-	}*/
-	return self.VIMemory.ProductIDs.indexOf(theGlobalID);//index;
-}
-function VI_RemoveProduct(theGlobalID){
-	var indexOfTarget = VI_FindProduct(theGlobalID);
-	if (indexOfTarget !== -1){
-		self.VIMemory.Products.splice(indexOfTarget, 1);
-		self.VIMemory.ProductIDs.splice(indexOfTarget, 1);
-	}
 }
 function VI_Support_MoreEmployees(){
 	var NewQA=Math.round(Math.random()*Math.random()*10*Vi_diff_mult);
@@ -220,9 +168,9 @@ function VI_Support_MoreEmployees(){
 	ActionQue.push(["EmployeeDoneButton",null,400]);
 }
 function VI_Support_SetCat(){
-	document.getElementById("NewProductCategory").selectedIndex=Math.round(Math.random(0,5));
+	document.getElementById("NewProductCategory").selectedIndex=Math.floor(Math.random()*5);
 	$("#NewProductCategory").trigger("change");
 }
 function VI_Support_SetSubCat(){
-	document.getElementById("NewProductSubCategory").selectedIndex=Math.round(Math.random(0,3));
+	document.getElementById("NewProductSubCategory").selectedIndex=Math.floor(Math.random()*3);
 }

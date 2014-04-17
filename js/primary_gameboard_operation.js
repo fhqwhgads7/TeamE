@@ -382,17 +382,15 @@ function removeProduct(prod) {
 		}
 		$("#ProductDisplayItem_" + prod.GlobalID).css('opacity', '0');
 		$("#ProductDisplayItem_" + prod.GlobalID).css('transition', '500ms ease-out');
-		TheGame.Players[TheGame.CurrentPlayerNum].NumProducts = TheGame.Players[TheGame.CurrentPlayerNum].Products.length;
 		setTimeout(function () {
 			$("div").remove("#ProductDisplayItem_" + prod.GlobalID);
 		}, 500);
 		if (prod.justStarted) {
 			TheGame.CurrentPlayer.hasMadeProductThisTurn = false;
 		}
-		if (prod.Owner.Type === "Computer"){
-			VI_RemoveProduct(prod.GlobalID);
-		}
 		prod.Owner.Products.splice(prod.Owner.Products.indexOf(prod), 1);
+		var ThePlayerAtLoss = TheGame.Players.indexOf(prod.Owner);
+		TheGame.Players[ThePlayerAtLoss].NumProducts = TheGame.Players[ThePlayerAtLoss].Products.length;
 		UpdatePlayerProductDisplayPosition(prod.Owner);
 		UpdatePlayerDisplay();
 	}

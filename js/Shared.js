@@ -20,7 +20,6 @@
 		publish key: pub-c-d3ce4b6d-4960-4db3-a8be-29709342456b
 -----------------------------------------------------------------------------*/
 function GlobalInitialize(){
-	
 	$("#ContentContainer").children().attr("disabled",true);
 	setTimeout(function(){
 		$("#ContentContainer").children().attr("disabled",false);
@@ -231,6 +230,7 @@ function Player(game,name,type,color){
 	newPlayer.LastDisplayedMoney=newPlayer.Money;
 	newPlayer.TriggeredEvents=[];
 	newPlayer.isHost=false;
+	newPlayer.FinishedCurrentTurn=false;
 	newPlayer.hasMadeProductThisTurn = false;
 	if(game){
 		newPlayer.ParentGame=game;
@@ -238,8 +238,7 @@ function Player(game,name,type,color){
 		game.NumPlayers=game.Players.length;
 		newPlayer.Number=game.NumPlayers-1;
 		newPlayer.GlobalID=newPlayer.Number;
-	}
-	else{
+	}else{
 		alert("Created player without a parent game!");
 	}
 	newPlayer.toString = function () {
@@ -285,4 +284,27 @@ function Game(id){
 		return newGame.ClassName+" "+this.ID.toString();
 	};
 	return newGame;
+}
+function Send(initiatorNum,funcNum,argBundle){
+	// [NW] this function needs to pass two integers and array (of strings) up somewhere such that they'll get pulled down and fed to Receive. InitiatorNum is THIS CLIENT'S ClientID
+	// [your code here]
+	setTimeout(function(){
+		Receive(initiatorNum+1,funcNum,argBundle);
+	},1200);
+}
+function Receive(initiatorNum,funcNum,argBundle){
+	// [NW] this function needs to be hooked somehow such that it gets two integers and array (of strings) in the format that the Send function formulates
+	var SendableFuncs=[ // [NW] these are the actions that can be networked
+		null,
+		HireTheEmployees,
+		CycleTurn,
+		PatentProduct,
+		QuitNetworkedGame,
+		ActuallyCreateNewProduct,
+		TryToAdvanceProduct,
+		TryToRevertProduct
+	];
+	if(initiatorNum!=ClientID){
+		SendableFuncs[funcNum](true,initiatorNum,argBundle);
+	}
 }

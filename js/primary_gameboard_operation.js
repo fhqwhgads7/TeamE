@@ -183,6 +183,9 @@ function LoadGameInitialize(gameName) {
 			}
 		}
 		TheGame.CurrentPlayer = TheGame.Players[TheGame.CurrentPlayerNum];
+		if(Online){
+			TheGame.CurrentPlayer=TheGame.Players[ClientID];
+		}
 		TheGame.CurrentPlayerNum = TheGame.CurrentPlayer.Number;
 		UpdatePlayerDisplay();
 		PopulateNewProdCategories();
@@ -296,12 +299,7 @@ function SelectProductCategory() {
 function createNewProduct() {
 	var nam = $("#NewProdName").val();
 	if (nam) {
-		var prod = Product(TheGame.CurrentPlayer, nam, $("#NewProductCategory option:selected").val(), $("#NewProductSubCategory option:selected").val(), TheGame.CurrentPlayer.Color);
-		prod.Phase = "Idea";
-		CreateProductDisplay(prod);
-		hideNewProductDialog();
-		playSound(GameSounds.ProductPlacement);
-		TheGame.CurrentPlayer.hasMadeProductThisTurn = true;
+		ActuallyCreateNewProduct(Online,ClientID);
 	} else {
 		$("#NewProdName").css("background-color", "red");
 		setTimeout(function () {
@@ -309,7 +307,31 @@ function createNewProduct() {
 		}, 200);
 		playSound(GameSounds.Wrong_Med);
 	}
-	$("#new-product-button").attr("disabled", (TheGame.CurrentPlayer.hasMadeProductThisTurn));
+}
+function ActuallyCreateNewProduct(online,cid,args){
+	var nam=$("#NewProdName").val();
+	var ply=TheGame.CurrentPlayer;
+	var prodCat=$("#NewProductCategory option:selected").val();
+	var subCat=$("#NewProductSubCategory option:selected").val();
+	if((online)&&(cid!=ClientID)){
+		ply=TheGame.Players[parseInt(args[0])];
+		nam=args[1];
+		prodCat=args[2];
+		subCat=args[3];
+	}
+	var prod = Product(ply, nam, prodCat, subCat, ply.Color);
+	prod.Phase = "Idea";
+	CreateProductDisplay(prod);
+	hideNewProductDialog();
+	playSound(GameSounds.ProductPlacement);
+	ply.hasMadeProductThisTurn = true;
+	if((online)&&(cid==ClientID)){
+		var Args=[cid.toString(),nam,prodCat,subCat];
+		Send(ClientID,5,Args);
+	}
+	if(cid==ClientID){
+		$("#new-product-button").attr("disabled",(ply.hasMadeProductThisTurn));
+	}
 }
 function CreateProductDisplay(prod) {
 	var GameBoard = document.getElementById("GameBoardCircle");
@@ -500,12 +522,19 @@ function InitiateEmpPopupDisplays() {
 	$("#EmpPopupDes").text(ply.NumCreative.toString());
 	$("#EmpPopupTes").text(ply.NumQA.toString());
 }
-function HireTheEmployees() {
+function HireTheEmployees(online,cid,args) {
 	var ply = TheGame.CurrentPlayer;
 	var designers = parseInt($("#EmpPopupDes").text(), 10);
 	var developers = parseInt($("#EmpPopupDev").text(), 10);
 	var testers = parseInt($("#EmpPopupTes").text(), 10);
-
+	
+	if((online)&&(cid!=ClientID)){
+		ply=TheGame.Players[cid];
+		designers=parseInt(args[1]);
+		developers=parseInt(args[2]);
+		testers=parseInt(args[3]);
+	}
+	
 	if (designers > ply.NumCreative) {
 		ply.Money -= (designers - ply.NumCreative) * BaseCosts.HireCreative;
 	}
@@ -519,6 +548,11 @@ function HireTheEmployees() {
 	ply.NumCreative = designers;
 	ply.NumDevs = developers;
 	ply.NumQA = testers;
+	
+	if((online)&&(cid==ClientID)){
+		var Args=[designers.toString(),developers.toString(),testers.toString()];
+		Send(ClientID,1,Args);
+	}
 
 	UpdatePlayerDisplay();
 }
@@ -600,77 +634,100 @@ function GetProdFromDispElemID(id) {
 	var Prod = TheGame.PlayerProducts[NewID];
 	return Prod;
 }
-function TryToAdvanceProduct() {
-	var CurPhase = CurrentlySelectedProduct.Phase;
+function TryToAdvanceProduct(online,cid,args) {
+	var prod=CurrentlySelectedProduct;
+	var ply=TheGame.CurrentPlayer;
+	if((online)&&(cid!=ClientID)){
+		prod=TheGame.PlayerProducts[parseInt(args[0])];
+		ply=TheGame.Players[cid];
+	}
+	var CurPhase = prod.Phase;
 	if (CurPhase !== ProductPhases.Maintenance) {
 		playSound(GameSounds.AdvanceProduct);
 	}
 	if (CurPhase === ProductPhases.Idea) {
-		CurrentlySelectedProduct.Phase = ProductPhases.Design;
+		prod.Phase = ProductPhases.Design;
 	} else if (CurPhase === ProductPhases.Design) {
-		CurrentlySelectedProduct.Phase = ProductPhases.Prototype;
+		prod.Phase = ProductPhases.Prototype;
 	} else if (CurPhase === ProductPhases.Prototype) {
-		TheGame.CurrentPlayer.Money = TheGame.CurrentPlayer.Money - BaseCosts.Prototype * SubCategoryAttributes[CurrentlySelectedProduct.SubCategory][1];
-		CurrentlySelectedProduct.Phase = ProductPhases.PrototypeTesting;
+		ply.Money = ply.Money - BaseCosts.Prototype * SubCategoryAttributes[prod.SubCategory][1];
+		prod.Phase = ProductPhases.PrototypeTesting;
 	} else if (CurPhase === ProductPhases.PrototypeTesting) {
-		CurrentlySelectedProduct.Phase = ProductPhases.Development;
+		prod.Phase = ProductPhases.Development;
 	} else if (CurPhase === ProductPhases.Development) {
-		CurrentlySelectedProduct.Phase = ProductPhases.PreDepTesting;
+		prod.Phase = ProductPhases.PreDepTesting;
 	} else if (CurPhase === ProductPhases.PreDepTesting) {
-		CurrentlySelectedProduct.Phase = ProductPhases.Deployment;
+		prod.Phase = ProductPhases.Deployment;
 	} else if (CurPhase === ProductPhases.Deployment) {
-		TheGame.CurrentPlayer.Money = TheGame.CurrentPlayer.Money - BaseCosts.Deployment;
-		CurrentlySelectedProduct.Phase = ProductPhases.PostDepTesting;
+		ply.Money = ply.Money - BaseCosts.Deployment;
+		prod.Phase = ProductPhases.PostDepTesting;
 	} else if (CurPhase === ProductPhases.PostDepTesting) {
-		CurrentlySelectedProduct.Phase = ProductPhases.Maintenance;
+		prod.Phase = ProductPhases.Maintenance;
 	} else if (CurPhase === ProductPhases.Maintenance) {
-		playSound(GameSounds.Wrong_Low);
+		if(cid==ClientID){playSound(GameSounds.Wrong_Low)};
 	}
 
 	//This if-block is for patenting reasons.
-	if (CurrentlySelectedProduct.isANewProduct && CurrentlySelectedProduct.Phase === ProductPhases.Maintenance) {
-		CurrentlySelectedProduct.isANewProduct = false;
+	if (prod.isANewProduct && prod.Phase === ProductPhases.Maintenance) {
+		prod.isANewProduct = false;
+	}
+	
+	if((online)&&(cid==ClientID)){
+		Args=[prod.GlobalID.toString()];
+		Send(ClientID,6,Args);
 	}
 
-	UpdateProductListDisplayPosition(GetProductsInSamePhase(CurrentlySelectedProduct));
-	UpdateProductListDisplayPosition(GetProductsInThisPhase(CurPhase, CurrentlySelectedProduct.Owner));
-	UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
+	UpdateProductListDisplayPosition(GetProductsInSamePhase(prod));
+	UpdateProductListDisplayPosition(GetProductsInThisPhase(CurPhase, prod.Owner));
+	UpdateCurProdDisplay(prod.DisplayItemID);
 	UpdatePlayerDisplay();
 }
-function TryToRevertProduct() {
-	var CurPhase = CurrentlySelectedProduct.Phase;
+function TryToRevertProduct(online,cid,args) {
+	var prod=CurrentlySelectedProduct;
+	var ply=TheGame.CurrentPlayer;
+	if((online)&&(cid!=ClientID)){
+		prod=TheGame.PlayerProducts[parseInt(args[0])];
+		ply=TheGame.Players[cid];
+	}
+	var CurPhase = prod.Phase;
 	var removeCheck = false;
 	if (CurPhase !== ProductPhases.Idea) {
-		playSound(GameSounds.MinorFail);
+		if(cid==ClientID){playSound(GameSounds.MinorFail)};
 	}
 	if (CurPhase === ProductPhases.Idea) {
-		ShowRemoveDialog();
-		removeCheck = true;
+		if(cid==ClientID){
+			ShowRemoveDialog();
+			removeCheck = true;
+		}
 	} else if (CurPhase === ProductPhases.Design) {
-		CurrentlySelectedProduct.Phase = ProductPhases.Idea;
-		CurrentlySelectedProduct.DesignStrength = 0;
+		prod.Phase = ProductPhases.Idea;
+		prod.DesignStrength = 0;
 	} else if (CurPhase === ProductPhases.Prototype) {
-		CurrentlySelectedProduct.Phase = ProductPhases.Design;
+		prod.Phase = ProductPhases.Design;
 	} else if (CurPhase === ProductPhases.PrototypeTesting) {
-		CurrentlySelectedProduct.Phase = ProductPhases.Prototype;
+		prod.Phase = ProductPhases.Prototype;
 	} else if (CurPhase === ProductPhases.Development) {
-		CurrentlySelectedProduct.Phase = ProductPhases.PrototypeTesting;
-		CurrentlySelectedProduct.BuildStrength = 0;
+		prod.Phase = ProductPhases.PrototypeTesting;
+		prod.BuildStrength = 0;
 	} else if (CurPhase === ProductPhases.PreDepTesting) {
-		CurrentlySelectedProduct.Phase = ProductPhases.Development;
+		prod.Phase = ProductPhases.Development;
 	} else if (CurPhase === ProductPhases.Deployment) {
-		CurrentlySelectedProduct.Phase = ProductPhases.PreDepTesting;
-		TheGame.CurrentPlayer.Money = TheGame.CurrentPlayer.Money - BaseCosts.Deployment / 2;
+		prod.Phase = ProductPhases.PreDepTesting;
+		ply.Money = ply.Money - BaseCosts.Deployment / 2;
 	} else if (CurPhase === ProductPhases.PostDepTesting) {
-		CurrentlySelectedProduct.Phase = ProductPhases.Deployment;
-		TheGame.CurrentPlayer.Money = TheGame.CurrentPlayer.Money - BaseCosts.Deployment / 2;
+		prod.Phase = ProductPhases.Deployment;
+		ply.Money = ply.Money - BaseCosts.Deployment / 2;
 	} else if (CurPhase === ProductPhases.Maintenance) {
-		CurrentlySelectedProduct.Phase = ProductPhases.PostDepTesting;
+		prod.Phase = ProductPhases.PostDepTesting;
+	}
+	if((online)&&(cid==ClientID)){
+		Args=[prod.GlobalID.toString()];
+		Send(ClientID,7,Args);
 	}
 	if (!removeCheck) {
-		UpdateProductListDisplayPosition(GetProductsInSamePhase(CurrentlySelectedProduct));
-		UpdateProductListDisplayPosition(GetProductsInThisPhase(CurPhase, CurrentlySelectedProduct.Owner));
-		UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
+		UpdateProductListDisplayPosition(GetProductsInSamePhase(prod));
+		UpdateProductListDisplayPosition(GetProductsInThisPhase(CurPhase, prod.Owner));
+		UpdateCurProdDisplay(prod.DisplayItemID);
 		UpdatePlayerDisplay();
 	}
 }
@@ -741,23 +798,47 @@ function PopulateScoreboard() {
 		$("#" + Str + "ScbdEmps").html(Ply.NumQA + Ply.NumDevs + Ply.NumCreative);
 	}
 }
-function CycleTurn() {
+function CycleTurn(online,cid,args) {
+	if(!online){
+		ActuallyCycleTurn(false);
+	}else{
+		TheGame.Players[cid].FinishedCurrentTurn=true;
+		if(cid==ClientID){
+			Send(ClientID,2,[]);
+		}
+		var WillCycle=true;
+		TheGame.Players.forEach(function(dude){
+			if(!dude.FinishedCurrentTurn){WillCycle=false;}
+		});
+		if(WillCycle){
+			ActuallyCycleTurn(true);
+		}
+	}
+}
+function ActuallyCycleTurn(roundOnly){
 	TheGame.CurrentPlayer.hasMadeProductThisTurn = false;
 	$("#new-product-button").attr("disabled", (TheGame.CurrentPlayer.hasMadeProductThisTurn));
 	$(".ProductDisplayItem").css("z-index", 1);
 	if (TheGame.NumPlayers > 1) {
 		var WillGo = false;
-		var NewPlyNum = TheGame.CurrentPlayerNum + 1;
-		if (NewPlyNum > (TheGame.NumPlayers - 1)) {
-			NewPlyNum = 0;
-			WillGo = true;
-		}
-		TheGame.CurrentPlayerNum = NewPlyNum;
-		TheGame.CurrentPlayer = TheGame.Players[TheGame.CurrentPlayerNum];
-		$("#CurProdAdvanceButton").prop("disabled", true);
-		$("#CurProdRevertButton").prop("disabled", true);
-		if (CurrentlySelectedProduct) {
-			UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayElemID);
+		if(!roundOnly){
+			var NewPlyNum = TheGame.CurrentPlayerNum + 1;
+			if (NewPlyNum > (TheGame.NumPlayers - 1)) {
+				NewPlyNum = 0;
+				WillGo = true;
+			}
+			TheGame.CurrentPlayerNum = NewPlyNum;
+			TheGame.CurrentPlayer = TheGame.Players[TheGame.CurrentPlayerNum];
+			$("#CurProdAdvanceButton").prop("disabled", true);
+			$("#CurProdRevertButton").prop("disabled", true);
+			if (CurrentlySelectedProduct) {
+				UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayElemID);
+			}
+		}else{
+			if (CurrentlySelectedProduct) {
+				UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayElemID);
+			}
+			WillGo=true;
 		}
 		if (WillGo) {
 			DisplayNewRoundEvent();
@@ -973,7 +1054,9 @@ function PatentTracker() {
 	return newPatentTracker;
 }
 
-function TryToBuyPatent(product, game) {
+function TryToBuyPatent() {
+	var product=CurrentlySelectedProduct;
+	var game=TheGame;
 	var cost = 2000;
 	var patentMessage = "Product " + product.Name + " was successfully patented!";
 
@@ -1002,17 +1085,29 @@ function TryToBuyPatent(product, game) {
 	} else if (!hasTheMoney) {
 		patentMessage = "You are $" + (cost - game.CurrentPlayer.Money).toString() + " short!";
 	} else {
-		game.CurrentPlayer.Money -= cost;
-		game.PatentTracker.Records[categoryIndex][1] = game.CurrentPlayer.GlobalID;
-		game.PatentTracker.Records[categoryIndex][2] = product.GlobalID;
-		game.PatentTracker.numPatents++;
-		UpdatePlayerDisplay();
-		UpdateCurProdDisplay(product.DisplayItemID);
+		PatentProduct(Online,ClientID);
 	}
 
 	return patentMessage;
 }
-
+function PatentProduct(online,cid,args){
+	var product=CurrentlySelectedProduct;
+	var ply=TheGame.CurrentPlayer;
+	if((online)&&(cid!=ClientID)){
+		product=TheGame.PlayerProducts[parseInt(args[0])];
+		ply=TheGame.Players[cid];
+	}
+	var categoryIndex = TheGame.PatentTracker.Categories.indexOf(product.SubCategory);
+	ply.Money -= cost;
+	TheGame.PatentTracker.Records[categoryIndex][1] = ply.GlobalID;
+	TheGame.PatentTracker.Records[categoryIndex][2] = product.GlobalID;
+	TheGame.PatentTracker.numPatents++;
+	if((online)&&(cid==ClientID)){
+		Send(ClientID,3,[product.GlobalID]);
+	}
+	UpdatePlayerDisplay();
+	UpdateCurProdDisplay(product.DisplayItemID);
+}
 function isThisCategoryPatented(prod, game) {
 	return (game.PatentTracker.Records[(game.PatentTracker.Categories.indexOf(prod.SubCategory))][1] !== null);
 }
@@ -1395,4 +1490,14 @@ function SwitchToFinalResults() {
 			window.location = "gameover.html";
 		}, 650);
 	}, 50);
+}
+
+function QuitNetworkedGame(online,cid){
+	if(!online){alert("what in the world...?");return;}
+	if(cid==ClientID){
+		// [NW] this client just tried to quit. Your code goes here.
+		Send(ClientID,4,[]);
+	}else{
+		// [NW] someone else tried to quit the game. cid is their GlobalID (which is the same as the ClientID on THEIR MACHINE). Your code goes here
+	}
 }

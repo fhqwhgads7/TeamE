@@ -16,9 +16,22 @@
 
 			var RotateDir=0;
 			var Rotation=0;
+			var Online=false;
+			var ClientID=0;
+			var Host=false;
 			
 			function Initialize()
 			{
+				if(localStorage.getItem("Online")){
+					Online=localStorage.getItem("Online"); // [NW] put a boolean 'true' in an object named 'Online' in this client's localStorage before the page loads to initiate online behavior. Everything depends on this var being set before any other functions call
+					if(Online){
+						ClientID=localStorage.getItem("ClientID"); // [NW] put an integer in THIS CLIENT'S localStorage that tells this client what HIS player's GlobalID is
+						Host=localStorage.getItem("Host"); // [NW] put a boolean 'true' in THIS CLIENT'S localStorage named 'Host' IF this client is the host
+					}
+				}
+				Online=true; //DEBUG
+				ClientID=0; //DEBUG
+				Host=true; //DEBUG
 				changeCurrentBGM("InGame");
 				GlobalInitialize();
 				GameInitialize();
@@ -40,6 +53,7 @@
 				}
 			}
 			function SaveThink(){
+				if(Online){return;}
 				if (TheGame){
 					if (TheGame.GameState=="ACTIVE"){
 						SaveThisGame("LastSavedGame");
@@ -63,7 +77,7 @@
 			function hideEmployeeDialog() {
 				$("#employee-dialog").hide();
 				$("#PopupOverlay").hide();
-				HireTheEmployees();
+				HireTheEmployees(Online,ClientID);
 			}
 			function ShowAllPlayers(){
 				$("#PopupOverlay").show();
@@ -75,12 +89,12 @@
 				$("#PopupOverlay").hide();
 			}
 			function EndCurrentTurn(){
-				CycleTurn();
+				CycleTurn(Online,ClientID);
 			}
 			function TryToPatentProduct(){
 				$("#PopupOverlay").show();
 				$("#PatentDialog").show();
-				PatentMessageDisplay(TryToBuyPatent(CurrentlySelectedProduct, TheGame));
+				PatentMessageDisplay(TryToBuyPatent());
 			}
 			function ClosePatentDialog(){
 				$("#PatentDialog").hide();
@@ -129,6 +143,10 @@
 				$("#QuitDialog").show();
 			}
 			function QuitGame(){
+				if(Online){
+					QuitNetworkedGame(true,ClientID);
+					return;
+				}
 				if (TheGame.GameType=="Local"){
 					SaveThisGame("LastSavedGame");
 				}
@@ -140,6 +158,12 @@
 			function CloseQuitDialog(){
 				$("#QuitDialog").hide();
 				$("#QuitOverlay").hide();
+			}
+			function UIProductAdvance(){
+				TryToAdvanceProduct(Online,ClientID);
+			}
+			function UIProductRevert(){
+				TryToRevertProduct(Online,ClientID);
 			}
 		</script>
 		<style>
@@ -280,8 +304,8 @@
 						
 						<div class="StandardText" style="text-overflow:hidden;left:6%;top:58%;font-size:8px;visibility:hidden"><span style="color:rgb(120,120,120)">Phase </span><span id="DisplayPPhase">nil</span></div>
 						<div class="StandardText" style="left:6%;top:63%;font-size:10px;visibility:hidden"><span style="color:rgb(120,120,120)">PFID </span><span id="DisplayPFID">0</span></div>
-						<button class="Standard Compact" id="CurProdAdvanceButton" style="top:66%;left:6%;height:15%;width:42%;" onmouseover="noSound()" onclick="TryToAdvanceProduct(); noSound();" disabled>Progress</button>
-						<button class="Standard Compact" id="CurProdRevertButton" style="top:66%;left:52%;height:15%;width:42%;" onmouseover="noSound()" onclick="TryToRevertProduct(); noSound();" disabled>Regress</button>
+						<button class="Standard Compact" id="CurProdAdvanceButton" style="top:66%;left:6%;height:15%;width:42%;" onmouseover="noSound()" onclick="UIProductAdvance(); noSound();" disabled>Progress</button>
+						<button class="Standard Compact" id="CurProdRevertButton" style="top:66%;left:52%;height:15%;width:42%;" onmouseover="noSound()" onclick="UIProductRevert(); noSound();" disabled>Regress</button>
 						<button class="Standard Compact" id="CurProdDetailsButton" style="top:82%;left:6%;height:15%;width:42%;" onmouseover="noSound()" onclick="ShowProductStats();" disabled>Details</button>
 						<button class="Standard Compact" id="CurProdPatentButton" style="top:82%;left:52%;height:15%;width:42%;" onmouseover="noSound()" onclick="TryToPatentProduct(); noSound();" disabled>Patent</button>
 					</div>

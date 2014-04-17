@@ -289,7 +289,7 @@ function Send(initiatorNum,funcNum,argBundle){
 	// [NW] this function needs to pass two integers and array (of strings) up somewhere such that they'll get pulled down and fed to Receive. InitiatorNum is THIS CLIENT'S ClientID
 	// [your code here]
 	setTimeout(function(){
-		Receive(initiatorNum+1,funcNum,argBundle);
+		Receive(1,funcNum,argBundle);
 	},1200);
 }
 function Receive(initiatorNum,funcNum,argBundle){

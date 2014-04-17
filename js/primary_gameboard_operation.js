@@ -530,9 +530,9 @@ function HireTheEmployees(online,cid,args) {
 	
 	if((online)&&(cid!=ClientID)){
 		ply=TheGame.Players[cid];
-		designers=parseInt(args[1]);
-		developers=parseInt(args[2]);
-		testers=parseInt(args[3]);
+		designers=parseInt(args[0]);
+		developers=parseInt(args[1]);
+		testers=parseInt(args[2]);
 	}
 	
 	if (designers > ply.NumCreative) {

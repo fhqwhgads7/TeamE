@@ -6,19 +6,14 @@
 		<script src="../js/jquery.js"></script>
 		<script src="../js/shared.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
-<script>
-		
-  
-		// other fields can be set just like with Parse.Object
-		user.set("phone", "650-555-0000");
-  
-		
-		</script>
+
 		<script>
 		Parse.initialize("xjUxyY8bghFGuSnM3ptEZkV3BiWOlD3VhkRLt4kz", "iZCS2S7ZuWn9keMoooLaHMlB7HMXpcqD1M60JVjp");
 		
 		var user = new Parse.User();
 		
+		// other fields can be set just like with Parse.Object
+		//user.set("phone", "650-555-0000");
 		
 			function Initialize()
 			{
@@ -28,51 +23,75 @@
 			{
 				SwitchToPage("title.html");
 			}
-			function CreateMPGame(){
-				alert("match hosting not implemented yet");
-			}
-			function FindGame(){
-				alert("matchmaking not implemented yet");
-			}
-			function CreateSPGame(){
-				SwitchToPage("new_game_options.html");
-			}
 			function SubmitRegistration(){
 				
 			    if ($("#Username").val().length < 6){
-					alert("Username needs to be 6 or more characters long");
+					ShowAlert("Username must be at least 6 characters long.", "fail.png");
+					playSound(GameSounds.Wrong_BAD);
 				}
 				else if ($("#Password").val().length < 6){
-					alert("Password needs to be 6 or more characters long");
-					}
+					ShowAlert("Password must be at least 6 characters long.", "fail.png");
+					playSound(GameSounds.Wrong_BAD);
+				}
 				else if ($("#Password").val().length != $("#reenterPassword").val().length){
-						alert("Passwords do not match");
-					}
-					else {
-				var inputUsername = $("#Username").val();
-				var inputPassword = $("#Password").val();
-				var inputRepeatPassword = $("#reenterPassword")
-				var inputEmail = $("#Email").val();
-				
-				user.set("username", inputUsername);
-				user.set("password", inputPassword);
-				user.set("email", inputEmail);
-				
-				user.signUp(null, {
-				  success: function(user) {
-				    // Hooray! Let them use the app now.
-				  },
-				  error: function(user, error) {
-				    // Show the error message somewhere and let the user try again.
-				    alert("Error: " + error.code + " " + error.message);
-				  }
-				});
-				
-				SwitchToPage("title.html");
-				alert("You have been successfully registered! ");
+					ShowAlert("Passwords do not match.", "fail.png");
+					playSound(GameSounds.Wrong_BAD);
+				}
+				else if (!IsValidEmailAddress($("#Email").val())){
+					ShowAlert("Invalid email address.", "fail.png");
+					playSound(GameSounds.Wrong_BAD);
+				}
+				else {
+					var inputUsername = $("#Username").val();
+					var inputPassword = $("#Password").val();
+					var inputRepeatPassword = $("#reenterPassword")
+					var inputEmail = $("#Email").val();
+					playSound(GameSounds.ButtonSelect);
+					
+					user.set("username", inputUsername);
+					user.set("password", inputPassword);
+					user.set("email", inputEmail);
+					
+					ShowAlert("Registering...", "loading_thing.gif");
+
+					user.signUp(null, {
+						success: function(user) {
+							ShowAlert("You have been successfully registered!", "success.png");
+							$("#AlertButton").attr('onclick', 'CloseAndSwitch()');
+						},
+						error: function(user, error) {
+							ShowAlert("Error: " + " " + error.message, "fail.png");
+						}
+					});
+					
+					
+				}
 			}
+			function IsValidEmailAddress(sEmail) {
+				var filter = /^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
+				return filter.test(sEmail);
 			}
-///Not done yet still working on SaveStats function
+			function ShowAlert(){
+				$("#AlertOverlay").show();
+				$("#Alerts").show();
+			}
+			function ShowAlert(message, image){
+				$("#AlertOverlay").show();
+				$("#Alerts").show();
+				$("#AlertMessage").text(message);
+				$("#AlertImage").attr('src', "../images/icons/" + image);
+			}
+			function CloseAlert() {
+				$("#AlertOverlay").hide();
+				$("#Alerts").hide();
+			}
+			function CloseAndSwitch() {
+				$("#AlertOverlay").hide();
+				$("#Alerts").hide();
+				GoBackToMainMenu();
+			}
+			
+			//Not done yet still working on SaveStats function
 		    function SaveStats(){
 				var FinalStats=Parse.Object.extend("FinalStats");
 				var finalStats=new FinalStats();
@@ -92,8 +111,8 @@
 					alert('Failed to create new object, with error code: ' + error.description);
 					}
 				});
-
 			}		
+			
 		</script>
 		<style>
 			div.OptionsBox{
@@ -154,12 +173,20 @@
 				
 				<div id="ButtonSheetOne" class="ButtonSheet" style="height:100%">
 					
-					<input type="text" id="Username" class="OneColumn" placeholder="Username" style="overflow:hidden;resize:none;top:40%;left:32%;height:5%;width:35%;"></input>
-					<input type="password" id="Password"  class="OneColumn" placeholder="Password" style="overflow:hidden;resize:none;top:47%;left:32%;height:5%;width:35%;"></input>
-					<input type="password" id="reenterPassword" input type="password" class="OneColumn" placeholder="Re-Enter Password" style="overflow:hidden;resize:none;top:54%;left:32%;height:5%;width:35%;"></input>
-					<input type="text" id="Email" class="OneColumn" placeholder="Email" style="overflow:hidden;resize:none;top:61%;left:32%;height:5%;width:35%;"></input>
-					<button class="Standard" style="left:30%;top:70%;width:40%" onclick="SubmitRegistration()">Submit</button>
-					<button class="Standard" onclick="GoBackToMainMenu()" style="left:34%;top:86%;width:32%">Main Menu</button>
+					<input type="text" id="Username" class="OneColumn" placeholder="Username" style="overflow:hidden;resize:none;top:39%;left:32%;height:5%;width:35.5%;"></input>
+					<input type="password" id="Password"  class="OneColumn" placeholder="Password" style="overflow:hidden;resize:none;top:46%;left:32%;height:5%;width:35.5%;"></input>
+					<input type="password" id="reenterPassword" input type="password" class="OneColumn" placeholder="Re-Enter Password" style="overflow:hidden;resize:none;top:53%;left:32%;height:5%;width:35.5%;"></input>
+					<input type="text" id="Email" class="OneColumn" placeholder="Email" style="overflow:hidden;resize:none;top:60%;left:32%;height:5%;width:35.5%;"></input>
+					<button class="Standard" style="left:34%;top:67%;width:32%" onclick="SubmitRegistration(); noSound();">Register</button>
+					<button class="Standard" onclick="GoBackToMainMenu()" style="left:34%;top:77%;width:32%">Main Menu</button>
+				</div>
+					
+				<div class="PopupOverlay" id="AlertOverlay">
+					<div class="Popup" id="Alerts" style="left:30%;width:40%;top:30%;height:40%">
+						<img id="AlertImage" src="../images/icons/fail.png" style="position:absolute;left:34%;top:5%;width:100px;height:100px"></img>
+						<div class="StandardText" id="AlertMessage" style="font-size:12px;margin:0px;width:100%;top:58%;">Failing...</div>															
+						<button class="Standard" id="AlertButton" onclick="CloseAlert()" style="top:70%;left:20%;width:60%">OK</button>
+					</div>
 				</div>
 				
 				</div>

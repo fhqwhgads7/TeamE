@@ -5,6 +5,7 @@
 		<Title>You're the Boss!</Title>
 		<script src="../js/jquery.js"></script>
 		<script src="../js/shared.js"></script>
+		<script src='http://code.jquery.com/jquery-migrate-1.2.1.js'></script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
 		<script>
 			//Parse.initialize("xjUxyY8bghFGuSnM3ptEZkV3BiWOlD3VhkRLt4kz", "iZCS2S7ZuWn9keMoooLaHMlB7HMXpcqD1M60JVjp");
@@ -12,6 +13,10 @@
 			localStorage.setItem("BGMMute", "");
 			localStorage.setItem("SFXMute", "");
 			function Initialize(){
+				if (!IsBrowserCompatible()){
+					$("#BrowserFailOverlay").show();
+					$("#BrowserFail").show();
+				}
 				$(":button.Standard").mouseenter( function(){
 					if (this.getAttribute("onmouseover") == null)
 						playSound(GameSounds.ButtonHover);
@@ -62,24 +67,24 @@
 				if (localStorage.getItem("BGMMute")=="Muted"){
 					localStorage.setItem("BGMMute", "");
 					$("#BGMSwitcher").attr("class","Standard");
-					$("#BGMSwitcher").css("background-image","url(../images/muzak_unmuted.png)");
+					$("#BGMSwitcher").css("background-image","url(../images/icons/muzak_unmuted.png)");
 				}
 				else{
 					localStorage.setItem("BGMMute","Muted");
 					$("#BGMSwitcher").attr("class","Muted");
-					$("#BGMSwitcher").css("background-image","url(../images/muzak_muted.png)");
+					$("#BGMSwitcher").css("background-image","url(../images/icons/muzak_muted.png)");
 				}
 			}
 			function SFXSwitch(){
 				if (localStorage.getItem("SFXMute")=="Muted"){
 					localStorage.setItem("SFXMute", "");
 					$("#SFXSwitcher").attr("class","Standard");
-					$("#SFXSwitcher").css("background-image","url(../images/speaker_unmuted.png)");
+					$("#SFXSwitcher").css("background-image","url(../images/icons/speaker_unmuted.png)");
 				}
 				else{
 					localStorage.setItem("SFXMute","Muted");
 					$("#SFXSwitcher").attr("class","Muted");
-					$("#SFXSwitcher").css("background-image","url(../images/speaker_muted.png)");
+					$("#SFXSwitcher").css("background-image","url(../images/icons/speaker_muted.png)");
 				}
 			}
 			
@@ -174,8 +179,8 @@
 	<body onload="Initialize()">
 		<button class="Standard" onclick="PlayerStats();" style="padding:0.4em 0em;left:82px;top:2px;width:40px;font-size:8px;z-index:2">Stats</button>
 		<button class="Standard" onclick="ShowAudioSettings();" style="padding:0.4em 0em;left:2px;top:2px;width:40px;font-size:8px;z-index:2">Volume</button>
-		<button class="Standard" id="BGMSwitcher" onclick="BGMSwitch();" style="background-position: -1px -1px;background-image:url(../images/muzak_unmuted.png);padding:0em 0em;left:42px;top:2px;width:20px;font-size:14px;z-index:2"><br></button>
-		<button class="Standard" id="SFXSwitcher" onclick="SFXSwitch();" style="background-position: -1px -1px;background-image:url(../images/speaker_unmuted.png);padding:0em 0em;left:62px;top:2px;width:20px;font-size:14px;z-index:2"><br></button>
+		<button class="Standard" id="BGMSwitcher" onclick="BGMSwitch();" style="background-position: -1px -1px;background-image:url(../images/icons/muzak_unmuted.png);padding:0em 0em;left:42px;top:2px;width:20px;font-size:14px;z-index:2"><br></button>
+		<button class="Standard" id="SFXSwitcher" onclick="SFXSwitch();" style="background-position: -1px -1px;background-image:url(../images/icons/speaker_unmuted.png);padding:0em 0em;left:62px;top:2px;width:20px;font-size:14px;z-index:2"><br></button>
 		<div id="AudioSettings" style="display:none;position:absolute;background-color:rgba(0,0,0,.75);top:0px;left:0px;width:800px;height:600px;z-index:5;">
 				<div class="OptionsBox" id="OptionsBox" style="left:20%;top:35%;">
 					<div class="StandardText" style="font-size:30px;left:3%;top:18%;">BGM Volume</div>
@@ -213,6 +218,15 @@
 
             </div>
 		</div>	
+		<div class="PopupOverlay" id="BrowserFailOverlay">
+			<div class="Popup" id="BrowserFail" style="z-index:999;top:30%;height:40%">
+				<div class="StandardText" id="StatsTitle" style="margin:0px;width:100%;font-size:20px;top:10%;">
+					Your browser is not fully compatible with this application. We recommend running it in one of these browsers instead:
+				</div>															
+                <button class="Standard" id="DownloadFirefox" onclick="window.location='http://www.mozilla.org/en-US/firefox/new/';" style="padding:0.4em 0em;font-size:14px;top:50%;left:10%;width:30%;height:40%"><image src="../images/icons/firefoxlogo.png" style="width:50px;height:50px"></image><br>Mozilla Firefox</button>
+                <button class="Standard" id="DownloadChrome" onclick="window.location='https://www.google.com/intl/en/chrome/browser/';" style="padding:0.4em 0em;font-size:14px;top:50%;right:10%;width:30%;height:40%"><image src="../images/icons/chromelogo.png" style="width:50px;height:50px"></image><br>Google Chrome</button>
+            </div>
+		</div>
 		
 	</body>
 	

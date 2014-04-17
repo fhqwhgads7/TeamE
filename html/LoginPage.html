@@ -14,36 +14,45 @@
 			{
 				GlobalInitialize();
 			}
-			function GoBackToMainMenu()
-			{
+			function GoBackToMainMenu() {
 				SwitchToPage("title.html");
-			}
-			function CreateMPGame(){
-				alert("match hosting not implemented yet");
-			}
-			function FindGame(){
-				alert("matchmaking not implemented yet");
-			}
-			function CreateSPGame(){
-				SwitchToPage("new_game_options.html");
-			}
-			function LoadGame(){
-				SwitchToPage("load.html");
 			}
 			function UserCheck(){
 				
 				var inputUsername = $("#Username").val();
 				var inputPassword = $("#Password").val();
+				ShowAlert("Logging in...", "loading_thing.gif");
 				
 				Parse.User.logIn(inputUsername, inputPassword, {
 					success: function(user) {
-						alert("You have been logged in!");
-						SwitchToPage("title.html");
+						//alert("You have been logged in!");
+						ShowAlert("You have been logged in!", "success.png");
+						$("#AlertButton").attr('onclick', 'CloseAndSwitch()');
 					},
 					error: function(user, error) {
-						alert(error.message);
+						//alert(error.message);
+						ShowAlert("Failed to log in: " + error.message, "fail.png");
 					}
 				});
+			}
+			function ShowAlert(){
+				$("#AlertOverlay").show();
+				$("#Alerts").show();
+			}
+			function ShowAlert(message, image){
+				$("#AlertOverlay").show();
+				$("#Alerts").show();
+				$("#AlertMessage").text(message);
+				$("#AlertImage").attr('src', "../images/icons/" + image);
+			}
+			function CloseAlert() {
+				$("#AlertOverlay").hide();
+				$("#Alerts").hide();
+			}
+			function CloseAndSwitch() {
+				$("#AlertOverlay").hide();
+				$("#Alerts").hide();
+				GoBackToMainMenu();
 			}
 		</script>
 		<style>
@@ -101,16 +110,22 @@
 	<body onload="Initialize()">
 		<div id="MainBackground">
 			<div id="ContentContainer">
-				<div class="FancyText" id="StartNewGameTitle" style="margin:0px;width:100%;top:20%;">Login</div> 
+				<div class="FancyText" id="StartNewGameTitle" style="margin:0px;width:100%;top:20%;">Log In</div> 
 				
 				<div id="ButtonSheetOne" class="ButtonSheet" style="height:100%">
 					
-					<input type="text" id="Username" class="OneColumn" placeholder="Username/Email" style="overflow:hidden;resize:none;top:45%;left:32%;height:5%;width:35%;"></input>
-					<input type="password" id="Password" class="OneColumn" placeholder="Password" style="overflow:hidden;resize:none;top:55%;left:32%;height:5%;width:35%;"></input>
-					<button class="Standard" style="left:30%;top:70%;width:40%" onclick="UserCheck()">Login</button>
-					<button class="Standard" onclick="GoBackToMainMenu()" style="left:34%;top:86%;width:32%">Main Menu</button>
+					<input type="text" id="Username" class="OneColumn" placeholder="Username/Email" style="overflow:hidden;resize:none;top:45%;left:32%;height:5%;width:35.5%;"></input>
+					<input type="password" id="Password" class="OneColumn" placeholder="Password" style="overflow:hidden;resize:none;top:55%;left:32%;height:5%;width:35.5%;"></input>
+					<button class="Standard" style="left:34%;top:65%;width:32%" onclick="UserCheck()">Log In</button>
+					<button class="Standard" onclick="GoBackToMainMenu()" style="left:34%;top:75%;width:32%">Main Menu</button>
 				</div>
-				
+					
+				<div class="PopupOverlay" id="AlertOverlay">
+					<div class="Popup" id="Alerts" style="left:30%;width:40%;top:30%;height:40%">
+						<img id="AlertImage" src="../images/icons/fail.png" style="position:absolute;left:34%;top:5%;width:100px;height:100px"></img>
+						<div class="StandardText" id="AlertMessage" style="font-size:12px;margin:0px;width:100%;top:58%;">Failing...</div>															
+						<button class="Standard" id="AlertButton" onclick="CloseAlert()" style="top:70%;left:20%;width:60%">OK</button>
+					</div>
 				</div>
 			</div>
 		</div>

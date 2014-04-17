@@ -6,23 +6,21 @@
 		<script src="../js/shared.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
 		<script src = "http://code.jquery.com/jquery-2.1.0.min.js"></script>
+		<script src='http://code.jquery.com/jquery-migrate-1.2.1.js'></script>
 	
 	<script>
 		var currentTime;
 		var currentBGM;
 		var TheBGM;
 		
-		var default_MainMenu = "../sounds/default_bgm/default_mainmenu";
-		var default_InGame = "../sounds/default_bgm/default_ingame";
-		var default_TimeRunningOut = "../sounds/default_bgm/default_timerunningout";
-		var default_FinalScores = "../sounds/default_bgm/default_finalscores";
-		
 		function Initialize()
 		{
 			currentTime = getTimeOfDay(new Date().getHours());
 			$("#OverBackground").css('background-image',$("#MainBackground").css('background-image'));
 			TheBGM = new Audio("../sounds/default_bgm/default_mainmenu.mp3");
-			setInterval(backgroundThink,1000);
+			if (IsBrowserCompatible()){
+				setInterval(backgroundThink,1000);
+			}
 			setInterval(BGMThink,50);
 		}
 		function backgroundThink()

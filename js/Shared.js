@@ -308,3 +308,16 @@ function Receive(initiatorNum,funcNum,argBundle){
 		SendableFuncs[funcNum](true,initiatorNum,argBundle);
 	}
 }
+
+/*
+	Make sure that each page that uses this next function has the following line in the head:
+	<script src='http://code.jquery.com/jquery-migrate-1.2.1.js'></script>
+*/
+function IsBrowserCompatible(){
+	var compatible = false;
+	var CompatibleBrowsers = [$.browser.webkit, $.browser.mozilla];
+	for (var i = 0; i < CompatibleBrowsers.length && !compatible; i++){
+		compatible = CompatibleBrowsers[i];
+	}
+	return compatible;
+}

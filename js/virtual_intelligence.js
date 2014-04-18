@@ -13,10 +13,10 @@ var VI_DIFFICULTY_MULT_TABLE={
 function VI_Begin(ply){
 	self=ply;
 	Vi_diff_mult=VI_DIFFICULTY_MULT_TABLE[TheGame.Settings.CPUIntelligence];
-	self.VIMemory.Money=parseInt($("#CurPlyMoney").text());
-	self.VIMemory.NumCreative=parseInt($("#CurPlyDsgns").text());
-	self.VIMemory.NumDevs=parseInt($("#CurPlyDevs").text());
-	self.VIMemory.NumQA=parseInt($("#CurPlyTsts").text());
+	self.VIMemory.Money=parseInt($("#CurPlyMoney").text(),10);
+	self.VIMemory.NumCreative=parseInt($("#CurPlyDsgns").text(),10);
+	self.VIMemory.NumDevs=parseInt($("#CurPlyDevs").text(),10);
+	self.VIMemory.NumQA=parseInt($("#CurPlyTsts").text(),10);
 	VISpeed = 0.5*Vi_diff_mult;
 	setTimeout(function(){
 		if (TheGame.GameState === "ACTIVE") {

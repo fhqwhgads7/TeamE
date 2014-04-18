@@ -320,7 +320,7 @@ function ActuallyCreateNewProduct(online,cid,args){
 	var prodCat=$("#NewProductCategory option:selected").val();
 	var subCat=$("#NewProductSubCategory option:selected").val();
 	if((online)&&(cid!=ClientID)){
-		ply=TheGame.Players[parseInt(args[0])];
+		ply=TheGame.Players[parseInt(args[0], 10)];
 		nam=args[1];
 		prodCat=args[2];
 		subCat=args[3];
@@ -536,9 +536,9 @@ function HireTheEmployees(online,cid,args) {
 	
 	if((online)&&(cid!=ClientID)){
 		ply=TheGame.Players[cid];
-		designers=parseInt(args[0]);
-		developers=parseInt(args[1]);
-		testers=parseInt(args[2]);
+		designers=parseInt(args[0], 10);
+		developers=parseInt(args[1], 10);
+		testers=parseInt(args[2], 10);
 	}
 	
 	if (designers > ply.NumCreative) {
@@ -644,7 +644,7 @@ function TryToAdvanceProduct(online,cid,args) {
 	var prod=CurrentlySelectedProduct;
 	var ply=TheGame.CurrentPlayer;
 	if((online)&&(cid!=ClientID)){
-		prod=TheGame.PlayerProducts[parseInt(args[0])];
+		prod=TheGame.PlayerProducts[parseInt(args[0], 10)];
 		ply=TheGame.Players[cid];
 	}
 	var CurPhase = prod.Phase;
@@ -692,7 +692,7 @@ function TryToRevertProduct(online,cid,args) {
 	var prod=CurrentlySelectedProduct;
 	var ply=TheGame.CurrentPlayer;
 	if((online)&&(cid!=ClientID)){
-		prod=TheGame.PlayerProducts[parseInt(args[0])];
+		prod=TheGame.PlayerProducts[parseInt(args[0], 10)];
 		ply=TheGame.Players[cid];
 	}
 	var CurPhase = prod.Phase;
@@ -1158,7 +1158,7 @@ function PatentProduct(online,cid,args){
 	var product=CurrentlySelectedProduct;
 	var ply=TheGame.CurrentPlayer;
 	if((online)&&(cid!=ClientID)){
-		product=TheGame.PlayerProducts[parseInt(args[0])];
+		product=TheGame.PlayerProducts[parseInt(args[0], 10)];
 		ply=TheGame.Players[cid];
 	}
 	var categoryIndex = TheGame.PatentTracker.Categories.indexOf(product.SubCategory);

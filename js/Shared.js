@@ -161,7 +161,7 @@ function playSound(sound){
 	}
 }
 function getTimeOfDay(x){
-	timeOfDay = "";
+	var timeOfDay = "";
     if(x>=5 && x<9) {
         $("#MainBackground").css("background-image", 'url(../images/background_morning_1.jpg)');
 		timeOfDay = "Morning";

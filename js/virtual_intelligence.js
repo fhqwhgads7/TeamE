@@ -144,7 +144,7 @@ function VI_End(){
 	}
 }
 function VI_Support_NewProduct(){
-	var Naem = NAEMS[Math.round(Math.random()*NAEMS.length-1)];
+	var Naem = NAEMS[Math.round(Math.random()*NAEMS.length)];
 	ActionQue.push(["new-product-button",null,200]);
 	ActionQue.push(["NewProdName",Naem,750]);
 	ActionQue.push(["FUNC_CALL",VI_Support_SetCat,150]);

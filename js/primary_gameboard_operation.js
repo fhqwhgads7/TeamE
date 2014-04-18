@@ -465,13 +465,15 @@ function GetProductsInThisPhase(ThisPhase, Ply) {
 
 function UpdatePlayerProductDisplayPosition(Ply) {
 	var ProductPhaseArray = [];
-	for (i = 0; i < Ply.Products.length; i++) {
-		if (ProductPhaseArray.indexOf(Ply.Products[i].Phase) <= -1) {
-			ProductPhaseArray.push(Ply.Products[i].Phase);
+	if (Ply.Products.length > 0) {
+		for (i = 0; i < Ply.Products.length; i++) {
+			if (ProductPhaseArray.indexOf(Ply.Products[i].Phase) <= -1) {
+				ProductPhaseArray.push(Ply.Products[i].Phase);
+			}
 		}
-	}
-	for (i = 0; i < ProductPhaseArray.length; i++) {
-		UpdateProductListDisplayPosition(GetProductsInThisPhase(ProductPhaseArray[i], Ply));
+		for (i = 0; i < ProductPhaseArray.length; i++) {
+			UpdateProductListDisplayPosition(GetProductsInThisPhase(ProductPhaseArray[i], Ply));
+		}
 	}
 }
 
@@ -941,6 +943,9 @@ function NewRoundCalc() {
 					if (Prod.Phase === Ply.Products[k].Phase) {
 						numOnSameSpot++;
 					}
+				}
+				if (numOnSameSpot === 0){
+					numOnSameSpot = 1;
 				}
 				if (Prod.Phase === ProductPhases.Idea) {
 					Prod.IdeaStrength = Prod.IdeaStrength + Math.ceil(SubCategoryAttributes[Prod.SubCategory][2] * 60 * (1.4 - 0.2 * (GetDifficultyConstant(TheGame.Settings.Difficulty))) / (numOnSameSpot + Prod.turnsInSamePhase));

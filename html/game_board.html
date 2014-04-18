@@ -84,7 +84,12 @@
 			function TryToPatentProduct(){
 				$("#PopupOverlay").show();
 				$("#PatentDialog").show();
-				PatentMessageDisplay(TryToBuyPatent());
+				if (Online){
+					PatentMessageDisplay(TryToBuyPatent());
+				}
+				else{
+					PatentMessageDisplay(OldTryToBuyPatent(CurrentlySelectedProduct, TheGame));
+				}
 			}
 			function ClosePatentDialog(){
 				$("#PatentDialog").hide();

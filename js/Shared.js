@@ -206,8 +206,6 @@ function Product(player,name,category,sub,color){
 		player.NumProducts=player.Products.length;
 		player.ParentGame.PlayerProducts.push(newProduct);
 		newProduct.GlobalID=player.ParentGame.PlayerProducts.length-1;
-	}else{
-		alert("Created product without an owner!");
 	}
 	newProduct.DisplayItemID="nil";
 	newProduct.toString = function () {
@@ -238,8 +236,6 @@ function Player(game,name,type,color){
 		game.NumPlayers=game.Players.length;
 		newPlayer.Number=game.NumPlayers-1;
 		newPlayer.GlobalID=newPlayer.Number;
-	}else{
-		alert("Created player without a parent game!");
 	}
 	newPlayer.toString = function () {
 		return newPlayer.ClassName+" "+newPlayer.GlobalID+": "+newPlayer.Name+", "+newPlayer.Type+", "+newPlayer.Color;

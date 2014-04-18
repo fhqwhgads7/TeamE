@@ -50,7 +50,7 @@ function RandomEvent(newName, newMessage, newTarget, newScale, newType, newValue
 	newRandomEvent.ClassName="RANDOMEVENT_OBJECT";
 	newRandomEvent.Name = newName;
 	newRandomEvent.Message = newMessage;
-	newRandomEvent.Target = newTarget;
+	newRandomEvent.AreaOfEffect = newTarget;
 	newRandomEvent.Scale = newScale;
 	newRandomEvent.Type = newType;
 	newRandomEvent.Value = newValue;
@@ -58,12 +58,13 @@ function RandomEvent(newName, newMessage, newTarget, newScale, newType, newValue
 	newRandomEvent.Likeliness = newLikeliness;
 	newRandomEvent.OccurrenceInterval = newOccurrenceInterval;
 	newRandomEvent.TurnsUntilActive = 3;
+	newRandomEvent.Target = null;
 	
 	return newRandomEvent;
 }
 var RandomEvents = [
 	new RandomEvent("Tax break!", "The IRS is in a good mood!", "AllPlayers", 2, "CashChange", 750, "cash", 0.45, 12),
-	new RandomEvent("Explosion!", "A major accident has destroyed a great chunk of your area!", "OnePlayer", -5, "AssetDestruction", 2, "disaster", 0.3, 6),
+	new RandomEvent("Explosion!", "A major accident has destroyed a great chunk of your area!", "OnePlayer", -7, "AssetDestruction", 4, "disaster", 0.2, 6),
 	new RandomEvent("Stock Market Plummets!", "People are scared to buy new things!", "AllPlayers", -3, "PayoutRateChange_All", 0.5, "stockcrash", 0.4, 10),
 	new RandomEvent("Video Game craze!", "A new study was released showing positive effects of gaming!", "AllPlayers", 3, "PayoutRateChange_Video Game", 1.5, "controller", 0.35, 15),
 	new RandomEvent("E.T. for the Atari 2600!", "Want to know what happens when a video game is too poorly designed? A crash!", "AllPlayers", -4, "PayoutRateChange_Video Game", 0.1, "et_atari", 0.1, 60),
@@ -74,7 +75,7 @@ var RandomEvents = [
 	new RandomEvent("SOLAR FLARE!", "It's caused a disruption in communication for a while!", "AllPlayers", -2, "SubCategoryShutdown_Communication", 2, "solarflare", 0.4, 30),
 	new RandomEvent("Alternative Energy!", "Yet another push for alternative energy sources is picking up steam.", "AllPlayers", 1, "PayoutRateChange_Solar", 1.1, "solarpanel", 0.7, 12),
 	new RandomEvent("Double decker couch?", "It's caused people to put more faith into the furniture market, at least.", "AllPlayers", 2, "PayoutRateChange_Furniture", 1.3, "legomoviecouch", 0.7, 24),
-	new RandomEvent("Hurricane!", "Dubbed Scrambles the Death Dealer, it is the cause of much destruction!", "AllPlayers", -7, "AssetDestruction", 4, "hurricane", 0.35, 15),
+	new RandomEvent("Hurricane!", "Dubbed Scrambles the Death Dealer, it is the cause of much destruction!", "AllPlayers", -5, "AssetDestruction", 2, "hurricane", 0.35, 15),
 	new RandomEvent("Recession!", "The economy looks to be in bad shape right now.", "AllPlayers", -9, "PayoutRateChange_All", 0.1, "recession", 0.1, 40),
 	new RandomEvent("HI BILLY MAYS HERE", "TO TALK TO EVERY SINGLE ONE OF YOU ABOUT HOW", "AllPlayers", 3, "PayoutRateChange_Cleaning", 1.4, "billymays", 0.1, 60),
 	new RandomEvent("Going green!", "Whether it's for the trees or against these devices...", "AllPlayers", -1, "PayoutRateChange_Printer", 0.7, "tree", 0.8, 9),
@@ -1062,6 +1063,44 @@ function PatentTracker() {
 	return newPatentTracker;
 }
 
+
+//This is here for unit testing purposes.
+function OldTryToBuyPatent(product, game) {
+ 	var cost = 2000;
+ 	var patentMessage = "Product " + product.Name + " was successfully patented!";
+	var categoryIndex = game.PatentTracker.Categories.indexOf(product.SubCategory);
+ 	var isPatentedAlready = isThisCategoryPatented(product, game);
+ 	var inPatentableCategory = true;
+ 	var preMaintenance = product.isANewProduct;
+ 	var wellBuiltEnough = getMonetaryValue(product) >= 1000;
+ 	var hasTheMoney = (game.CurrentPlayer.Money >= cost);
+
+ 	if (isPatentedAlready) {
+ 		patentOwner = game.PatentTracker.Records[categoryIndex][1];
+ 		if (patentOwner === game.CurrentPlayer.GlobalID) {
+ 			patentMessage = "You've already purchased a patent for this type of product!";
+ 		} else {
+ 			patentMessage = "Player " + (patentOwner + 1).toString() + ": " + game.Players[patentOwner].Name + " already has the patent for " + product.SubCategory + " products!";
+ 		}
+ 	} else if (!inPatentableCategory) {
+ 		patentMessage = product.SubCategory + "-type products cannot be patented!";
+ 	} else if (!preMaintenance) {
+ 		patentMessage = "This product has already been on the market!";
+ 	} else if (!wellBuiltEnough) {
+ 		patentMessage = "Your product isn't impressive enough just yet!";
+ 	} else if (!hasTheMoney) {
+ 		patentMessage = "You are $" + (cost - game.CurrentPlayer.Money).toString() + " short!";
+ 	} else {
+		game.CurrentPlayer.Money -= cost;
+		game.PatentTracker.Records[categoryIndex][1] = game.CurrentPlayer.GlobalID;
+		game.PatentTracker.Records[categoryIndex][2] = product.GlobalID;
+		game.PatentTracker.numPatents++;
+		UpdatePlayerDisplay();
+		UpdateCurProdDisplay(product.DisplayItemID);
+ 	}
+ 	return patentMessage;
+}
+
 function TryToBuyPatent() {
 	var product=CurrentlySelectedProduct;
 	var game=TheGame;
@@ -1098,6 +1137,7 @@ function TryToBuyPatent() {
 
 	return patentMessage;
 }
+
 function PatentProduct(online,cid,args){
 	var product=CurrentlySelectedProduct;
 	var ply=TheGame.CurrentPlayer;
@@ -1188,6 +1228,53 @@ function RandomEventSelector() {
 			if (theValue === TheGame.RandomEvents[i].Scale) {
 				if (IterateThroughThese.indexOf(TheGame.RandomEvents[i]) < 0) {
 					if ((TheGame.RandomEvents[i].TurnsUntilActive <= 0) && (TheGame.RandomEvents[i].Likeliness >= Math.random())) {
+						if (TheGame.RandomEvents[i].AreaOfEffect === "OnePlayer") {
+							TheGame.RandomEvents[i].Target = TheGame.Players[Math.floor(Math.random() * TheGame.Players.length)];
+						} else {
+							TheGame.RandomEvents[i].Target = TheGame.Players;
+						}
+						
+						if (TheGame.RandomEvents[i].Type === "AssetDestruction"){
+							TheGame.RandomEvents[i].toBeRemoved = [];
+							if (Array.isArray(TheGame.RandomEvents[i].Target)) {
+								for (var l = 0; l < TheGame.RandomEvents[i].Target.length; l++) {
+									var numProd = 0;
+									var tries = 0;
+									if (TheGame.RandomEvents[i].Target[l].Products.length > 0) {
+										for (k = 0; ((numProd < TheGame.RandomEvents[i].Value) && numProd < TheGame.RandomEvents[i].Target[l].Products.length && (tries < 2 * TheGame.RandomEvents[i].Value)); k++) {
+											k = (k % (TheGame.RandomEvents[i].Target[l].Products.length));
+											if (k === 0) {
+												tries++;
+											}
+											if (Math.random() > 0.85) {
+												numProd++;
+												if (TheGame.RandomEvents[i].toBeRemoved.indexOf(TheGame.RandomEvents[i].Target[l].Products[k].GlobalID) <= -1){
+													TheGame.RandomEvents[i].toBeRemoved.push(TheGame.RandomEvents[i].Target[l].Products[k].GlobalID);
+												}
+											}
+										}
+									}
+								}
+							}
+							else {
+								var numProd = 0;
+								var tries = 0;
+								if (TheGame.RandomEvents[i].Target.Products.length > 0) {
+									for (k = 0; (numProd < TheGame.RandomEvents[i].Value && numProd < TheGame.RandomEvents[i].Target.Products.length && (tries < 2 * TheGame.RandomEvents[i].Value)); k++) {
+										k = (k % (TheGame.RandomEvents[i].Target.Products.length));
+										if (k === 0) {
+											tries++;
+										}
+										if (Math.random() > 0.85) {
+											numProd++;
+											if (TheGame.RandomEvents[i].toBeRemoved.indexOf(TheGame.RandomEvents[i].Target.Products[k].GlobalID) <= -1){
+												TheGame.RandomEvents[i].toBeRemoved.push(TheGame.RandomEvents[i].Target.Products[k].GlobalID);
+											}
+										}
+									}
+								}
+							}
+						}
 						IterateThroughThese.push(TheGame.RandomEvents[i]);
 						TheGame.RandomEvents[i].TurnsUntilActive = TheGame.RandomEvents[i].OccurrenceInterval;
 					}
@@ -1206,16 +1293,9 @@ function RandomEventIterator() {
 		var Msg = Event.Name;
 		var Desc = Event.Message + " ";
 		var AllCaps = (Event.Message === Event.Message.toUpperCase());
-		var AreaOfEffect = Event.Target;
 		var Action = Event.Type;
 		var Value = Event.Value;
-		var Target;
-
-		if (AreaOfEffect === "OnePlayer") {
-			Target = TheGame.Players[Math.floor(Math.random() * TheGame.Players.length)];
-		} else {
-			Target = TheGame.Players;
-		}
+		var Target = Event.Target;
 
 		if (Action === "CashChange") {
 			if (Array.isArray(Target)) {
@@ -1261,47 +1341,17 @@ function RandomEventIterator() {
 			}
 		} else if (Action === "AssetDestruction") {
 			var toBeRemoved = [];
+			for (var Lost in Event.toBeRemoved){
+				toBeRemoved.push(TheGame.PlayerProducts[Event.toBeRemoved[Lost]]);
+			}
 			if (Array.isArray(Target)) {
-				for (i = 0; i < Target.length; i++) {
-					var numProd = 0;
-					var tries = 0;
-					if (Target[i].Products.length > 0) {
-						for (j = 0; ((numProd < Value) && numProd < Target[i].Products.length && (tries < 2 * Value)); j++) {
-							j = (j % (Target[i].Products.length));
-							if (j === 0) {
-								tries++;
-							}
-							if (Math.random() > 0.85) {
-								numProd++;
-								if (toBeRemoved.indexOf(Target[i].Products[j]) <= -1){
-									toBeRemoved.push(Target[i].Products[j]);
-								}
-							}
-						}
-					}
-				}
 				Desc += "All players have lost up to " + Value.toString() + " product";
 				if (Value !== 1) {
 					Desc += "s";
 				}
 				Desc += "!";
 			} else {
-				var numProd = 0;
-				var tries = 0;
-				if (Target.Products.length > 0) {
-					for (i = 0; (numProd < Value && numProd < Target.Products.length && (tries < 2 * Value)); i++) {
-						i = (i % (Target.Products.length));
-						if (i === 0) {
-							tries++;
-						}
-						if (Math.random() > 0.85) {
-							numProd++;
-							if (toBeRemoved.indexOf(Target.Products[i]) <= -1){
-								toBeRemoved.push(Target.Products[i]);
-							}
-						}
-					}
-				}
+				var numProd = toBeRemoved.length;
 				if (numProd > 1) {
 					Desc += "Player " + Target.Name + " has lost " + numProd.toString() + " products!";
 				} else if (numProd > 0) {

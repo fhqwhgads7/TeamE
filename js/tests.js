@@ -1,14 +1,14 @@
 test("new Product can be instantiated", function() {
 	var someGame = new Game();
     var newProductName = "new Product name";
-    var newProduct = Product(null, newProductName, 'Product Category', 'Product Sub-Category', 'Player Color');
+    var newProduct = new Product(null, newProductName, 'Product Category', 'Product Sub-Category', 'Player Color');
 
     ok(newProduct, "New Product was successfully created");
     equal(newProduct.Name, newProductName, "New Product object was created with expected name" );
 });
 test("new Player can be instantiated", function() {
     var newPlayerName = "new Player name";
-    var newPlayer = Product(null, newPlayerName, 'Test', 'Colorless');
+    var newPlayer = new Player(null, newPlayerName, 'Test', 'Colorless');
 
     ok(newPlayer, "New Player was successfully created");
     equal(newPlayer.Name, newPlayerName, "New Player object was created with expected name" );
@@ -27,7 +27,7 @@ test("background can actually change", function(){
 	for (i = 22; (i < 5 || i >= 22); i=(i%24)+1){
 		equal("Night", getTimeOfDay(i), "Hour is " + i.toString() + " and should return Night.");}
 });
-
+ 
 test("patenting functions work properly", function(){
 	
 	var testGame = new Game("2947");
@@ -50,13 +50,13 @@ test("patenting functions work properly", function(){
 	var categoryIndex = 0;
 	testGame.CurrentPlayer = PlayerThree;
 
-	ok(TryToBuyPatent(Product_3_1, testGame), "The function for buying patents doesn't break.");
-	ok((TryToBuyPatent(Product_3_1, testGame).indexOf("impressive enough") > -1), "This product isn't impressive enough just yet.");
+	ok(OldTryToBuyPatent(Product_3_1, testGame), "The function for buying patents doesn't break.");
+	ok((OldTryToBuyPatent(Product_3_1, testGame).indexOf("impressive enough") > -1), "This product isn't impressive enough just yet.");
 	Product_3_1.IdeaStrength=100;
 	Product_3_1.DesignStrength=100;
 	Product_3_1.BuildStrength=100;
 	PlayerThree.Money=0;
-	ok((TryToBuyPatent(Product_3_1, testGame).indexOf("short") > -1), "More money should be required.");
+	ok((OldTryToBuyPatent(Product_3_1, testGame).indexOf("short") > -1), "More money should be required.");
 	PlayerThree.Money=9015;
 	
 	//To simulate the patenting success. (The function to patent manipulates html elements, which cannot be done during unit tests.)
@@ -64,14 +64,14 @@ test("patenting functions work properly", function(){
 	testGame.PatentTracker.Records[categoryIndex][1] = PlayerThree.GlobalID;
 	testGame.PatentTracker.Records[categoryIndex][2] = Product_3_1.GlobalID;
 	
-	ok((TryToBuyPatent(Product_3_2, testGame).indexOf("You've already") > -1), "They should already have this patent.");
+	ok((OldTryToBuyPatent(Product_3_2, testGame).indexOf("You've already") > -1), "They should already have this patent.");
 	
 	//Player One's turn
 	testGame.CurrentPlayer = PlayerOne;
 	
-	ok(TryToBuyPatent(Product_1_2, testGame), "Still no breaking.");
-	ok((TryToBuyPatent(Product_1_2, testGame).indexOf("impressive enough") > -1), "This product isn't impressive enough just yet.");
-	ok((TryToBuyPatent(Product_1_1, testGame).indexOf("already has the patent") > -1), "Player Three beat Player One to the punch.");
+	ok(OldTryToBuyPatent(Product_1_2, testGame), "Still no breaking.");
+	ok((OldTryToBuyPatent(Product_1_2, testGame).indexOf("impressive enough") > -1), "This product isn't impressive enough just yet.");
+	ok((OldTryToBuyPatent(Product_1_1, testGame).indexOf("already has the patent") > -1), "Player Three beat Player One to the punch.");
 	
 	//Simulating Player One patenting their dinky little key holder
 	categoryIndex = testGame.PatentTracker.Categories.indexOf(Product_1_2.SubCategory);
@@ -82,9 +82,9 @@ test("patenting functions work properly", function(){
 	//Player Two's turn.
 	testGame.CurrentPlayer = PlayerTwo;
 	
-	ok(TryToBuyPatent(Product_2_2, testGame), "Still no breaking.");
+	ok(OldTryToBuyPatent(Product_2_2, testGame), "Still no breaking.");
 	Product_2_2.isANewProduct = false; //Not a new product.
-	ok((TryToBuyPatent(Product_2_2, testGame).indexOf("on the market") > -1), "This product was on the market and shouldn't be patented.");
+	ok((OldTryToBuyPatent(Product_2_2, testGame).indexOf("on the market") > -1), "This product was on the market and shouldn't be patented.");
 	
 	
 	//ROYAL TESTS

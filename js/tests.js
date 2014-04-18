@@ -97,3 +97,10 @@ test("patenting functions work properly", function(){
 	equal(doIPayRoyalties(Product_3_3, testGame.PatentTracker), PlayerOne.GlobalID, "Player One gets royalties.");
 	
 });
+
+test("the VI initializes properly and knows its own name",function(){
+	var Gaem=new Game("0099");
+	var Ply=new Player(Gaem,"Test_Player","Computer","Red");
+	ok(Ply.VIMemory,"VI never initialized");
+	ok(Ply.VIMemory.Name=="Test_Player","VI doesn't know its name");
+});

@@ -1010,9 +1010,25 @@ function NewRoundCalc() {
 	} else {
 		$("#ControlLock").hide();
 	}
-	RandomEventIterator();
+	if(!Online){
+		RandomEventIterator();
+	}else if(Host){
+		RandomEventIterator();
+		var Vents=JSON.stringify(RandomEventsToIterate);
+		Send(ClientID,8,Vents);
+	}
 	UpdatePlayerDisplay();
 	if (CurrentlySelectedProduct) {
+		UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
+	}
+}
+function RandomEventsGo(online,cid,args){
+	if(!online){alert("you cant do this");return;}
+	if(cid==ClientID){alert("don't do this");return;}
+	RandomEventsToIterate=JSON.parse(args[0]);
+	RandomEventIterator();
+	UpdatePlayerDisplay();
+	if(CurrentlySelectedProduct){
 		UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
 	}
 }

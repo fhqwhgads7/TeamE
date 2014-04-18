@@ -19,6 +19,18 @@
 		subscribe key: sub-c-52dd673e-b2ba-11e3-aab4-02ee2ddab7fe
 		publish key: pub-c-d3ce4b6d-4960-4db3-a8be-29709342456b
 -----------------------------------------------------------------------------*/
+/*
+	Make sure that each page that uses this next function has the following line in the head:
+	<script src='http://code.jquery.com/jquery-migrate-1.2.1.js'></script>
+*/
+function IsBrowserCompatible(){
+	var compatible = false;
+	var CompatibleBrowsers = [$.browser.webkit, $.browser.mozilla];
+	for (var i = 0; i < CompatibleBrowsers.length && !compatible; i++){
+		compatible = CompatibleBrowsers[i];
+	}
+	return compatible;
+}
 function GlobalInitialize(){
 	$("#ContentContainer").children().attr("disabled",true);
 	setTimeout(function(){
@@ -297,12 +309,12 @@ function Game(id){
 	also these things need to be set
 	localStorage.setItem("Online",true)
 	localStorage.setItem("Host",true) //ONLY set this to true ON THE CLIENT who is the host
-	localStorage.setItem("ClientID",0) //this needs to be set as a unique number on every client's machine AND the number must correspond to THAT CLIENT'S PLAYER'S index in the game object's Players array. The player's GlobalID. Yes, the player objects don't exist yet, but their order simply follows the order of their indices in the game object. So just order the clients in accordance with their players' order in the game startup info object, starting at index 0
+	localStorage.setItem("ClientID",0) //this needs to be set as a unique number on every client's machine AND the number must correspond to THAT CLIENT'S PLAYER'S index in the game object's Players array. The player's GlobalID. Yes, the player objects don't exist yet, but their order simply follows the order of their indices in the game object. So just order the clients in accordance with their players' order in the game startup info object, starting at index 0 (PlyOne will become the player with GlobalID 0)
 
 	then, you can just push them to the game_board page and they will load up everything fine from the localStorage items
 -*/
 function Send(initiatorNum,funcNum,argBundle){
-	// [NW] this function needs to pass two integers and array (of strings) up somewhere such that they'll get pulled down and fed to Receive. InitiatorNum is THIS CLIENT'S ClientID
+	// [NW] this function needs to pass two integers and array (of strings) up somewhere such that they'll get pulled down and fed to Receive. InitiatorNum is THIS CLIENT'S (the sender or initiator) ClientID
 	// [your code here]
 }
 function Receive(initiatorNum,funcNum,argBundle){
@@ -315,22 +327,10 @@ function Receive(initiatorNum,funcNum,argBundle){
 		QuitNetworkedGame,
 		ActuallyCreateNewProduct,
 		TryToAdvanceProduct,
-		TryToRevertProduct
+		TryToRevertProduct,
+		RandomEventsGo
 	];
 	if(initiatorNum!=ClientID){
 		SendableFuncs[funcNum](true,initiatorNum,argBundle);
 	}
-}
-
-/*
-	Make sure that each page that uses this next function has the following line in the head:
-	<script src='http://code.jquery.com/jquery-migrate-1.2.1.js'></script>
-*/
-function IsBrowserCompatible(){
-	var compatible = false;
-	var CompatibleBrowsers = [$.browser.webkit, $.browser.mozilla];
-	for (var i = 0; i < CompatibleBrowsers.length && !compatible; i++){
-		compatible = CompatibleBrowsers[i];
-	}
-	return compatible;
 }

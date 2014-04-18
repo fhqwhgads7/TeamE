@@ -5,6 +5,13 @@
 		You have to go up one level in order to access files from other folders.
 		.. = One folder up from the current folder.
 		-->
+		<script type="text/javascript">
+			var RotateDir=0;
+			var Rotation=0;
+			var Online=false;
+			var ClientID=0;
+			var Host=false;
+		</script>
 		<script src="../js/jquery.js"></script>
 		<script src="../js/shared.js"></script>
 		<script src="../js/CircularJSON.js"></script>
@@ -13,25 +20,8 @@
 		<script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
 		<script type="text/javascript">
-
-			var RotateDir=0;
-			var Rotation=0;
-			var Online=false;
-			var ClientID=0;
-			var Host=false;
-			
 			function Initialize()
 			{
-				if(localStorage.getItem("Online")){
-					Online=localStorage.getItem("Online"); // [NW] put a boolean 'true' in an object named 'Online' in this client's localStorage before the page loads to initiate online behavior. Everything depends on this var being set before any other functions call
-					if(Online){
-						ClientID=localStorage.getItem("ClientID"); // [NW] put an integer in THIS CLIENT'S localStorage that tells this client what HIS player's GlobalID is
-						Host=localStorage.getItem("Host"); // [NW] put a boolean 'true' in THIS CLIENT'S localStorage named 'Host' IF this client is the host
-					}
-				}
-				Online=true; //DEBUG
-				ClientID=0; //DEBUG
-				Host=true; //DEBUG
 				changeCurrentBGM("InGame");
 				GlobalInitialize();
 				GameInitialize();

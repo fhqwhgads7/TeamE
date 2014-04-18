@@ -285,12 +285,29 @@ function Game(id){
 	};
 	return newGame;
 }
+// [NW] Ryan: in order to start a new game on everyone's client, put these things into each client's localStorage
+/*-
+	1. an object with the following attributes, and its name in local storage must be "TheBrandNewGame"
+	TheBrandNewGame.Options=new Object();
+	TheBrandNewGame.Options.GameDifficulty= //string, EASY NORMAL HARD LUNATIC
+	TheBrandNewGame.Options.CPUIntelligence= //string, BEGINNER STANDARD EXPERT LUNATIC
+	TheBrandNewGame.Options.NumberOfRounds= //integer
+	TheBrandNewGame.Options.PatentingEnabled= //boolean
+	TheBrandNewGame.Players.["PlyOne"]=new Object();
+	TheBrandNewGame.Players.["PlyOne"].Name= //string
+	TheBrandNewGame.Players.["PlyOne"].Type= //string, Player Computer
+	TheBrandNewGame.Players.["PlyOne"].Color= //string
+	continue with more players, PlyOne becoming PlyTwo and so on
+	also these things need to be set
+	localStorage.setItem("Online",true)
+	localStorage.setItem("Host",true) //ONLY set this to true ON THE CLIENT who is the host
+	localStorage.setItem("ClientID",0) //this needs to be set as a unique number on every client's machine AND the number must correspond to THAT CLIENT'S PLAYER'S index in the game object's Players array. The player's GlobalID. Yes, the player objects don't exist yet, but their order simply follows the order of their indices in the game object. So just order the clients in accordance with their players' order in the game startup info object, starting at index 0
+
+	then, you can just push them to the game_board page and they will load up everything fine from the localStorage items
+-*/
 function Send(initiatorNum,funcNum,argBundle){
 	// [NW] this function needs to pass two integers and array (of strings) up somewhere such that they'll get pulled down and fed to Receive. InitiatorNum is THIS CLIENT'S ClientID
 	// [your code here]
-	setTimeout(function(){
-		Receive(1,funcNum,argBundle);
-	},1200);
 }
 function Receive(initiatorNum,funcNum,argBundle){
 	// [NW] this function needs to be hooked somehow such that it gets two integers and array (of strings) in the format that the Send function formulates

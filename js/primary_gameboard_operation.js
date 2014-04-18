@@ -132,6 +132,9 @@ function NewGameInitialize() {
 	var GameCreationInfo = JSON.parse(localStorage.getItem("TheBrandNewGame"));
 	TheGame = new Game("2947");
 	TransferGameStartupInfo(GameCreationInfo, TheGame);
+	if(Online){
+		TheGame.CurrentPlayerNum=ClientID;
+	}
 	TheGame.CurrentPlayer = TheGame.Players[TheGame.CurrentPlayerNum];
 	TheGame.CurrentPlayerNum = TheGame.CurrentPlayer.Number;
 	if (TheGame.Settings.PatentingEnabled === "On") {
@@ -183,9 +186,6 @@ function LoadGameInitialize(gameName) {
 			}
 		}
 		TheGame.CurrentPlayer = TheGame.Players[TheGame.CurrentPlayerNum];
-		if(Online){
-			TheGame.CurrentPlayer=TheGame.Players[ClientID];
-		}
 		TheGame.CurrentPlayerNum = TheGame.CurrentPlayer.Number;
 		UpdatePlayerDisplay();
 		PopulateNewProdCategories();
@@ -245,6 +245,11 @@ function TransferGameStartupInfo(from, to) {
 	to.Settings.PatentingEnabled = from.Options.PatentingEnabled;
 	to.Settings.NumberOfRounds = from.Options.NumberOfRounds;
 	to.GameType = from.GameType;
+	Online=(to.GameType=="Online");
+	if(Online){
+		Host=localStorage.getItem("Host");
+		ClientID=localStorage.getItem("ClientID");
+	}
 }
 function GetDifficultyConstant(difficulty) {
 	var returnValue = 0;
@@ -864,6 +869,9 @@ function ActuallyCycleTurn(roundOnly){
 	}, 1250);
 }
 function DisplayNewRoundEvent() {
+	TheGame.Players.forEach(function(ply){
+		ply.FinishedCurrentTurn=false;
+	});
 	$("#ControlLock").hide();
 	var Num = TheGame.CurrentRound + 1;
 	$('.Standard').attr("disabled", true);

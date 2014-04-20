@@ -120,10 +120,14 @@
         }		
 		function SendStatModifications(ThisName){
 			var Changes = {};
+			Changes.GamesPlayed = 0;
+			Changes.GamesWon = 0;
 			var ThisPlayer = ThePlayers[GetPlayerByName(ThisName)];
-			if (ThisPlayer){
-				Changes.GamesPlayed = Number(WasItOnline)*Number(ThePlayers.length > 1);
-				Changes.GamesWon = Number(WasItOnline)*Number(DidTheyWin(ThisName))*Number(ThePlayers.length > 1);
+			if (ThisPlayer && WasItOnline && (ThePlayers.length > 1)){
+				Changes.GamesPlayed = 1;
+				if (DidTheyWin(ThisName)){
+					Changes.GamesWon = Number(DidTheyWin(ThisName));
+				}
 			}
 			return Changes;
 		}

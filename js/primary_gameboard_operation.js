@@ -419,7 +419,7 @@ function removeProduct(prod) {
 		prod.Owner.Products.splice(prod.Owner.Products.indexOf(prod), 1);
 		var ThePlayerAtLoss = TheGame.Players.indexOf(prod.Owner);
 		TheGame.Players[ThePlayerAtLoss].NumProducts = TheGame.Players[ThePlayerAtLoss].Products.length;
-		UpdatePlayerProductDisplayPosition(prod.Owner);
+		UpdateProductListDisplayPosition(GetProductsInThisPhase(prod.Phase, prod.Owner));
 		UpdatePlayerDisplay();
 	}
 	$("#new-product-button").attr("disabled", (TheGame.CurrentPlayer.hasMadeProductThisTurn));

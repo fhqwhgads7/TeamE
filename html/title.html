@@ -5,6 +5,9 @@
 		<script src="../js/shared.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
 		<script>
+			var CurrentUserExists = false; 
+			var SwitchBackToMain = false;
+			
 			function Initialize(){
 				GlobalInitialize();
 				changeCurrentBGM("MainMenu");
@@ -23,6 +26,7 @@
 				$("#ButtonSheetThree").css("left","0%");
 			}
 			function NetworkedGame(){
+				SwitchBackToMain = true;
 				$("#ButtonSheetTwo").children().attr('disabled', false);
 				$("#ButtonSheetOne").children().attr('disabled', true);
 				setTimeout(function(){
@@ -63,7 +67,7 @@
 				SwitchToPage("new_game_options_online.html");
 			}
 			function FindGame(){
-				SwitchToPage("find_game.html");
+				SwitchToPage("find_game_online.html");
 			}
 			function CreateSPGame(){
 				SwitchToPage("new_game_options.html");
@@ -78,6 +82,7 @@
 				$("#ButtonSheetOne").css("left","0%");
 				$("#ButtonSheetOne").children().attr('disabled', false);
 				$("#ButtonSheetThree").children().attr('disabled', true);
+				$("#NetworkedGame").attr('disabled', !CurrentUserExists);
 				setTimeout(function(){
 					playSound(GameSounds.PageSwitch);
 					$("#ButtonSheetThree").css("left","100%");
@@ -87,16 +92,20 @@
 				$("#ButtonSheetOne").css("left","0%");
 				$("#ButtonSheetOne").children().attr('disabled', false);
 				$("#ButtonSheetTwo").children().attr('disabled', true);
+				$("#NetworkedGame").attr('disabled', !CurrentUserExists);
+				SwitchBackToMain = false;
 				setTimeout(function(){
 					playSound(GameSounds.PageSwitch);
 					$("#ButtonSheetTwo").css("left","-100%");
 				},150);
 			}
-			function LoginPage(){
-				SwitchToPage("LoginPage.html");
-			}
-			function RegistrationPage(){
-				SwitchToPage("RegistrationPage.html");
+			function CheckForUser(CurrentUser){
+				CurrentUserExists = CurrentUser;
+				$("#ButtonSheetTwo").children().attr('disabled', !CurrentUserExists);
+				$("#NetworkedGame").attr('disabled', !CurrentUserExists);
+				if (SwitchBackToMain && !CurrentUserExists){
+					BackFromMP();
+				}
 			}
 		</script>
 		<style type="text/css">
@@ -114,16 +123,14 @@
 		<div id="MainBackground">
 			<div id="ContentContainer">
 				<div id="ButtonSheetOne" class="ButtonSheet" style="height:100%">
-					<button class="Standard"  style="left:30%;top:50%;width:40%" onclick="LocalGame()">Local Game</button>
-					<button class="Standard" style="left:30%;top:60%;width:40%" onclick="NetworkedGame()">Networked Game</button>
-					<button class="Standard" style="left:30%;top:70%;width:40%" onclick="HowToPlay()">How to Play</button>
+					<button class="Standard" id="LocalGame" style="left:30%;top:50%;width:40%" onclick="LocalGame()">Local Game</button>
+					<button class="Standard" id="NetworkedGame" style="left:30%;top:60%;width:40%" onclick="NetworkedGame()">Networked Game</button>
+					<button class="Standard" id="Instructions" style="left:30%;top:70%;width:40%" onclick="HowToPlay()">How to Play</button>
 				</div>
 				<div id="ButtonSheetTwo" class="ButtonSheet" style="left:-100%">
-					<button class="Standard" style="left:24%;top:50%;width:25%" onclick="CreateMPGame()">Create</button>
-					<button class="Standard" style="left:52%;top:50%;width:25%" onclick="FindGame()">Find</button>
-					<button class="Standard" style="left:24%;top:61%;width:25%" onclick="LoginPage()">Log in</button>
-					<button class="Standard" style="left:52%;top:61%;width:25%" onclick="RegistrationPage()">Register</button>
-					<button class="Standard" style="left:40%;top:72%" onclick="BackFromMP()">Back</button>
+					<button class="Standard" style="left:24%;top:55%;width:25%" onclick="CreateMPGame()">Create</button>
+					<button class="Standard" style="left:52%;top:55%;width:25%" onclick="FindGame()">Find</button>
+					<button class="Standard" style="left:40%;top:66%" onclick="BackFromMP()">Back</button>
 				</div>
 				<div id="ButtonSheetThree" class="ButtonSheet" style="left:100%">
 					<button class="Standard" style="left:24%;top:55%;width:25%" onclick="CreateSPGame()">Create</button>

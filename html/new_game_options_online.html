@@ -56,6 +56,7 @@
 				TheBrandNewGame.Options=new Object();
 				TheBrandNewGame.Options.GameName=$("#GameName").val();
 				TheBrandNewGame.Options.GameDifficulty=$("#GameDifficulty option:selected").val();
+				TheBrandNewGame.Options.CPUIntelligence="STANDARD";
 				TheBrandNewGame.Options.NumberOfRounds=$("#NumberOfRounds option:selected").val().toString();
 				TheBrandNewGame.Options.PatentingEnabled=$("#Patenting option:selected").val().toString();
 				localStorage.setItem("TheBrandNewGame",JSON.stringify(TheBrandNewGame));

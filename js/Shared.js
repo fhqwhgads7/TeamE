@@ -1,24 +1,3 @@
-/*-----------------------------------------------------------------------------
-	PARSE.COM
-	email: ajmurill@asu.edu
-	password: Reinforcements1!
-	username: EntrepreneurshipCST316
-	our data: https://www.parse.com/apps/entrepreneurshipgame/collections
-		application ID: xjUxyY8bghFGuSnM3ptEZkV3BiWOlD3VhkRLt4kz
-		client key: 1EhZ7nrrYMz5BVp58jBXMf07eU8xW2k4LDFFxIVL
-		net key: 8XJD3yidSyRUuDwPvT8l7oTKpmwKaHwzgQHjIRaE
-		javascript key: iZCS2S7ZuWn9keMoooLaHMlB7HMXpcqD1M60JVjp
-		REST API key: C1GSXmeSV6oVWvLjZ3rA1j5Ey4RsmnMHHxlFQTip
-		master key: lOqdFFVjQViO7PCp7EtH86i8DXSTrH6SedXny4Rr
------------------------------------------------------------------------------*/
-/*-----------------------------------------------------------------------------
-	pubnub.COM
-	email: ryan.lane@asu.edu
-	password: Reinforcements1!
-	our data: 
-		subscribe key: sub-c-52dd673e-b2ba-11e3-aab4-02ee2ddab7fe
-		publish key: pub-c-d3ce4b6d-4960-4db3-a8be-29709342456b
------------------------------------------------------------------------------*/
 /*
 	Make sure that each page that uses this next function has the following line in the head:
 	<script src='http://code.jquery.com/jquery-migrate-1.2.1.js'></script>

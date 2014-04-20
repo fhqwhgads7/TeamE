@@ -261,11 +261,20 @@
 			}		
 			function UserDataControls(WindowThing){
 				var TheWindow = WindowThing.contentWindow.location.toString();
+				
 				if (TheWindow.indexOf("/game_board.html") > -1){
 					$("#UserControls").hide();
 				}
 				else {
 					$("#UserControls").show();
+					if (TheWindow.indexOf("/gameover.html") > -1){
+						var CurrentUser = Parse.User.current();
+						if (CurrentUser){
+							var StatChanges = WindowThing.contentWindow.SendStatModifications(CurrentUser.get("username"));
+							CurrentUser.set("gamesplayed", CurrentUser.get("gamesplayed") + StatChanges.GamesPlayed);
+							CurrentUser.set("gameswon", CurrentUser.get("gameswon") + StatChanges.GamesWon);
+						}
+					}
 				}
 			}
 		</script>

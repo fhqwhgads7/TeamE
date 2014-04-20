@@ -1557,6 +1557,7 @@ function GetFinalResults() {
 	}
 
 	localStorage.setItem("FinalResults", JSON.stringify(Plyr));
+	localStorage.setItem("WasItOnline", Online.toString());
 }
 
 function SwitchToFinalResults() {

@@ -223,15 +223,15 @@ function SaveThisGame(gameName) {
 	localStorage.setItem("LoadingAGame", gameName);
 }
 function TipThink() {
-	var Elem = document.getElementById("TipSpan");
-	var Pos = parseInt(Elem.style.left.replace("px", ""), 10);
+	var Elem = $("#TipSpan");
+	var Pos = parseInt(Elem.css("left").replace("px", ""), 10);
 	var NewPos = Pos - 1;
-	if (NewPos <= -Elem.innerHTML.length * 15) {
+	if (NewPos <= -(Elem.width()) - 30) {
 		NewPos = BOARD_WIDTH + 1;
 		SelectedTip = Math.floor(Math.random() * Tips.length * 0.5 * (1 + (TheGame.CurrentRound / TheGame.Settings.NumberOfRounds)));
-		Elem.innerHTML = Tips[SelectedTip];
+		Elem.text(Tips[SelectedTip]);
 	}
-	Elem.style.left = (NewPos).toString() + "px";
+	Elem.css("left", (NewPos).toString() + "px");
 }
 function TransferGameStartupInfo(from, to) {
 	for (var i = 1; i <= 6; i++) {

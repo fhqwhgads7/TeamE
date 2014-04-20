@@ -345,7 +345,7 @@ function CreateProductDisplay(prod) {
 	ProdElem.id = "ProductDisplayItem_" + prod.GlobalID;
 	prod.DisplayItemID = ProdElem.id;
 	ProdElem.addEventListener("click", function () {
-		playSound(GameSounds.Message);
+		playSound(GameSounds.ProductSelect);
 		$("#" + ProdElem.id).css("box-shadow", "0px 0px 60px 10px #AAAAAA");
 		$("#" + ProdElem.id).css("opacity", "1");
 		UpdateCurProdDisplay(ProdElem.id);
@@ -375,7 +375,7 @@ function RecreateProductDisplay(prod) {
 	ProdElem.id = "ProductDisplayItem_" + prod.GlobalID;
 	prod.DisplayItemID = ProdElem.id;
 	ProdElem.addEventListener("click", function () {
-		playSound(GameSounds.Message);
+		playSound(GameSounds.ProductSelect);
 		$("#" + ProdElem.id).css("box-shadow", "0px 0px 60px 10px #AAAAAA");
 		$("#" + ProdElem.id).css("opacity", "1");
 		UpdateCurProdDisplay(ProdElem.id);
@@ -1410,7 +1410,7 @@ function DoesItBreak(prod) {
 function MoveItSoon(Ply, prod) {
 	if (prod.turnsInSamePhase >= 6) {
 		Ply.TriggeredEvents.push(function () {
-			TriggeredEventDisplay("Your product " + prod.Name + " has been in the " + prod.Phase + " phase for a while. Consider moving it along.", GameSounds.Message, "longtime");
+			TriggeredEventDisplay("Your product " + prod.Name + " has been in the " + prod.Phase + " phase for a while. Consider moving it along.", GameSounds.MoveitMessage, "longtime");
 		});
 	}
 }

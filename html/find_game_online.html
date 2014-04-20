@@ -219,6 +219,7 @@
 		<!-- Lobby scripts and styles -->
 		<script type="text/javascript">
 			var TheBrandNewGame;
+			var Countdown = 6;
 			// function Initialize(){
 			// 	GlobalInitialize();
 			// 	PopulatePlayerColorFields();
@@ -257,8 +258,24 @@
 				goToFindGame();
 			}
 			function BeginGame(){
+				$("#back-button").attr('disabled',true);
+				$("#begin-game-button").attr('disabled',true);
+				setTimeout(function(){
+					if (Countdown <= 0) {
+						//Actual game starting logic goes here.
+						SwitchToPage("title.html");
+					}
+					else {
+						Countdown--;
+						if (Countdown < 6) {
+							$("#Countdown").show();
+							$("#Countdown").text(Countdown.toString());
+							playSound(GameSounds.Countdown);
+						}
+						BeginGame();
+					}
+				},1000);
 			}
-
 			function NameFieldFlash(Num){
 				$("#Player"+Num+"Name").css("background-color", "red");
 				setTimeout(function(){ $("#Player"+Num+"Name").css("background-color", "white"); },100);
@@ -395,7 +412,8 @@
 						<!-- dynamic -->
 					</select>
 				</div>
-				<button class="Standard" onclick="GoBack()" style="left:16%;top:82%;width:28%;font-size:20px">Back</button>
+				<button id="back-button" class="Standard" onclick="GoBack()" style="left:16%;top:82%;width:28%;font-size:20px">Back</button>
+				<div id="Countdown" class="StandardText" style="display:none;margin:0px;width:100%;top:82%;">Fail</div>
 				<button id="begin-game-button" class="Standard" onclick="BeginGame()" disabled style="right:16%;top:82%;width:28%;font-size:20px">Start Game</button>
 			</div>
 		</div>

@@ -138,16 +138,19 @@ var GameSounds={
 	GainMoney: '../sounds/sfx/gainmoney.wav',
 	LoseMoney: '../sounds/sfx/losemoney.wav',
 	ProductPlacement: '../sounds/sfx/product.wav',
+	ProductSelect: '../sounds/sfx/product_select.wav',
 	AdvanceProduct: '../sounds/sfx/advance.wav',
 	NextTurn: '../sounds/sfx/nextplayersturn.wav',
 	NextRound: '../sounds/sfx/nextround.wav',
 	Message: '../sounds/sfx/message.wav',
+	MoveitMessage: '../sounds/sfx/moveitmessage.wav',
 	Event: '../sounds/sfx/event.wav',
 	Wrong_Low: '../sounds/sfx/wrong_1.wav',
 	Wrong_Med: '../sounds/sfx/wrong_2.wav',
 	Wrong_BAD: '../sounds/sfx/wrong_3.wav',
 	GameOver: '../sounds/sfx/gameover.wav',
-	MinorFail: '../sounds/sfx/minor_fail.wav'
+	MinorFail: '../sounds/sfx/minor_fail.wav',
+	Countdown: '../sounds/sfx/countdown.wav'
 };
 function playSound(sound){
 	if (localStorage.getItem("SFXMute")!=="Muted"){

@@ -104,3 +104,8 @@ test("the VI initializes properly and knows its own name",function(){
 	ok(Ply.VIMemory,"VI never initialized");
 	ok(Ply.VIMemory.Name=="Test_Player","VI doesn't know its name");
 });
+
+test("music plays",function(){
+	var music=music
+	ok(music, "Music plays.");
+});

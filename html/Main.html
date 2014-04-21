@@ -18,12 +18,10 @@
 					$("#BrowserFailOverlay").show();
 					$("#BrowserFail").show();
 				}
-				alert("so");
 				if (Parse.User.current()){
 					ShowUser();
-				} else {
-					alert("hey!");
 				}
+				
 				$(":button.Standard").mouseenter( function(){
 					if (this.getAttribute("onmouseover") == null)
 						playSound(GameSounds.ButtonHover);

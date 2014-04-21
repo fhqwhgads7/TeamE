@@ -3,8 +3,18 @@
 	<head>
 		<script src="../js/jquery.js"></script>
 		<script src="../js/shared.js"></script>
+		<script src="https://www.parsecdn.com/js/parse-1.2.18.min.js"></script>
+		<script src="http://cdn.pubnub.com/pubnub.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
 		<script>
+			Parse.initialize("xjUxyY8bghFGuSnM3ptEZkV3BiWOlD3VhkRLt4kz", "iZCS2S7ZuWn9keMoooLaHMlB7HMXpcqD1M60JVjp");
+
+			// PubNub business 
+			var pubnub = PUBNUB.init({
+				publish_key: 'pub-c-d3ce4b6d-4960-4db3-a8be-29709342456b',
+				subscribe_key: 'sub-c-52dd673e-b2ba-11e3-aab4-02ee2ddab7fe'
+			});
+
 			var TheBrandNewGame=null;
 			var GameName;
 			var GameDifficulty;			//EASY, NORMAL, HARD, LUNATIC
@@ -25,11 +35,31 @@
 			}
 			
 			function HostTheGame(){
-				SaveOptions();
-				//Not yet complete
-				//The idea is to check if the game name is taken, then if it isn't, send all the data to pubhub and such
-				//Then start hosting the game
-				goToLobby();
+				var CurrentUser = Parse.User.current();
+				var currentUsername = CurrentUser.get("username");
+				var Game = Parse.Object.extend("Game");
+				var newGame = new Game();
+				newGame.set("host", CurrentUser);
+				newGame.set("open", true);
+				newGame.set("players", [currentUsername]);
+
+				var newGameName = $("#GameName").val();
+				newGame.set("name", newGameName);
+				var newGameOptions = SaveOptions(newGameName);
+				newGame.set("options", newGameOptions);
+
+				newGame.save(null, {
+					success: function(newGame) {
+						pubnub.publish({
+								channel: 'gameList',
+								message: {"newGame": newGameName}
+						});	
+						goToLobby(newGameName);
+					},
+					error: function(newGame, error) {
+						alert("Error creating game. Try again?");
+					}
+				});
 			}
 			function GoBackToMainMenu(){
 				SwitchToPage("title.html");
@@ -68,16 +98,18 @@
 					}
 				}
 			}
-			function SaveOptions()
+			function SaveOptions(gameName)
 			{
 				if(!TheBrandNewGame){TheBrandNewGame=new Object();}
 				TheBrandNewGame.Options=new Object();
-				TheBrandNewGame.Options.GameName=$("#GameName").val();
+				TheBrandNewGame.Options.GameName=gameName;
 				TheBrandNewGame.Options.GameDifficulty=$("#GameDifficulty option:selected").val();
 				TheBrandNewGame.Options.CPUIntelligence="STANDARD";
 				TheBrandNewGame.Options.NumberOfRounds=$("#NumberOfRounds option:selected").val().toString();
 				TheBrandNewGame.Options.PatentingEnabled=$("#Patenting option:selected").val().toString();
 				localStorage.setItem("TheBrandNewGame",JSON.stringify(TheBrandNewGame));
+
+				return TheBrandNewGame.Options;
 			}
 			function RestorePrevious()
 			{
@@ -93,7 +125,8 @@
 			}
 			
 			
-			function goToLobby() {
+			function goToLobby(gameName) {
+				$("#new-game-name").text(gameName);
 				$("#create-game-wrapper").hide();
 				$("#lobby-wrapper").show();
 			} 
@@ -210,8 +243,7 @@
 					<button class="Standard" onclick="GoBackToMainMenu()" style="left:20%;width:28%;top:73%;font-size:20px">Main Menu</button>
 				</div>
 				<div id="lobby-wrapper">
-					<div class="StandardText" id="StartNewGameTitle" style="font-size:40px;margin:0px;width:100%;top:7%;">New Game: Players</div> 
-					<div class="StandardText" id="NameOfTheGame" style="font-size:15px;margin:0px;width:100%;top:16%;">Game Name: <span id="new-game-name">Borked</span></div> 
+					<div class="StandardText" id="StartNewGameTitle" style="font-size:40px;margin:0px;width:100%;top:7%;">New Game: <span id="new-game-name">Borked</span></div> 
 					<div class="PlayerBox" id="PlayerOneBox" style="border-color:red;left:13%;top:22%;">
 						<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business One</div>
 						<textarea disabled maxlength=10 id="PlayerOneName" class="OneColumn" placeholder="Business/Player Name" style="position:absolute;overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>

@@ -18,9 +18,11 @@
 					$("#BrowserFailOverlay").show();
 					$("#BrowserFail").show();
 				}
-				NetworkButtonDisableCheck()
+				alert("so");
 				if (Parse.User.current()){
 					ShowUser();
+				} else {
+					alert("hey!");
 				}
 				$(":button.Standard").mouseenter( function(){
 					if (this.getAttribute("onmouseover") == null)
@@ -35,6 +37,7 @@
 						playSound(GameSounds.ButtonSelect);
 				});
 				LoadOptions();
+
 			}
 			function ShowAudioSettings(){
 				$("#AudioSettings").show();
@@ -380,7 +383,7 @@
 		</style>
 	</head>
 	
-	<body onload="Initialize()">
+	<body onload="Initialize();">
 		<div id="UserControls" style="position:absolute;width:800px;height:600px">
 			<div id="NotLoggedIn" class="UserBox" style="right:10px;top:-7px;z-index:3">
 				<div class="StandardText" style="font-size:10px;margin:0px;width:100%;top:10%;z-index:3">Welcome, guest.</div>

@@ -45,8 +45,8 @@
 
 				var newGameName = $("#GameName").val();
 				newGame.set("name", newGameName);
-				var newGameOptions = SaveOptions(newGameName);
-				newGame.set("options", newGameOptions);
+				var TheBrandNewGame = SaveOptions(newGameName);
+				newGame.set("optionsObject", TheBrandNewGame);
 
 				newGame.save(null, {
 					success: function(newGame) {
@@ -109,7 +109,7 @@
 				TheBrandNewGame.Options.PatentingEnabled=$("#Patenting option:selected").val().toString();
 				localStorage.setItem("TheBrandNewGame",JSON.stringify(TheBrandNewGame));
 
-				return TheBrandNewGame.Options;
+				return TheBrandNewGame;
 			}
 			function RestorePrevious()
 			{

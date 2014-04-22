@@ -1,3 +1,20 @@
+###################
+## Current Project
+###################
+
+js/blanket.js
+js/tests.js
+js/qunit-junit-plugin.js
+js/qunit-reporter-junit.js
+js/qunit.js
+js/run-qunit.js
+css/qunit.css
+html/test.html
+test-results.xml
+phantomjs.exe
+build.sh
+
+
 #################
 ## Eclipse
 #################

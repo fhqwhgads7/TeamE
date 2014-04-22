@@ -10,7 +10,7 @@
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
 		<script>
 			Parse.initialize("xjUxyY8bghFGuSnM3ptEZkV3BiWOlD3VhkRLt4kz", "iZCS2S7ZuWn9keMoooLaHMlB7HMXpcqD1M60JVjp");
-		
+			
 			localStorage.setItem("BGMMute", "");
 			localStorage.setItem("SFXMute", "");
 			function Initialize(){
@@ -21,7 +21,7 @@
 				if (Parse.User.current()){
 					ShowUser();
 				}
-				
+				NetworkButtonDisableCheck();
 				$(":button.Standard").mouseenter( function(){
 					if (this.getAttribute("onmouseover") == null)
 						playSound(GameSounds.ButtonHover);
@@ -35,7 +35,7 @@
 						playSound(GameSounds.ButtonSelect);
 				});
 				LoadOptions();
-
+				window.addEventListener('message', UserDataControls, false);
 			}
 			function ShowAudioSettings(){
 				$("#AudioSettings").show();
@@ -242,20 +242,20 @@
 				$("#Username").text("sir. If you can see this, fix your code");
 				var anotherFunction = "";
 				var CurrentWindow = document.getElementById("MainGamePage");
-
-				if (CurrentWindow.contentWindow.location.toString().indexOf("_online") > -1){
-					anotherFunction = " " + "document.getElementById('MainGamePage').contentWindow.SwitchToPage('title.html');";
-				}
 				Parse.User.logOut();
 				NetworkButtonDisableCheck();
-				$("#AlertButton").attr('onclick', 'CloseAlert();' + anotherFunction);
+				$("#AlertButton").attr('onclick', 'CloseAlert(); document.getElementById("MainGamePage").contentWindow.postMessage("Logout", "*");');
 				ShowAlert("You have been logged out. If this was an accident, please log back in.", "success.png");
 			}
 			function NetworkButtonDisableCheck(){
+				
 				var CurrentWindow = document.getElementById("MainGamePage");
 				var CurrentUser = Parse.User.current() !== null;
-				if (CurrentWindow.contentWindow.location.toString().indexOf("/title.html") > -1){
-					CurrentWindow.contentWindow.CheckForUser(CurrentUser);
+				if (CurrentUser){
+					CurrentWindow.contentWindow.postMessage('UserExists', '*');
+				}
+				else{
+					CurrentWindow.contentWindow.postMessage('NoUser', '*');
 				}
 			}
 			function ShowAlert(){
@@ -278,20 +278,26 @@
 				$("#AlertOverlay").hide();
 				$("#Alerts").hide();
 			}		
-			function UserDataControls(WindowThing){
-				var TheWindow = WindowThing.contentWindow.location.toString();
-				
-				if (TheWindow.indexOf("/game_board.html") > -1){
+			function UserDataControls(event){
+				if (event.data === "HideIt"){
 					$("#UserControls").hide();
 				}
 				else {
 					$("#UserControls").show();
-					if (TheWindow.indexOf("/gameover.html") > -1){
+					if (event.data === "GiveMeUsername"){
+						localStorage.setItem("CurrentUsername", Parse.User.current().get("username").toString());
+					}
+					else {
+						localStorage.setItem("CurrentUsername", null);
+					}
+					var TheEvent = event.data.toString();
+					if (TheEvent.indexOf("FinishedGame") > -1){
 						var CurrentUser = Parse.User.current();
 						if (CurrentUser){
-							var StatChanges = WindowThing.contentWindow.SendStatModifications(CurrentUser.get("username"));
-							CurrentUser.set("gamesplayed", CurrentUser.get("gamesplayed") + StatChanges.GamesPlayed);
-							CurrentUser.set("gameswon", CurrentUser.get("gameswon") + StatChanges.GamesWon);
+							CurrentUser.set("gamesplayed", CurrentUser.get("gamesplayed") + 1);
+							if (TheEvent === "FinishedGameAndWon"){
+								CurrentUser.set("gameswon", CurrentUser.get("gameswon") + 1);
+							}
 						}
 					}
 				}
@@ -412,7 +418,7 @@
 				<button class="Standard" onclick="HideAudioSettings();" style="left:35%;top:68%;width:30%">Done</button>
 		</div>
 		<div id="MainGame" style="position:absolute;top:0px;left:0px;width:800px;height:600px;z-index:1;">
-			<iframe id="MainGamePage" src="title.html" style="top:0px;left:0px;width:800px;height:600px;" frameborder="0" allowtransparency="yes" scrolling="no" onLoad="UserDataControls(this); NetworkButtonDisableCheck();"></iframe>
+			<iframe id="MainGamePage" src="title.html" style="top:0px;left:0px;width:800px;height:600px;" frameborder="0" allowtransparency="yes" scrolling="no" onLoad="NetworkButtonDisableCheck()"></iframe>
 		</div>
 		<div id="Background" style="position:absolute;top:0px;left:0px;width:800px;height:600px;z-index:0;">
 			<iframe src="background.html" style="top:0px;left:0px;width:100%;height:100%;background-color:rgb(128,128,128,0);" frameborder="0" allowtransparency="no" scrolling="no"></iframe>

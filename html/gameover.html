@@ -13,6 +13,7 @@
 		
 		function Initialize()
 		{
+			parent.postMessage("GiveMeUsername", '*');
 			changeCurrentBGM("FinalScores");
 			setTimeout(function(){
 				$("#Blanket").css("transition","500ms ease-out");
@@ -35,7 +36,7 @@
 			$(".PlayerBox").hide();
 			
 			if(localStorage.getItem("FinalResults")){
-				for(PlyNum in ThePlayers){
+				for(var PlyNum in ThePlayers){
 					var Ply=ThePlayers[PlyNum];
 					var Str="";
 					if(PlyNum==0){Str="PlyOne";}else if(PlyNum==1){Str="PlyTwo";}else if(PlyNum==2){Str="PlyThree";}else if(PlyNum==3){Str="PlyFour";}else if(PlyNum==4){Str="PlyFive";}else if(PlyNum==5){Str="PlySix";}
@@ -46,18 +47,22 @@
 					$("#"+Str+"ScbdProds").html(Ply.NumProducts);
 					$("#"+Str+"ScbdEmps").html(Ply.NumEmployees);
 				}
+				if (localStorage.getItem("CurrentUsername") !== null){
+					SendStatModifications(localStorage.getItem("CurrentUsername"));
+				}
 			}
 		}	
 		function GetPlayerByName(TheName){
 			var index = -1;
-			for (var i = 0; i < ThePlayers.length && index <= -1; i++){
-				if (ThePlayers[i].Name === TheName){
-					index = i;
+			for(var PlyNum in ThePlayers){
+				var Ply=ThePlayers[PlyNum];
+				if (Ply.Name === TheName){
+					index = PlyNum;
 				}
 			}
 			return index;
 		}
-		function DidTheyWin(TheName){
+		function DidTheyWin(ThisPlayer){
 			var index = -1;
 			var amount = 0;
 			
@@ -67,7 +72,7 @@
 					amount = ThePlayers[i].Money;
 				}
 			}
-			return ThePlayers.indexOf[GetPlayerByName(TheName)].money === amount;
+			return ThisPlayer.money === amount;
 		}
 
 		function PlayerStats(){
@@ -80,56 +85,16 @@
 			$("#PopupOverlay").hide();
 			$("#PlyOneScbdBox").show();
 		}
-		function StatsPop(){
-			$(".PlayerBox").hide();
-			var ThePlayers;
-			
-			if(localStorage.getItem("FinalResults")){
-				ThePlayers=JSON.parse(localStorage.getItem("FinalResults"));
-				var Ply=ThePlayers[0];
-				$("#PlyOneStatsName").html(Ply.Name);
-				var games=1;
-				$("#TotalGamesPlayed").html(games);
-				$("#GamesWon").html(games);
-				var percent=100;
-				$("#WinningPercent").html(percent);
-				$("#TotalDollars").html(Ply.Money);
-			}
-		}
-///Not done yet working on save function to save to logged in player		
-		function SaveStats(){
-			var FinalStats=Parse.Object.extend("Final");
-			var finalStats=new FinalStats();
-		
-			finalStats.set("playerName", "#PlyOneStatsName");
-			finalStats.set("gamesplayed", games);
-			finalStats.set("gameswon", games);
-			finalStats.set("winpercent", percent);
-			finalStats.set("totaldollars", Ply.Money);
-		
-			finalStats.save(null, {
-				success: function(finalStats) {
-				  alert('New object created with objectId: ' + finalStats.id);
-                },
-                error: function(finalStats, error) {
-
-                  alert('Failed to create new object, with error code: ' + error.description);
-                }
-            });
-
-        }		
 		function SendStatModifications(ThisName){
-			var Changes = {};
-			Changes.GamesPlayed = 0;
-			Changes.GamesWon = 0;
+			var TheMessage = "";
 			var ThisPlayer = ThePlayers[GetPlayerByName(ThisName)];
 			if (ThisPlayer && WasItOnline && (ThePlayers.length > 1)){
-				Changes.GamesPlayed = 1;
+				TheMessage = "FinishedGame";
 				if (DidTheyWin(ThisName)){
-					Changes.GamesWon = Number(DidTheyWin(ThisName));
+					TheMessage += "AndWon";
 				}
 			}
-			return Changes;
+			parent.postMessage(TheMessage, '*');
 		}
 		</script>
 		

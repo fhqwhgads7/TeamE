@@ -9,6 +9,8 @@
 			var SwitchBackToMain = false;
 			
 			function Initialize(){
+				parent.postMessage("ShowIt","*");
+				window.addEventListener('message', NetworkButtonManagement, false);
 				GlobalInitialize();
 				changeCurrentBGM("MainMenu");
 				$("#ButtonSheetOne").children().attr('disabled', false);
@@ -106,6 +108,9 @@
 				if (SwitchBackToMain && !CurrentUserExists){
 					BackFromMP();
 				}
+			}
+			function NetworkButtonManagement(event) {
+				CheckForUser(event.data === 'UserExists');
 			}
 		</script>
 		<style type="text/css">

@@ -1543,6 +1543,7 @@ function GameOverDisplay() {
 
 function GetFinalResults() {
 	var Plyr = {};
+	Plyr.length = 0;
 
 	for (PlyNum in TheGame.Players) {
 		var Ply = TheGame.Players[PlyNum];
@@ -1553,6 +1554,7 @@ function GetFinalResults() {
 		Plyr[PlyNum].Color = Ply.Color;
 		Plyr[PlyNum].NumProducts = Ply.NumProducts;
 		Plyr[PlyNum].NumEmployees = (Ply.NumQA + Ply.NumDevs + Ply.NumCreative);
+		Plyr.length++;
 
 	}
 

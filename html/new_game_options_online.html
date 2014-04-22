@@ -24,6 +24,7 @@
 			
 			function Initialize()
 			{
+				window.addEventListener('message', Peace, false);
 				goToCreateGame();
 				PopulatePlayerColorFields();
 				GlobalInitialize();
@@ -33,7 +34,11 @@
 				}
 				LoadOptions();
 			}
-			
+			function Peace(event){
+				if (event.data === 'Logout'){
+					GoBackToMainMenu();
+				}
+			}
 			function HostTheGame(){
 				var CurrentUser = Parse.User.current();
 				var currentUsername = CurrentUser.get("username");

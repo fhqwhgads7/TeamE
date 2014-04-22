@@ -9,15 +9,18 @@
 		<script src="http://cdn.pubnub.com/pubnub.min.js"></script>
 
 		<script>
-			function Initialize()
-			{
+			function Initialize() {
+				window.addEventListener('message', Peace, false);
 				GlobalInitialize();
 			}
-			function GoBackToMainMenu()
-			{
+			function GoBackToMainMenu() {
 				SwitchToPage("title.html");
 			}
-
+			function Peace(event){
+				if (event.data === 'Logout'){
+					GoBackToMainMenu();
+				}
+			}
 			function goToLobby() {
 				playSound(GameSounds.ButtonSelect);
 				$("#find-game-wrapper").hide();

@@ -30,7 +30,9 @@
 				var joinedGame = localStorage.getItem("joinedGame");
 				if(joinedGame){
 					LoadOptions();
-					goToLobby(joinedGame.gameId, joinedGame.gameName);
+					var joinedGameId = localStorage.getItem("joinedGameId");
+					var joinedGameName = localStorage.getItem("joinedGameName");
+					goToLobby(false, joinedGameId, joinedGameName);
 				} else {
 					goToCreateGame();
 					PopulatePlayerColorFields();
@@ -72,7 +74,7 @@
 							});	
 							ShowAlert("Game has been hosted!", "success.png");
 							$("#AlertButton").attr('disabled', false);
-							goToLobby(newGame.id, newGameName);
+							goToLobby(true, newGame.id, newGameName);
 						},
 						error: function(newGame, error) {
 							ShowAlert("Error creating game. Try again?", "fail.png");
@@ -146,8 +148,13 @@
 			}
 			
 			
-			function goToLobby(gameId, gameName) {
+			function goToLobby(isHost, gameId, gameName) {
 				localStorage.removeItem("joinedGame");
+				if(!isHost) {
+					$("#back-button").click(function() {
+						SwitchToPage("find_game_online.html");
+					}); 
+				}
 				$("#new-game-name").text(gameName);
 				$("#create-game-wrapper").hide();
 				$("#lobby-wrapper").show();

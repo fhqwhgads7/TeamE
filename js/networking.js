@@ -31,15 +31,15 @@ function joinGame(gameId) {
                         message: {"playerJoined": currentUsername}
                 }); 
             }
-            localStorage.setItem("joinedGame", {
-                "gameId": gameId,
-                "gameName": game.get("name")
-            }); 
+            localStorage.setItem("joinedGame", true); 
+            localStorage.setItem("joinedGameId", gameId); 
+            localStorage.setItem("joinedGameName", game.get("name")); 
         }
       },
       error: function(object, error) {
         alert("Oops, couldn't join the game: " + error.message);
         localStorage.removeItem("joinedGame"); 
+        SwitchToPage("find_game_online.html");
       }
     });
 }

@@ -1,7 +1,0 @@
-Files and directories that will not be in the main release, but that probably need to be here during development (or I just don't know what to do with them) have the prefix "ZZZ_" so that they are grouped nicely at the bottom of the list. These files are removed every time the project is exported to the production branch.
-
-Files that I (andrew) don't know what to do with at the time of this writing are marked with the suffix "_DEL", meaning they need to be moved/renamed/eventually-deleted by their creator because they don't quite fit with the current system structure.
-
-If one of your files is marked "_DEL", please consider moving it, renaming it, merging its content into another existing file and deleting it, or the like. It doesn't mean I hate you. A directory marked _DEL follows the same rules recursively for all its children.
-
-All filenames are lowercase with underscores representing spaces. The only time caps are used is in the aforementioned prefixes.

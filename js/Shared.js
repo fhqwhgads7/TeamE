@@ -275,6 +275,10 @@ function Game(id){
 	};
 	return newGame;
 }
+function HasNonAlphaNumerics(Input){
+	var filter = /[^a-zA-Z0-9 ]/;
+	return filter.test(Input);
+}
 // [NW] Ryan: in order to start a new game on everyone's client, put these things into each client's localStorage
 /*-
 	1. an object with the following attributes, and its name in local storage must be "TheBrandNewGame"

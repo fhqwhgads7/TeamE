@@ -1,3 +1,0 @@
-All files here should be OGG VORBIS files. OGG is a free-and-open lossy compression format with solid perfomance, and we need very high compression ratios on these files if this is to be a lightweight web application. Some BGM files are quite long. BGM files: try to compress to about Quality-5 OGG (Audacity can do this). Other short sounds, like sound effects, compression is inconsequential, so just make sure it's an OGG. And don't use background music tracks that are voiced (not tryin to distract the players).
-
-Also, try not to put any sound-effects in here with a sample rate of less than 44.1kHZ. They sound like crap.

@@ -5,15 +5,9 @@
 		<script src="../js/shared.js"></script>
 		<script src="https://www.parsecdn.com/js/parse-1.2.18.min.js"></script>
 		<script src="http://cdn.pubnub.com/pubnub.min.js"></script>
+		<script src="../js/networking.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
 		<script>
-			Parse.initialize("xjUxyY8bghFGuSnM3ptEZkV3BiWOlD3VhkRLt4kz", "iZCS2S7ZuWn9keMoooLaHMlB7HMXpcqD1M60JVjp");
-
-			// PubNub business 
-			var pubnub = PUBNUB.init({
-				publish_key: 'pub-c-d3ce4b6d-4960-4db3-a8be-29709342456b',
-				subscribe_key: 'sub-c-52dd673e-b2ba-11e3-aab4-02ee2ddab7fe'
-			});
 
 			var TheBrandNewGame=null;
 			var GameName;
@@ -21,7 +15,7 @@
 			var NumberOfRounds;			//Between 40 and 60
 			var PatentingEnabled;		//true/false
 			var Countdown = 6;
-			
+
 			function Initialize()
 			{
 				window.addEventListener('message', Peace, false);
@@ -32,7 +26,18 @@
 				if(localStorage.getItem("TheBrandNewGame")){
 					TheBrandNewGame=JSON.parse(localStorage.getItem("TheBrandNewGame"));
 				}
-				LoadOptions();
+
+				var joinedGame = localStorage.getItem("joinedGame");
+				if(joinedGame){
+					LoadOptions();
+					goToLobby(joinedGame.gameId, joinedGame.gameName);
+				} else {
+					goToCreateGame();
+					PopulatePlayerColorFields();
+					GlobalInitialize();
+					changeCurrentBGM("MainMenu");
+					LoadOptions();
+				}
 			}
 			function Peace(event){
 				if (event.data === 'Logout'){
@@ -45,9 +50,6 @@
 					playSound(GameSounds.Wrong_BAD);
 				}
 				else {
-					var CurrentUser = Parse.User.current();
-					var currentUsername = CurrentUser.get("username");
-					var Game = Parse.Object.extend("Game");
 					var newGame = new Game();
 					newGame.set("host", CurrentUser);
 					newGame.set("open", true);
@@ -78,6 +80,7 @@
 					});
 				}
 			}
+			
 			function GoBackToMainMenu(){
 				SwitchToPage("title.html");
 			}
@@ -142,7 +145,8 @@
 			}
 			
 			
-			function goToLobby(gameName) {
+			function goToLobby(gameId, gameName) {
+				localStorage.removeItem("joinedGame");
 				$("#new-game-name").text(gameName);
 				$("#create-game-wrapper").hide();
 				$("#lobby-wrapper").show();

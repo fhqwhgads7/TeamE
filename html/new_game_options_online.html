@@ -51,7 +51,7 @@
 				}
 				else {
 					var newGame = new Game();
-					newGame.set("host", CurrentUser);
+					newGame.set("host", currentUsername);
 					newGame.set("open", true);
 					newGame.set("players", [currentUsername]);
 
@@ -59,6 +59,7 @@
 					newGame.set("name", newGameName);
 					var TheBrandNewGame = SaveOptions(newGameName);
 					newGame.set("optionsObject", TheBrandNewGame);
+
 					ShowAlert("Hosting game " + newGameName + "...", "loading_thing.gif");
 					playSound(GameSounds.ButtonSelect);
 					$("#AlertButton").attr('disabled', true);
@@ -71,7 +72,7 @@
 							});	
 							ShowAlert("Game has been hosted!", "success.png");
 							$("#AlertButton").attr('disabled', false);
-							goToLobby(newGameName);
+							goToLobby(newGame.id, newGameName);
 						},
 						error: function(newGame, error) {
 							ShowAlert("Error creating game. Try again?", "fail.png");
@@ -80,7 +81,7 @@
 					});
 				}
 			}
-			
+
 			function GoBackToMainMenu(){
 				SwitchToPage("title.html");
 			}

@@ -189,7 +189,7 @@ div.ProductDisplayItem{
 	transition:1s ease-out;
 	webkit-transform-origin:50% 50%;
 	moz-transform-origin:50% 50%;
-	opacity: 0.8;
+	opacity: 0.5;
 }
 .OneColumn{
 	position:absolute;

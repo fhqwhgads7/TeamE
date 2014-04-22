@@ -192,6 +192,7 @@ function LoadGameInitialize(gameName) {
 		PopulateNewProdCategories();
 		for (var i = 0; i < TheGame.CurrentPlayer.Products.length; i++) {
 			$("#ProductDisplayItem_" + TheGame.CurrentPlayer.Products[i].GlobalID).css("z-index", 2);
+			$("#ProductDisplayItem_" + TheGame.CurrentPlayer.Products[i].GlobalID).css("opacity", 1);
 		}
 		if (TheGame.Settings.NumberOfRounds - TheGame.CurrentRound <= 5) {
 			changeCurrentBGM("TimeRunningOut");
@@ -347,11 +348,9 @@ function CreateProductDisplay(prod) {
 	ProdElem.addEventListener("click", function () {
 		playSound(GameSounds.ProductSelect);
 		$("#" + ProdElem.id).css("box-shadow", "0px 0px 60px 10px #AAAAAA");
-		$("#" + ProdElem.id).css("opacity", "1");
 		UpdateCurProdDisplay(ProdElem.id);
 		setTimeout(function () {
 			$("#" + ProdElem.id).css("box-shadow", "4px 4px 15px -2px #000000");
-			$("#" + ProdElem.id).css("opacity", "0.8");
 		}, 200);
 	});
 	ProdElem.className = "ProductDisplayItem";
@@ -364,6 +363,7 @@ function CreateProductDisplay(prod) {
 	ProdElem.style.backgroundColor = prod.Color;
 	ProdElem.style.webkitTransform = "rotate(" + (-Rotation).toString() + "deg)";
 	ProdElem.style.MozTransform = "rotate(" + (-Rotation).toString() + "deg)";
+	ProdElem.style.opacity = 1;
 	GameBoard.appendChild(ProdElem);
 	UpdateProductListDisplayPosition(GetProductsInSamePhase(prod));
 	UpdatePlayerDisplay();
@@ -377,11 +377,9 @@ function RecreateProductDisplay(prod) {
 	ProdElem.addEventListener("click", function () {
 		playSound(GameSounds.ProductSelect);
 		$("#" + ProdElem.id).css("box-shadow", "0px 0px 60px 10px #AAAAAA");
-		$("#" + ProdElem.id).css("opacity", "1");
 		UpdateCurProdDisplay(ProdElem.id);
 		setTimeout(function () {
 			$("#" + ProdElem.id).css("box-shadow", "4px 4px 15px -2px #000000");
-			$("#" + ProdElem.id).css("opacity", "0.8");
 		}, 200);
 	});
 	ProdElem.className = "ProductDisplayItem";
@@ -829,6 +827,7 @@ function ActuallyCycleTurn(roundOnly){
 	TheGame.CurrentPlayer.hasMadeProductThisTurn = false;
 	$("#new-product-button").attr("disabled", (TheGame.CurrentPlayer.hasMadeProductThisTurn));
 	$(".ProductDisplayItem").css("z-index", 1);
+	$(".ProductDisplayItem").css("opacity", 0.5);
 	if (TheGame.NumPlayers > 1) {
 		var WillGo = false;
 		if(!roundOnly){
@@ -861,6 +860,7 @@ function ActuallyCycleTurn(roundOnly){
 			TriggeredEventIterator(TheGame.CurrentPlayer.TriggeredEvents);
 			for (i = 0; i < TheGame.CurrentPlayer.Products.length; i++) {
 				$("#ProductDisplayItem_" + TheGame.CurrentPlayer.Products[i].GlobalID).css("z-index", 2);
+				$("#ProductDisplayItem_" + TheGame.CurrentPlayer.Products[i].GlobalID).css("opacity", 1);
 			}
 			playSound(GameSounds.NextTurn);
 			$("#ProductWindow").hide();
@@ -903,6 +903,7 @@ function DisplayNewRoundEvent() {
 				Elem.style.top = "600px";
 				for (i = 0; i < TheGame.CurrentPlayer.Products.length; i++) {
 					$("#ProductDisplayItem_" + TheGame.CurrentPlayer.Products[i].GlobalID).css("z-index", 2);
+					$("#ProductDisplayItem_" + TheGame.CurrentPlayer.Products[i].GlobalID).css("opacity", 1);
 				}
 				$("#ProductWindow").hide();
 				$("#RoundNumberDisplay").text("ROUND " + Num.toString());

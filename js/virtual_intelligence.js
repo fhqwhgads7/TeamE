@@ -11,18 +11,20 @@ var VI_DIFFICULTY_MULT_TABLE={
 	"EXPERT":1.25
 };
 function VI_Begin(ply){
-	self=ply;
-	Vi_diff_mult=VI_DIFFICULTY_MULT_TABLE[TheGame.Settings.CPUIntelligence];
-	self.VIMemory.Money=parseInt($("#CurPlyMoney").text(),10);
-	self.VIMemory.NumCreative=parseInt($("#CurPlyDsgns").text(),10);
-	self.VIMemory.NumDevs=parseInt($("#CurPlyDevs").text(),10);
-	self.VIMemory.NumQA=parseInt($("#CurPlyTsts").text(),10);
-	VISpeed = 0.5*Vi_diff_mult;
 	setTimeout(function(){
-		if (TheGame.GameState === "ACTIVE") {
-			VI_CloseThePopUps();
-		}
-	},50+VI_WAIT_TIME*Number(TheGame.Players.indexOf(self)<=0));
+		self=ply;
+		Vi_diff_mult=VI_DIFFICULTY_MULT_TABLE[TheGame.Settings.CPUIntelligence];
+		self.VIMemory.Money=parseInt($("#CurPlyMoney").text(),10);
+		self.VIMemory.NumCreative=parseInt($("#CurPlyDsgns").text(),10);
+		self.VIMemory.NumDevs=parseInt($("#CurPlyDevs").text(),10);
+		self.VIMemory.NumQA=parseInt($("#CurPlyTsts").text(),10);
+		VISpeed = 0.5*Vi_diff_mult;
+		setTimeout(function(){
+			if (TheGame.GameState === "ACTIVE") {
+				VI_CloseThePopUps();
+			}
+		},50+VI_WAIT_TIME*Number(TheGame.Players.indexOf(self)<=0));
+	}, 1250);
 }
 function VI_CloseThePopUps(){
 	if ($("#QuitDialog").is(":visible")){

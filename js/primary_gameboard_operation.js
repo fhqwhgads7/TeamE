@@ -152,9 +152,9 @@ function NewGameInitialize() {
 	setTimeout(DisplayNewRoundEvent, 1);
 	$("#MainBoard").hide();
 	setTimeout(Appear, 750);
-	setTimeout(function () {
+	setTimeout(function(){
 		TheGame.CurrentPlayer.TurnInit();
-	}, 2000);
+	}, 1000);
 
 }
 function LoadGameInitialize(gameName) {
@@ -210,7 +210,7 @@ function LoadGameInitialize(gameName) {
 		}, 10);
 		setTimeout(function () {
 			TheGame.CurrentPlayer.TurnInit();
-		}, 1250);
+		}, 1000);
 	}
 	if (TheGame.CurrentPlayer.Type === "Computer") {
 		$("#ControlLock").show();
@@ -816,7 +816,9 @@ function CycleTurn(online,cid,args) {
 		}
 		var WillCycle=true;
 		TheGame.Players.forEach(function(dude){
-			if(!dude.FinishedCurrentTurn){WillCycle=false;}
+			if(!dude.FinishedCurrentTurn){
+				WillCycle = false;
+			}
 		});
 		if(WillCycle){
 			ActuallyCycleTurn(true);
@@ -867,9 +869,7 @@ function ActuallyCycleTurn(roundOnly){
 	} else {
 		DisplayNewRoundEvent();
 	}
-	setTimeout(function () {
-		TheGame.CurrentPlayer.TurnInit();
-	}, 1250);
+	TheGame.CurrentPlayer.TurnInit();
 }
 function DisplayNewRoundEvent() {
 	TheGame.Players.forEach(function(ply){

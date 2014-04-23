@@ -44,14 +44,42 @@ function joinGame(gameId) {
     });
 }
 
+function leaveGame(gameId) {
+    var query = new Parse.Query(Game);
+    query.get(gameId, {
+      success: function(game) {
+        var playersList = game.get("players");
+        var indexOfPlayerBouncing = playersList.indexOf(currentUsername);
+        if (indexOfPlayerBouncing > -1) {
+            playersList.splice(indexOfPlayerBouncing,1);
+            game.set("players", playersList);
+            game.save(null, {
+                success: function(game) {
+                    console.log("joinedGame worked.");
+                },
+                error: function(game, error) {
+                    console.log("Couldn't add you (" + currentUsername + ") to this game's list of players." + error.message);
+                }
+            });
+            pubnub.publish({
+                    channel: gameId,
+                    message: {"refreshPlayers": currentUsername}
+            }); 
+        }
+      },
+      error: function(object, error) {
+        alert("Oops, couldn't leave the game: " + error.message);
+      }
+    });
+}
 
 			
-function RemoveGame(gameID){
+function RemoveGame(gameId){
 	var query = new Parse.Query(Game);
-	query.get(gameID, {
-		success: function(gameID) {
+	query.get(gameId, {
+		success: function(gameId) {
 			// The object was retrieved successfully.
-			gameID.destroy({});
+			gameId.destroy({});
 		},
 		error: function(object, error) {
 		// The object was not retrieved successfully.

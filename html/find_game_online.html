@@ -29,7 +29,7 @@
 			pubnub.subscribe({
 				channel: 'gameList',
 				message: function(message){
-					if("newGame" in message){
+					if("refreshGames" in message){
 						updateGameList();
 					}
 				}

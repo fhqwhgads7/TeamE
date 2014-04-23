@@ -70,7 +70,7 @@
 						success: function(newGame) {
 							pubnub.publish({
 									channel: 'gameList',
-									message: {"newGame": newGameName}
+									message: {"refreshGames": newGameName}
 							});	
 							ShowAlert("Game has been hosted!", "success.png");
 							$("#AlertButton").attr('disabled', false);
@@ -135,13 +135,13 @@
 				return TheBrandNewGame;
 			}
 			
-			function RemoveThisGame(gameID){
-			/*
+			function RemoveThisGame(gameId){
+				RemoveGame(gameId);
 				pubnub.publish({
 					channel: 'gameList',
-					message: {"removeGame": newGameName}
+					message: {"refreshGames": gameId}
 				});
-			*/
+			
 			}
 			function ValueToDropDownSelection(theValue, dropdown)
 			{
@@ -165,18 +165,25 @@
 			        })
 			      },
 			      error: function(object, error) {
-			        alert("Oops, couldn't refresh players list: " + error.message);
+			        console.log("Oops, couldn't refresh players list: " + error.message);
 			      }
 			    });
 			}
 
 			function goToLobby(isHost, gameId, gameName) {
 				// localStorage.removeItem("joinedGame");
-				if(!isHost) {
-					$("#back-button").attr('onclick', 'SwitchToPage("find_game_online.html")'); 
+				if(isHost) {
+					$("#back-button").click(function () {
+						RemoveThisGame(gameId);
+						goToCreateGame();
+					});
 				}
 				else {
-					$("#back-button").attr('onclick', 'goToCreateGame(); RemoveThisGame('+gameId+')'); 
+					$("#back-button").click(function () {
+						leaveGame(gameId);	
+						SwitchToPage("find_game_online.html");
+					});
+					$("#begin-game-button").hide();
 				}
 				$("#new-game-name").text(gameName);
 				$("#create-game-wrapper").hide();

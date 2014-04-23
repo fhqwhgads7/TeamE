@@ -50,7 +50,7 @@
 					playSound(GameSounds.Wrong_BAD);
 				}
 				else {
-					var newGame = new Game();
+					var newGame = new ParseGame();
 					newGame.set("host", currentUsername);
 					newGame.set("open", true);
 					newGame.set("players", [currentUsername]);
@@ -163,6 +163,7 @@
 						});	
 						localStorage.setItem("TheBrandNewGame", JSON.stringify(TheBrandNewGame));
 						localStorage.setItem("Online",true);
+						localStorage.setItem("gameId", gameId);
 						localStorage.setItem("Host", isHost);
 						localStorage.setItem("ClientID",players.indexOf(currentUsername));
 					},

@@ -208,7 +208,7 @@
 			}
 
 			function goToLobby(isHost, gameId, gameName) {
-				// localStorage.removeItem("joinedGame");
+				localStorage.removeItem("joinedGame");
 				if(isHost) {
 					$("#back-button").click(function () {
 						RemoveThisGame(gameId);

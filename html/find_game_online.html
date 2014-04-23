@@ -13,6 +13,9 @@
 				window.addEventListener('message', Peace, false);
 				GlobalInitialize();
 				updateGameList();
+				setInterval(function(){
+					updateGameList();
+				},1000);
 			}
 			function GoBackToMainMenu() {
 				SwitchToPage("title.html");
@@ -42,7 +45,8 @@
 
 				query.find({
 				  success: function(results) {
-					var gameListElement = $("#game-list").remove(".game-row");
+					var gameListElement = $("#game-list");
+					$(".game-row").remove();
 
 				  	results.forEach(function(game){
 						var name = game.get("name");
@@ -65,7 +69,7 @@
 									SwitchToPage("new_game_options_online.html");
 								},
 								error: function(error) {
-									alert("Unable to join");
+									ShowAlert("Unable to join game", "fail.png");
 								}
 							})
 						});
@@ -78,6 +82,18 @@
 				    // error is an instance of Parse.Error.
 				  }
 				});
+			}
+			function ShowAlert(message, image){
+				$("#find-game-wrapper").children().attr('disabled',true);
+				$("#AlertOverlay").show();
+				$("#Alerts").show();
+				$("#AlertMessage").text(message);
+				$("#AlertImage").attr('src', "../images/icons/" + image);
+			}
+			function CloseAlert() {
+				$("#find-game-wrapper").children().attr('disabled',false);
+				$("#AlertOverlay").hide();
+				$("#Alerts").hide();
 			}
 
 		</script>
@@ -183,6 +199,13 @@
 	<body onload="Initialize()">
 		<div id="MainBackground">
 		<div id="ContentContainer">
+			<div class="PopupOverlay" id="AlertOverlay">
+				<div class="Popup" id="Alerts" style="left:30%;width:40%;top:30%;height:40%">
+					<img id="AlertImage" src="../images/icons/fail.png" style="position:absolute;left:34%;top:5%;width:100px;height:100px"></img>
+					<div class="StandardText" id="AlertMessage" style="font-size:12px;margin:0px;width:100%;top:55%;">Failing...</div>															
+					<button class="Standard" id="AlertButton" onclick="CloseAlert()" style="top:70%;left:20%;width:60%">OK</button>
+				</div>
+			</div>
 			<div id="find-game-wrapper">
 				<div class="StandardText" id="MainTitle" style="margin:0;width:800px;top:7%">
 					Find Online Game

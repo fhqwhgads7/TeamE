@@ -43,3 +43,18 @@ function joinGame(gameId) {
       }
     });
 }
+
+			
+function RemoveGame(gameID){
+	var query = new Parse.Query(Game);
+	query.get(gameID, {
+		success: function(gameID) {
+			// The object was retrieved successfully.
+			gameID.destroy({});
+		},
+		error: function(object, error) {
+		// The object was not retrieved successfully.
+		// error is a Parse.Error with an error code and description.
+		}
+	});
+}

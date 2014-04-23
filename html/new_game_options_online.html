@@ -134,26 +134,28 @@
 
 				return TheBrandNewGame;
 			}
-			function RestorePrevious()
-			{
-				LoadOptions();
-				alert("Your previous settings have been restored.");
-			}
 			
+			function RemoveThisGame(gameID){
+			/*
+				pubnub.publish({
+					channel: 'gameList',
+					message: {"removeGame": newGameName}
+				});
+			*/
+			}
 			function ValueToDropDownSelection(theValue, dropdown)
 			{
 				$('[id=dropdown] option').filter(function() { 
 					return ($(this).value() == theValue);
 				}).prop('selected', true);
 			}
-			
-			
 			function goToLobby(isHost, gameId, gameName) {
 				localStorage.removeItem("joinedGame");
 				if(!isHost) {
-					$("#back-button").click(function() {
-						SwitchToPage("find_game_online.html");
-					}); 
+					$("#back-button").attr('onclick', 'SwitchToPage("find_game_online.html")'); 
+				}
+				else {
+					$("#back-button").attr('onclick', 'goToCreateGame(); RemoveThisGame(gameId)'); 
 				}
 				$("#new-game-name").text(gameName);
 				$("#create-game-wrapper").hide();

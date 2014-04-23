@@ -85,22 +85,32 @@
 			function GoBackToMainMenu(){
 				SwitchToPage("title.html");
 			}
-			function BeginGame(){
+			function BeginGame(gameId, isHost){
 				$("#back-button").attr('disabled',true);
 				$("#begin-game-button").attr('disabled',true);
 				setTimeout(function(){
 					if (Countdown <= 0) {
 						//Actual game starting logic goes here.
-						SwitchToPage("game_board.html");
-					}
-					else {
+						BuildTheBrandNewGameOnline(gameId, isHost);
+						// Set game to closed
+					    var query = new Parse.Query(Game);
+					    query.get(gameId, {
+					      success: function(game) {
+					      	game.set("open", false);
+							SwitchToPage("game_board.html");
+					      },
+					      error: function(object, error) {
+					        console.log("Oops, couldn't refresh players list: " + error.message);
+					      }
+					    });
+					} else {
 						Countdown--;
 						if (Countdown < 6) {
 							$("#Countdown").show();
 							$("#Countdown").text(Countdown.toString());
 							playSound(GameSounds.Countdown);
 						}
-						BeginGame();
+						BeginGame(gameId, isHost);
 					}
 				},1000);
 			}
@@ -132,14 +142,41 @@
 
 				return TheBrandNewGame;
 			}
-			
+
+			function BuildTheBrandNewGameOnline(gameId, isHost) {
+				var query = new Parse.Query(Game);
+				query.get(gameId, {
+					success: function(game) {
+						// The object was retrieved successfully.
+						TheBrandNewGame = game.get("optionsObject");
+						var players = game.get("players");
+						var playerIndexMappings = ["PlyOne", "PlyTwo", "PlyThree", "PlyFour", "PlyFive", "PlySix"];
+				        var playersBoxesColors = $(".PlayerBox").find("select.TwoColumnSecond");
+						$.each(players, function(index,player){
+							var playerKey = playerIndexMappings[index];
+							TheBrandNewGame.Players = [];
+							TheBrandNewGame.Players[playerKey] = new Object();
+							TheBrandNewGame.Players[playerKey].Name = player;
+							TheBrandNewGame.Players[playerKey].Type = "Player";
+							TheBrandNewGame.Players[playerKey].Color = $(playersBoxesColors[index]).val();
+						});	
+						localStorage.setItem("Online",true);
+						localStorage.setItem("Host", isHost);
+						localStorage.setItem("ClientID",players.indexOf(currentUsername));
+					},
+					error: function(object, error) {
+						alert("you got problems" + error.message);
+					}
+				});
+
+			}
+
 			function RemoveThisGame(gameId){
 				RemoveGame(gameId);
 				pubnub.publish({
 					channel: 'gameList',
 					message: {"refreshGames": gameId}
 				});
-			
 			}
 			function ValueToDropDownSelection(theValue, dropdown)
 			{
@@ -206,7 +243,7 @@
 						if("refreshPlayers" in message){
 							refreshPlayerBoxes(gameId);
 						} else if ("startGame" in message) {
-							BeginGame();
+							BeginGame(gameId, isHost);
 						}
 					}
 				});

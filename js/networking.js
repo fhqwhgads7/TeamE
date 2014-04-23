@@ -10,7 +10,7 @@ var pubnub = PUBNUB.init({
 });
 
 function joinGame(gameId) {
-    var query = new Parse.Query(Game);
+    var query = new Parse.Query(ParseGame);
     query.get(gameId, {
       success: function(game) {
         var playersList = game.get("players");
@@ -48,7 +48,7 @@ function joinGame(gameId) {
 }
 
 function leaveGame(gameId) {
-    var query = new Parse.Query(Game);
+    var query = new Parse.Query(ParseGame);
     query.get(gameId, {
       success: function(game) {
         var playersList = game.get("players");
@@ -81,7 +81,7 @@ function leaveGame(gameId) {
 
 			
 function RemoveGame(gameId){
-	var query = new Parse.Query(Game);
+	var query = new Parse.Query(ParseGame);
 	query.get(gameId, {
 		success: function(gameId) {
 			// The object was retrieved successfully.

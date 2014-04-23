@@ -299,9 +299,16 @@ function HasNonAlphaNumerics(Input){
 
 	then, you can just push them to the game_board page and they will load up everything fine from the localStorage items
 -*/
-function Send(initiatorNum,funcNum,argBundle){
+function Send(gameId, initiatorNum,funcNum,argBundle){
 	// [NW] this function needs to pass two integers and array (of strings) up somewhere such that they'll get pulled down and fed to Receive. InitiatorNum is THIS CLIENT'S (the sender or initiator) ClientID
-	// [your code here]
+	pubnub.publish({
+		channel: gameId,
+		message: {"gameAction": {
+			clientId: initiatorNum,
+			functionNum: funcNum, 
+			args: JSON.stringify(argBundle)
+		}} 
+	});
 }
 function Receive(initiatorNum,funcNum,argBundle){
 	// [NW] this function needs to be hooked somehow such that it gets two integers and array (of strings) in the format that the Send function formulates

@@ -250,6 +250,22 @@ function TransferGameStartupInfo(from, to) {
 	if(Online){
 		Host=localStorage.getItem("Host");
 		ClientID=localStorage.getItem("ClientID");
+		GameId = localStorage.getItem("gameId");
+		pubnub.publish({
+			channel: GameId,
+			message: {"gameInitialize": ClientID} 
+		});
+		pubnub.subscribe({
+			channel: GameId,
+			message: function(message){
+				if("gameAction" in message){
+					var clientId = message.gameAction.clientId;
+					var functionNum = message.gameAction.functionNum;
+					var args = JSON.parse(message.gameAction.args);
+					Receive(clientId, functionNum, args);
+				}
+			}
+		});
 	}
 }
 function GetDifficultyConstant(difficulty) {
@@ -333,7 +349,7 @@ function ActuallyCreateNewProduct(online,cid,args){
 	ply.hasMadeProductThisTurn = true;
 	if((online)&&(cid==ClientID)){
 		var Args=[cid.toString(),nam,prodCat,subCat];
-		Send(ClientID,5,Args);
+		Send(GameId, ClientID,5,Args);
 	}
 	if(cid==ClientID){
 		$("#new-product-button").attr("disabled",(ply.hasMadeProductThisTurn));
@@ -556,7 +572,7 @@ function HireTheEmployees(online,cid,args) {
 	
 	if((online)&&(cid==ClientID)){
 		var Args=[designers.toString(),developers.toString(),testers.toString()];
-		Send(ClientID,1,Args);
+		Send(GameId, ClientID,1,Args);
 	}
 
 	UpdatePlayerDisplay();
@@ -679,7 +695,7 @@ function TryToAdvanceProduct(online,cid,args) {
 	
 	if((online)&&(cid==ClientID)){
 		Args=[prod.GlobalID.toString()];
-		Send(ClientID,6,Args);
+		Send(GameId, ClientID,6,Args);
 	}
 
 	UpdateProductListDisplayPosition(GetProductsInSamePhase(prod));
@@ -727,7 +743,7 @@ function TryToRevertProduct(online,cid,args) {
 	}
 	if((online)&&(cid==ClientID)){
 		Args=[prod.GlobalID.toString()];
-		Send(ClientID,7,Args);
+		Send(GameId, ClientID,7,Args);
 	}
 	if (!removeCheck) {
 		UpdateProductListDisplayPosition(GetProductsInSamePhase(prod));
@@ -809,7 +825,7 @@ function CycleTurn(online,cid,args) {
 	}else{
 		TheGame.Players[cid].FinishedCurrentTurn=true;
 		if(cid==ClientID){
-			Send(ClientID,2,[]);
+			Send(GameId, ClientID,2,[]);
 		}
 		var WillCycle=true;
 		TheGame.Players.forEach(function(dude){
@@ -1020,7 +1036,7 @@ function NewRoundCalc() {
 	}else if(Host){
 		RandomEventIterator();
 		var Vents=JSON.stringify(RandomEventsToIterate);
-		Send(ClientID,8,Vents);
+		Send(GameId, ClientID,8,Vents);
 	}
 	UpdatePlayerDisplay();
 	if (CurrentlySelectedProduct) {
@@ -1172,7 +1188,7 @@ function PatentProduct(online,cid,args){
 	TheGame.PatentTracker.Records[categoryIndex][2] = product.GlobalID;
 	TheGame.PatentTracker.numPatents++;
 	if((online)&&(cid==ClientID)){
-		Send(ClientID,3,[product.GlobalID]);
+		Send(GameId, ClientID,3,[product.GlobalID]);
 	}
 	UpdatePlayerDisplay();
 	UpdateCurProdDisplay(product.DisplayItemID);
@@ -1578,7 +1594,7 @@ function QuitNetworkedGame(online,cid){
 	if(!online){alert("what in the world...?");return;}
 	if(cid==ClientID){
 		// [NW] this client just tried to quit. Your code goes here.
-		Send(ClientID,4,[]);
+		Send(GameId, ClientID,4,[]);
 	}else{
 		// [NW] someone else tried to quit the game. cid is their GlobalID (which is the same as the ClientID on THEIR MACHINE). Your code goes here
 	}

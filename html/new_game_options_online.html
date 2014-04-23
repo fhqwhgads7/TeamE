@@ -93,7 +93,7 @@
 						//Actual game starting logic goes here.
 						BuildTheBrandNewGameOnline(gameId, isHost);
 						// Set game to closed
-					    var query = new Parse.Query(Game);
+					    var query = new Parse.Query(ParseGame);
 					    query.get(gameId, {
 					      success: function(game) {
 					      	game.set("open", false);
@@ -145,7 +145,7 @@
 			}
 
 			function BuildTheBrandNewGameOnline(gameId, isHost) {
-				var query = new Parse.Query(Game);
+				var query = new Parse.Query(ParseGame);
 				query.get(gameId, {
 					success: function(game) {
 						// The object was retrieved successfully.
@@ -189,7 +189,7 @@
 			}
 
 			function refreshPlayerBoxes(gameId) {
-			    var query = new Parse.Query(Game);
+			    var query = new Parse.Query(ParseGame);
 			    query.get(gameId, {
 			      success: function(game) {
 			        var playersList = game.get("players");

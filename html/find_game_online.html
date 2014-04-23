@@ -36,7 +36,7 @@
 			});	
 
 			function updateGameList() {
-				var query = new Parse.Query(Game);
+				var query = new Parse.Query(ParseGame);
 
 				query.equalTo("open", true);
 

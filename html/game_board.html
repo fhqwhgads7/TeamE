@@ -140,10 +140,11 @@
 			function QuitGame(){
 				if(Online){
 					QuitNetworkedGame(true,ClientID);
-					return;
 				}
-				if (TheGame.GameType=="Local"){
-					SaveThisGame("LastSavedGame");
+				else {
+					if (TheGame.GameType=="Local"){
+						SaveThisGame("LastSavedGame");
+					}
 				}
 				CloseQuitDialog();
 				TheGame=null;

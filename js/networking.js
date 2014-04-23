@@ -44,6 +44,7 @@ function joinGame(gameId) {
     });
 }
 
+
 			
 function RemoveGame(gameID){
 	var query = new Parse.Query(Game);

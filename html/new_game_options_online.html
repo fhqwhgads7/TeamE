@@ -153,13 +153,13 @@
 						var players = game.get("players");
 						var playerIndexMappings = ["PlyOne", "PlyTwo", "PlyThree", "PlyFour", "PlyFive", "PlySix"];
 				        var playersBoxesColors = $(".PlayerBox").find("select.TwoColumnSecond");
+						TheBrandNewGame.Players = [];
 						$.each(players, function(index,player){
 							var playerKey = playerIndexMappings[index];
-							TheBrandNewGame.Players = [];
-							TheBrandNewGame.Players[playerKey] = new Object();
-							TheBrandNewGame.Players[playerKey].Name = player;
-							TheBrandNewGame.Players[playerKey].Type = "Player";
-							TheBrandNewGame.Players[playerKey].Color = $(playersBoxesColors[index]).val();
+							TheBrandNewGame.Players[index] = new Object();
+							TheBrandNewGame.Players[index].Name = player;
+							TheBrandNewGame.Players[index].Type = "Player";
+							TheBrandNewGame.Players[index].Color = $(playersBoxesColors[index]).val();
 						});	
 						localStorage.setItem("TheBrandNewGame", JSON.stringify(TheBrandNewGame));
 						localStorage.setItem("Online",true);

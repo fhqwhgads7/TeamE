@@ -133,11 +133,11 @@ function NewGameInitialize() {
 	var GameCreationInfo = JSON.parse(localStorage.getItem("TheBrandNewGame"));
 	TheGame = new Game("2947");
 	TransferGameStartupInfo(GameCreationInfo, TheGame);
+
 	if(Online){
 		TheGame.CurrentPlayerNum=ClientID;
 	}
 	TheGame.CurrentPlayer = TheGame.Players[TheGame.CurrentPlayerNum];
-	TheGame.CurrentPlayerNum = TheGame.CurrentPlayer.Number;
 	if (TheGame.Settings.PatentingEnabled === "On") {
 		TheGame.PatentTracker = new PatentTracker();
 	}
@@ -187,7 +187,6 @@ function LoadGameInitialize(gameName) {
 			}
 		}
 		TheGame.CurrentPlayer = TheGame.Players[TheGame.CurrentPlayerNum];
-		TheGame.CurrentPlayerNum = TheGame.CurrentPlayer.Number;
 		UpdatePlayerDisplay();
 		PopulateNewProdCategories();
 		for (var i = 0; i < TheGame.CurrentPlayer.Products.length; i++) {
@@ -235,8 +234,8 @@ function TipThink() {
 	Elem.css("left", (NewPos).toString() + "px");
 }
 function TransferGameStartupInfo(from, to) {
-	for (var i = 1; i <= 6; i++) {
-		var Ply = from.Players["Ply" + NumberNameTable[i]];
+	for (var i = 0; i < 5; i++) {
+		var Ply = from.Players[i];
 		if (Ply) {
 			new Player(to, Ply.Name, Ply.Type, Ply.Color);
 		}
@@ -247,7 +246,7 @@ function TransferGameStartupInfo(from, to) {
 	to.Settings.PatentingEnabled = from.Options.PatentingEnabled;
 	to.Settings.NumberOfRounds = from.Options.NumberOfRounds;
 	to.GameType = from.GameType;
-	Online=(to.GameType=="Online");
+	Online = localStorage.getItem("Online");
 	if(Online){
 		Host=localStorage.getItem("Host");
 		ClientID=localStorage.getItem("ClientID");

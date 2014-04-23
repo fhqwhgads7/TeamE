@@ -18,7 +18,7 @@ function joinGame(gameId) {
             if (playersList.indexOf(currentUsername) == -1) {
                 playersList.push(currentUsername);
                 game.set("players", playersList);
-                if(playersList.length < 6) {
+                if(playersList.length >= 6) {
                     game.set("open", false);
                 }
                 game.save(null, {

@@ -173,7 +173,7 @@
 					$("#back-button").attr('onclick', 'SwitchToPage("find_game_online.html")'); 
 				}
 				else {
-					$("#back-button").attr('onclick', 'goToCreateGame(); RemoveThisGame(gameId)'); 
+					$("#back-button").attr('onclick', 'goToCreateGame(); RemoveThisGame('+gameId+')'); 
 				}
 				$("#new-game-name").text(gameName);
 				$("#create-game-wrapper").hide();

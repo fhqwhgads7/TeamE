@@ -97,6 +97,7 @@
 					    query.get(gameId, {
 					      success: function(game) {
 					      	game.set("open", false);
+							localStorage.setItem("LoadingAGame", null);
 							SwitchToPage("game_board.html");
 					      },
 					      error: function(object, error) {

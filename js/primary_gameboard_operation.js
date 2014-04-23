@@ -1035,8 +1035,10 @@ function NewRoundCalc() {
 		RandomEventIterator();
 	}else if(Host){
 		RandomEventIterator();
-		var Vents=JSON.stringify(RandomEventsToIterate);
-		Send(GameId, ClientID,8,Vents);
+		if (RandomEventsToIterate.length > 0){
+			var Vents=JSON.stringify(RandomEventsToIterate);
+			Send(GameId,ClientID,8,Vents);
+		}
 	}
 	UpdatePlayerDisplay();
 	if (CurrentlySelectedProduct) {

@@ -18,29 +18,27 @@
 
 			function Initialize()
 			{
+
 				window.addEventListener('message', Peace, false);
-				goToCreateGame();
-				PopulatePlayerColorFields();
-				GlobalInitialize();
-				changeCurrentBGM("MainMenu");
-				if(localStorage.getItem("TheBrandNewGame")){
-					TheBrandNewGame=JSON.parse(localStorage.getItem("TheBrandNewGame"));
-				}
 
 				var joinedGame = localStorage.getItem("joinedGame");
 				if(joinedGame){
-					LoadOptions();
 					var joinedGameId = localStorage.getItem("joinedGameId");
 					var joinedGameName = localStorage.getItem("joinedGameName");
 					goToLobby(false, joinedGameId, joinedGameName);
 				} else {
+					
+					if(localStorage.getItem("TheBrandNewGame")){
+						TheBrandNewGame=JSON.parse(localStorage.getItem("TheBrandNewGame"));
+						LoadOptions();
+					}
 					goToCreateGame();
 					PopulatePlayerColorFields();
 					GlobalInitialize();
 					changeCurrentBGM("MainMenu");
-					LoadOptions();
 				}
-			}
+
+							}
 			function Peace(event){
 				if (event.data === 'Logout'){
 					GoBackToMainMenu();
@@ -93,7 +91,8 @@
 				setTimeout(function(){
 					if (Countdown <= 0) {
 						//Actual game starting logic goes here.
-						SwitchToPage("title.html");
+
+						SwitchToPage("gameboard.html");
 					}
 					else {
 						Countdown--;
@@ -177,6 +176,12 @@
 						RemoveThisGame(gameId);
 						goToCreateGame();
 					});
+					$("#begin-game-button-button").click(function () {
+		                pubnub.publish({
+		                        channel: gameId,
+		                        message: {"startGame": currentUsername}
+		                }); 
+					});
 				}
 				else {
 					$("#back-button").click(function () {
@@ -195,11 +200,14 @@
                         channel: gameId,
                         message: {"refreshPlayers": currentUsername}
                 }); 
+
 				pubnub.subscribe({
 					channel: gameId,
 					message: function(message){
 						if("refreshPlayers" in message){
 							refreshPlayerBoxes(gameId);
+						} else if ("startGame" in message) {
+							BeginGame();
 						}
 					}
 				});
@@ -412,7 +420,7 @@
 					</div>
 					<button id="back-button" class="Standard" onclick="goToCreateGame()" style="left:16%;top:82%;width:28%;font-size:20px">Back</button>
 					<div id="Countdown" class="StandardText" style="display:none;margin:0px;width:100%;top:82%;">Fail</div>
-					<button id="begin-game-button" class="Standard" onclick="BeginGame()" style="right:16%;top:82%;width:28%;font-size:20px">Start Game</button>
+					<button id="begin-game-button" class="Standard" onclick="" style="right:16%;top:82%;width:28%;font-size:20px">Start Game</button>
 				</div>
 			</div>
 		</div>

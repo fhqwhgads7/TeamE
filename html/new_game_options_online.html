@@ -149,6 +149,24 @@
 					return ($(this).value() == theValue);
 				}).prop('selected', true);
 			}
+
+			function refreshPlayerBoxes(gameId) {
+			    var query = new Parse.Query(Game);
+			    query.get(gameId, {
+			      success: function(game) {
+			        var playersList = game.get("players");
+			        var playersBoxesPlayerNames = $(".PlayerBox").find("textarea");
+			        $(playersBoxesPlayerNames).val("");
+			        $.each(playersList, function(index, player) {
+				        $(playersBoxesPlayerNames[index]).val(player);
+			        })
+			      },
+			      error: function(object, error) {
+			        alert("Oops, couldn't refresh players list: " + error.message);
+			      }
+			    });
+			}
+
 			function goToLobby(isHost, gameId, gameName) {
 				localStorage.removeItem("joinedGame");
 				if(!isHost) {
@@ -160,6 +178,21 @@
 				$("#new-game-name").text(gameName);
 				$("#create-game-wrapper").hide();
 				$("#lobby-wrapper").show();
+
+				// Subscribe to current game's channel	
+				refreshPlayerBoxes(gameId);
+                pubnub.publish({
+                        channel: gameId,
+                        message: {"refreshPlayers": currentUsername}
+                }); 
+				pubnub.subscribe({
+					channel: gameId,
+					message: function(message){
+						if("refreshPlayers" in message){
+							refreshPlayerBoxes(gameId);
+						}
+					}
+				});
 			} 
 			function goToCreateGame() {
 				$("#lobby-wrapper").hide();

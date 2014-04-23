@@ -28,7 +28,7 @@ function joinGame(gameId) {
                 });
                 pubnub.publish({
                         channel: gameId,
-                        message: {"playerJoined": currentUsername}
+                        message: {"refreshPlayers": currentUsername}
                 }); 
             }
             localStorage.setItem("joinedGame", true); 

@@ -18,6 +18,9 @@ function joinGame(gameId) {
             if (playersList.indexOf(currentUsername) == -1) {
                 playersList.push(currentUsername);
                 game.set("players", playersList);
+                if(playersList.length < 6) {
+                    game.set("open", false);
+                }
                 game.save(null, {
                     success: function(game) {
                         console.log("joinedGame worked.");
@@ -53,6 +56,9 @@ function leaveGame(gameId) {
         if (indexOfPlayerBouncing > -1) {
             playersList.splice(indexOfPlayerBouncing,1);
             game.set("players", playersList);
+            if(playersList.length < 6) {
+                game.set("open", true);
+            }
             game.save(null, {
                 success: function(game) {
                     console.log("joinedGame worked.");

@@ -105,13 +105,15 @@ test("the VI initializes properly and knows its own name",function(){
 	ok(Ply.VIMemory.Name=="Test_Player","VI doesn't know its name");
 });
 
-test("user can actually register properly",function(){
+/*test("user can actually register properly",function(){
 	
 });
 
 test("user can login properly",function(){
 	
-});/*
+});
+*/
+/*
 test("music plays",function(){
 	var music=music
 	ok(music, "Music plays.");

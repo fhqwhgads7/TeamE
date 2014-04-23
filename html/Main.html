@@ -294,6 +294,7 @@
 							if (TheEvent === "FinishedGameAndWon"){
 								CurrentUser.set("gameswon", CurrentUser.get("gameswon") + 1);
 							}
+							CurrentUser.save();
 						}
 					}
 				}

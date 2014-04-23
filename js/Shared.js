@@ -222,6 +222,7 @@ function Player(game,name,type,color){
 	newPlayer.LastDisplayedMoney=newPlayer.Money;
 	newPlayer.TriggeredEvents=[];
 	newPlayer.isHost=false;
+	newPlayer.isActive=true;
 	newPlayer.FinishedCurrentTurn=false;
 	newPlayer.hasMadeProductThisTurn = false;
 	if(game){
@@ -321,7 +322,8 @@ function Receive(initiatorNum,funcNum,argBundle){
 		ActuallyCreateNewProduct,
 		TryToAdvanceProduct,
 		TryToRevertProduct,
-		RandomEventsGo
+		RandomEventsGo,
+		removeProductOnline
 	];
 	if(initiatorNum!=ClientID){
 		SendableFuncs[funcNum](true,initiatorNum,argBundle);

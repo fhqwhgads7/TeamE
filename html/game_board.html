@@ -143,7 +143,7 @@
 			}
 			function QuitGame(){
 				if(Online){
-					QuitNetworkedGame(true,ClientID);
+					QuitNetworkedGame(true,ClientID,"NoRecursion");
 				}
 				else {
 					if (TheGame.GameType=="Local"){
@@ -448,10 +448,10 @@
 								
 							<button class="Standard" style="left:20%;top:82%;width:60%" onclick="CloseDetailsDialog()">OK</button>
 						</div>
-						<div class="Popup" id="RemoveDialog">
-							<div id="RemoveMessage" class="StandardText" style="margin:0px;width:100%;top:10%">Are you sure you want to remove this product from the gameboard?</div>
-							<button class="Standard" id="CancelRemoveButton" style="left:10%;top:75%;width:30%" onclick="CloseRemoveDialog()">Cancel</button>
-							<button class="Standard" id="ConfirmRemoveButton" style="right:10%;top:75%;width:30%" onclick="removeProduct(CurrentlySelectedProduct); CloseRemoveDialog(); noSound()">Remove</button>
+						<div class="Popup" id="RemoveDialog" style="top:25%;height:50%;">
+							<div id="RemoveMessage" class="StandardText" style="font-size:35px;margin:0px;width:100%;top:7%">Are you sure you want to remove this product from the gameboard?</div>
+							<button class="Standard" id="CancelRemoveButton" style="font-size:20px;left:10%;top:75%;width:30%" onclick="CloseRemoveDialog()">Cancel</button>
+							<button class="Standard" id="ConfirmRemoveButton" style="font-size:20px;right:10%;top:75%;width:30%" onclick="removeProduct(CurrentlySelectedProduct); CloseRemoveDialog(); noSound()">Remove</button>
 						</div>
 						<div class="Popup" id="EventDialog" style="top:10%;height:80%;width:60%;left:20%">
 							<div class="StandardText" id="EventTitle" style="font-size:35px;margin:0px;width:100%;top:3%;">Code is broken!</div>
@@ -477,6 +477,7 @@
 					<span id="CashFour" class="CashAlert">0</span>
 					<span id="CashFive" class="CashAlert">0</span>
 					<span id="CashSix" class="CashAlert">0</span>
+					<span id="CashOnline" class="CashAlert">0</span>
 					<div class="StandardText" id="TipSpan" style="font-size:12px;transition:none;white-space:nowrap;color:rgba(255,255,255,.8);top:97%;left:980px;">Welcome to the stage of Entrepreneurship!</div>
 					<div class="StandardText" id="RoundNumberDisplay" style="font-size:20px;transition:none;top:1%;right:1%;text-align:right">Round Borked!</div>
 				</div>

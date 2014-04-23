@@ -14,11 +14,12 @@
 			var GameDifficulty;			//EASY, NORMAL, HARD, LUNATIC
 			var NumberOfRounds;			//Between 40 and 60
 			var PatentingEnabled;		//true/false
+			var GameHasStarted = false;
 			var Countdown = 6;
-
+			var TheGameID;
+			
 			function Initialize()
 			{
-
 				window.addEventListener('message', Peace, false);
 				GlobalInitialize();
 				PopulatePlayerColorFields();
@@ -41,11 +42,15 @@
 							}
 			function Peace(event){
 				if (event.data === 'Logout'){
+					leaveGame(TheGameID);	
 					GoBackToMainMenu();
 				}
 			}
 			function HostTheGame(){
-				if (HasNonAlphaNumerics($("#GameName").val())){
+				if ($("#GameName").val().length < 5){
+					ShowAlert("Game name must be at least 5 characters long.", "fail.png");
+					playSound(GameSounds.Wrong_BAD);
+				} else if (HasNonAlphaNumerics($("#GameName").val())){
 					ShowAlert("Game name must contain only letters, numbers, or spaces.", "fail.png");
 					playSound(GameSounds.Wrong_BAD);
 				}
@@ -54,6 +59,7 @@
 					newGame.set("host", currentUsername);
 					newGame.set("open", true);
 					newGame.set("players", [currentUsername]);
+					newGame.set("capacity", 6);
 
 					var newGameName = $("#GameName").val();
 					newGame.set("name", newGameName);
@@ -63,18 +69,33 @@
 					ShowAlert("Hosting game " + newGameName + "...", "loading_thing.gif");
 					playSound(GameSounds.ButtonSelect);
 					$("#AlertButton").attr('disabled', true);
-
-					newGame.save(null, {
-						success: function(newGame) {
-							pubnub.publish({
-									channel: 'gameList',
-									message: {"refreshGames": newGameName}
-							});	
-							ShowAlert("Game has been hosted!", "success.png");
-							$("#AlertButton").attr('disabled', false);
-							goToLobby(true, newGame.id, newGameName);
+					
+					var query = new Parse.Query(ParseGame).equalTo("name", newGameName);
+					query.count({
+						success: function(message){
+							if (parseInt(message,10) > 0) {
+								ShowAlert("Game name already exists.", "fail.png");
+								$("#AlertButton").attr('disabled', false);
+							}
+							else {
+								newGame.save(null, {
+									success: function(newGame) {
+										pubnub.publish({
+											channel: 'gameList',
+											message: {"refreshGames": newGameName}
+										});	
+										ShowAlert("Game has been hosted!", "success.png");
+										$("#AlertButton").attr('disabled', false);
+										goToLobby(true, newGame.id, newGameName);
+									},
+									error: function(newGame, error) {
+										ShowAlert("Error creating game. Try again?", "fail.png");
+										$("#AlertButton").attr('disabled', false);
+									}
+								});
+							}
 						},
-						error: function(newGame, error) {
+						error: function(error){
 							ShowAlert("Error creating game. Try again?", "fail.png");
 							$("#AlertButton").attr('disabled', false);
 						}
@@ -88,22 +109,25 @@
 			function BeginGame(gameId, isHost){
 				$("#back-button").attr('disabled',true);
 				$("#begin-game-button").attr('disabled',true);
+				GameHasStarted = true;
 				setTimeout(function(){
 					if (Countdown <= 0) {
 						//Actual game starting logic goes here.
 						BuildTheBrandNewGameOnline(gameId, isHost);
 						// Set game to closed
-					    var query = new Parse.Query(ParseGame);
-					    query.get(gameId, {
-					      success: function(game) {
-					      	game.set("open", false);
+						var query = new Parse.Query(ParseGame);
+						query.get(gameId, {
+						  success: function(game) {
+							game.set("open", false);
+							game.save();
+							game.destroy();
 							localStorage.setItem("LoadingAGame", null);
 							SwitchToPage("game_board.html");
-					      },
-					      error: function(object, error) {
-					        console.log("Oops, couldn't refresh players list: " + error.message);
-					      }
-					    });
+						  },
+						  error: function(object, error) {
+							console.log("Oops, couldn't refresh players list: " + error.message);
+						  }
+						});
 					} else {
 						Countdown--;
 						if (Countdown < 6) {
@@ -139,32 +163,31 @@
 				TheBrandNewGame.Options.CPUIntelligence="STANDARD";
 				TheBrandNewGame.Options.NumberOfRounds=$("#NumberOfRounds option:selected").val().toString();
 				TheBrandNewGame.Options.PatentingEnabled=$("#Patenting option:selected").val().toString();
+				TheBrandNewGame.GameType = "Online";
 				localStorage.setItem("TheBrandNewGame",JSON.stringify(TheBrandNewGame));
 
 				return TheBrandNewGame;
 			}
 
-			function BuildTheBrandNewGameOnline(gameId, isHost) {
+			function BuildTheBrandNewGameOnline(gameId, amIHost) {
 				var query = new Parse.Query(ParseGame);
 				query.get(gameId, {
 					success: function(game) {
 						// The object was retrieved successfully.
 						TheBrandNewGame = game.get("optionsObject");
 						var players = game.get("players");
-						var playerIndexMappings = ["PlyOne", "PlyTwo", "PlyThree", "PlyFour", "PlyFive", "PlySix"];
 				        var playersBoxesColors = $(".PlayerBox").find("select.TwoColumnSecond");
 						TheBrandNewGame.Players = [];
 						$.each(players, function(index,player){
-							var playerKey = playerIndexMappings[index];
 							TheBrandNewGame.Players[index] = new Object();
 							TheBrandNewGame.Players[index].Name = player;
 							TheBrandNewGame.Players[index].Type = "Player";
 							TheBrandNewGame.Players[index].Color = $(playersBoxesColors[index]).val();
+							TheBrandNewGame.Players[index].isHost = amIHost;
 						});	
 						localStorage.setItem("TheBrandNewGame", JSON.stringify(TheBrandNewGame));
-						localStorage.setItem("Online",true);
 						localStorage.setItem("gameId", gameId);
-						localStorage.setItem("Host", isHost);
+						localStorage.setItem("Host", amIHost.toString());
 						localStorage.setItem("ClientID",players.indexOf(currentUsername));
 					},
 					error: function(object, error) {
@@ -195,11 +218,16 @@
 			        var playersList = game.get("players");
 			        var playersBoxes = $(".PlayerBox");
 			        var playersBoxesPlayerNames = $(playersBoxes).find("textarea");
+					var playersBoxesPlayerStatuses = $(playersBoxes).find(".TwoColumnFirst");
 			        $(playersBoxes).addClass("empty");
 			        $(playersBoxesPlayerNames).val("");
+					if (localStorage.getItem("Host") === "true"){
+						$(playersBoxesPlayerStatuses).attr('disabled',false);
+					}
 			        $.each(playersList, function(index, player) {
 				        $(playersBoxes[index]).removeClass("empty");
 				        $(playersBoxesPlayerNames[index]).val(player);
+				        $(playersBoxesPlayerStatuses[index]).attr('disabled',true);
 			        })
 			      },
 			      error: function(object, error) {
@@ -210,16 +238,21 @@
 
 			function goToLobby(isHost, gameId, gameName) {
 				localStorage.removeItem("joinedGame");
+				parent.postMessage("HideIt","*");
+				TheGameID = gameId;
 				if(isHost) {
 					$("#back-button").click(function () {
+						parent.postMessage("ShowIt","*");
 						RemoveThisGame(gameId);
 						goToCreateGame();
 					});
 					$("#begin-game-button").click(function() {
-		                pubnub.publish({
-		                        channel: gameId,
-		                        message: {"startGame": currentUsername}
-		                }); 
+						if (!GameHasStarted){
+							pubnub.publish({
+								channel: gameId,
+								message: {"startGame": currentUsername}
+							}); 
+						}
 					});
 				}
 				else {

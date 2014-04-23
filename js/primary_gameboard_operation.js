@@ -62,6 +62,23 @@ function RandomEvent(newName, newMessage, newTarget, newScale, newType, newValue
 	
 	return newRandomEvent;
 }
+function CloneRandomEvent(RandomEventToBeCloned){
+	var newRandomEvent = {};
+	newRandomEvent.ClassName="RANDOMEVENT_OBJECT";
+	newRandomEvent.Name = RandomEventToBeCloned.Name;
+	newRandomEvent.Message = RandomEventToBeCloned.Message;
+	newRandomEvent.AreaOfEffect = RandomEventToBeCloned.Target;
+	newRandomEvent.Scale = RandomEventToBeCloned.Scale;
+	newRandomEvent.Type = RandomEventToBeCloned.Type;
+	newRandomEvent.Value = RandomEventToBeCloned.Value;
+	newRandomEvent.Picture = RandomEventToBeCloned.Picture;
+	newRandomEvent.Likeliness = RandomEventToBeCloned.Likeliness;
+	newRandomEvent.OccurrenceInterval = RandomEventToBeCloned.OccurrenceInterval;
+	newRandomEvent.TurnsUntilActive = 3;
+	newRandomEvent.Target = null;
+	
+	return newRandomEvent;
+}
 var RandomEvents = [
 	new RandomEvent("Tax break!", "The IRS is in a good mood!", "AllPlayers", 2, "CashChange", 750, "cash", 0.45, 12),
 	new RandomEvent("Explosion!", "A major accident has destroyed a great chunk of your area!", "OnePlayer", -7, "AssetDestruction", 4, "disaster", 0.2, 6),
@@ -135,7 +152,10 @@ function NewGameInitialize() {
 	TransferGameStartupInfo(GameCreationInfo, TheGame);
 
 	if(Online){
-		TheGame.CurrentPlayerNum=ClientID;
+		TheGame.CurrentPlayerNum=parseInt(ClientID,10);
+	}
+	else{
+		TheGame.CurrentPlayerNum=0;
 	}
 	TheGame.CurrentPlayer = TheGame.Players[TheGame.CurrentPlayerNum];
 	if (TheGame.Settings.PatentingEnabled === "On") {
@@ -246,9 +266,9 @@ function TransferGameStartupInfo(from, to) {
 	to.Settings.PatentingEnabled = from.Options.PatentingEnabled;
 	to.Settings.NumberOfRounds = from.Options.NumberOfRounds;
 	to.GameType = from.GameType;
-	Online = localStorage.getItem("Online");
+	Online = to.GameType === "Online";
 	if(Online){
-		Host=localStorage.getItem("Host");
+		Host=localStorage.getItem("Host")==="true";
 		ClientID=localStorage.getItem("ClientID");
 		GameId = localStorage.getItem("gameId");
 		pubnub.publish({
@@ -350,6 +370,9 @@ function ActuallyCreateNewProduct(online,cid,args){
 	if((online)&&(cid==ClientID)){
 		var Args=[cid.toString(),nam,prodCat,subCat];
 		Send(GameId, ClientID,5,Args);
+		UpdateCurProdDisplay("ProductDisplayItem_" + prod.GlobalID);
+		$("#ProductDisplayItem_" + prod.GlobalID).css('opacity', 1);
+		$("#ProductDisplayItem_" + prod.GlobalID).css('z-index', "2");
 	}
 	if(cid==ClientID){
 		$("#new-product-button").attr("disabled",(ply.hasMadeProductThisTurn));
@@ -372,17 +395,19 @@ function CreateProductDisplay(prod) {
 	ProdElem.style.backgroundImage = "url('../images/ProductIcons/" + prod.Category.toLowerCase() + "_" + prod.SubCategory.toLowerCase() + ".png')";
 	ProdElem.style.left = "0px";
 	ProdElem.style.top = "0px";
-	ProdElem.style.zIndex = "2";
 	ProdElem.style.borderStyle = "outset";
 	ProdElem.style.borderColor = PlayerColors[prod.Color];
 	ProdElem.style.backgroundColor = prod.Color;
 	ProdElem.style.webkitTransform = "rotate(" + (-Rotation).toString() + "deg)";
 	ProdElem.style.MozTransform = "rotate(" + (-Rotation).toString() + "deg)";
-	ProdElem.style.opacity = 1;
 	GameBoard.appendChild(ProdElem);
 	UpdateProductListDisplayPosition(GetProductsInSamePhase(prod));
 	UpdatePlayerDisplay();
-	UpdateCurProdDisplay(ProdElem.id);
+	if (!Online){
+		ProdElem.style.opacity = 1;
+		ProdElem.style.zIndex = "2";
+		UpdateCurProdDisplay(ProdElem.id);
+	}
 }
 function RecreateProductDisplay(prod) {
 	var GameBoard = document.getElementById("GameBoardCircle");
@@ -413,6 +438,7 @@ function RecreateProductDisplay(prod) {
 
 function removeProduct(prod) {
 	if (prod) {
+		var theID = prod.GlobalID;
 		playSound(GameSounds.LoseMoney);
 		$("#ProductWindow").hide();
 		if (isThisProductPatented(prod, TheGame)) {
@@ -421,10 +447,10 @@ function removeProduct(prod) {
 		if (prod === CurrentlySelectedProduct) {
 			CurrentlySelectedProduct = null;
 		}
-		$("#ProductDisplayItem_" + prod.GlobalID).css('opacity', '0');
-		$("#ProductDisplayItem_" + prod.GlobalID).css('transition', '500ms ease-out');
+		$("#ProductDisplayItem_" + theID.toString()).css('opacity', '0');
+		$("#ProductDisplayItem_" + theID.toString()).css('transition', '500ms ease-out');
 		setTimeout(function () {
-			$("div").remove("#ProductDisplayItem_" + prod.GlobalID);
+			$("div").remove("#ProductDisplayItem_" + theID.toString());
 		}, 500);
 		if (prod.justStarted) {
 			TheGame.CurrentPlayer.hasMadeProductThisTurn = false;
@@ -434,10 +460,45 @@ function removeProduct(prod) {
 		TheGame.Players[ThePlayerAtLoss].NumProducts = TheGame.Players[ThePlayerAtLoss].Products.length;
 		UpdateProductListDisplayPosition(GetProductsInThisPhase(prod.Phase, prod.Owner));
 		UpdatePlayerDisplay();
+		if (!ProductsBeingRemoved && Online){
+			Send(GameId, ClientID,9,theID.toString());
+		}
 	}
 	$("#new-product-button").attr("disabled", (TheGame.CurrentPlayer.hasMadeProductThisTurn));
 }
-
+function removeProductOnline(online,cid,args){
+	if (ProductsBeingRemoved){
+		setTimeout(function(){
+			removeProductOnline(online,cid,args);
+		},400);
+	}
+	else {
+		if(!online){alert("This is a guard statement.");return;}
+		if(cid===ClientID){alert("It is made of guard and statement.");return;}
+		ProdElemID=parseInt(JSON.parse(args),10);
+		if (ProdElemID !== null) {
+			playSound(GameSounds.LoseMoney);
+			$("#ProductWindow").hide();
+			if (isThisProductPatented(TheGame.PlayerProducts[ProdElemID], TheGame)) {
+				removePatentFromRecords(TheGame.PlayerProducts[ProdElemID], TheGame);
+			}
+			if (TheGame.PlayerProducts[ProdElemID] === CurrentlySelectedProduct) {
+				CurrentlySelectedProduct = null;
+			}
+			$("#ProductDisplayItem_" + ProdElemID.toString()).css('opacity', '0');
+			$("#ProductDisplayItem_" + ProdElemID.toString()).css('transition', '500ms ease-out');
+			setTimeout(function () {
+				$("div").remove("#ProductDisplayItem_" + ProdElemID.toString());
+			}, 500);
+			TheOwner = TheGame.PlayerProducts[ProdElemID].Owner;
+			TheOwner.Products.splice(TheOwner.Products.indexOf(TheGame.PlayerProducts[ProdElemID]), 1);
+			var ThePlayerAtLoss = TheGame.Players.indexOf(TheOwner);
+			TheGame.Players[ThePlayerAtLoss].NumProducts = TheGame.Players[ThePlayerAtLoss].Products.length;
+			UpdateProductListDisplayPosition(GetProductsInThisPhase(TheGame.PlayerProducts[ProdElemID].Phase, TheOwner));
+			UpdatePlayerDisplay();
+		}
+	}
+}
 function removeMultipleProducts(HitList) {
 	ProductsBeingRemoved = true;
 	if (HitList.length > 1) {
@@ -454,13 +515,11 @@ function removeMultipleProducts(HitList) {
 
 function GetProductsInSamePhase(prod) {
 	var ProdsInSameSpot = [];
-
 	for (i = 0; i < prod.Owner.Products.length; i++) {
 		if (prod.Owner.Products[i].Phase === prod.Phase) {
 			ProdsInSameSpot.push(prod.Owner.Products[i]);
 		}
 	}
-
 	return ProdsInSameSpot;
 }
 
@@ -755,7 +814,14 @@ function TryToRevertProduct(online,cid,args) {
 function VisualCashAlert() {
 	var Ply = TheGame.CurrentPlayer;
 	var Amt = Ply.Money - Ply.LastDisplayedMoney;
-	var theNumber = NumberNameTable[TheGame.CurrentPlayerNum + 1];
+	var theNumber;
+	
+	if (Online){
+		theNumber = "Online";
+	}
+	else {
+		theNumber = NumberNameTable[TheGame.CurrentPlayerNum + 1];
+	}
 	if (!ShowCashAlert) {
 		return;
 	}
@@ -817,6 +883,9 @@ function PopulateScoreboard() {
 		$("#" + Str + "ScbdMoney").html(Ply.Money);
 		$("#" + Str + "ScbdProds").html(Ply.NumProducts);
 		$("#" + Str + "ScbdEmps").html(Ply.NumQA + Ply.NumDevs + Ply.NumCreative);
+		if (!(Ply.isActive)){
+			$("#" + Str + "ScbdBox").css('opacity',0.5);
+		}
 	}
 }
 function CycleTurn(online,cid,args) {
@@ -825,11 +894,12 @@ function CycleTurn(online,cid,args) {
 	}else{
 		TheGame.Players[cid].FinishedCurrentTurn=true;
 		if(cid==ClientID){
+			$("#ControlLock").show();
 			Send(GameId, ClientID,2,[]);
 		}
 		var WillCycle=true;
 		TheGame.Players.forEach(function(dude){
-			if(!dude.FinishedCurrentTurn){
+			if(!(dude.FinishedCurrentTurn) && (dude.isActive)){
 				WillCycle = false;
 			}
 		});
@@ -939,11 +1009,13 @@ function DisplayNewRoundEvent() {
 	}
 }
 function NewRoundCalc() {
-	RandomEventSelector();
+	if (!Online || Host){
+		RandomEventSelector();
+	}
 	DecrementCategoryChanges();
 	for (var i = 0; i < TheGame.Players.length; i++) {
 		var Ply = TheGame.Players[i];
-		if (Ply.NumProducts > 0) {
+		if (Ply.NumProducts > 0 && Ply.isActive) {
 			for (var j = 0; j < Ply.Products.length; j++) {
 				var Prod = Ply.Products[j];
 				if (Prod.Phase !== Prod.PhaseAtStartOfTurn) {
@@ -1003,27 +1075,29 @@ function NewRoundCalc() {
 	for (var i = 0; i < TheGame.Players.length; i++) {
 		var Ply = TheGame.Players[i];
 		var Net = 0;
-		if (Ply.NumProducts < 1) {
-			Net = Math.round(BasePayouts.DayJobEachTurn * TotalPayoutRate * (1.4 - 0.2 * (GetDifficultyConstant(TheGame.Settings.Difficulty))));
-		} else {
-			for (var j = 0; j < Ply.Products.length; j++) {
-				var Prod = Ply.Products[j];
-				if (Prod.Phase === ProductPhases.Maintenance && (SubCategoryAttributes[Prod.SubCategory][4] <= 0)) {
-					var earnings = Math.round(getMonetaryValue(Prod) * SubCategoryAttributes[Prod.SubCategory][3] * TotalPayoutRate * (1.4 - 0.2 * (GetDifficultyConstant(TheGame.Settings.Difficulty))));
-					if (TheGame.PatentTracker) {
-						patentOwnerID = doIPayRoyalties(Prod, TheGame.PatentTracker);
-						if (patentOwnerID !== -1) {
-							cashOwed = Math.round(earnings / 10);
-							earnings -= cashOwed;
-							TheGame.Players[patentOwnerID].Money += cashOwed;
+		if (Ply.isActive){
+			if (Ply.NumProducts < 1) {
+				Net = Math.round(BasePayouts.DayJobEachTurn * TotalPayoutRate * (1.4 - 0.2 * (GetDifficultyConstant(TheGame.Settings.Difficulty))));
+			} else {
+				for (var j = 0; j < Ply.Products.length; j++) {
+					var Prod = Ply.Products[j];
+					if (Prod.Phase === ProductPhases.Maintenance && (SubCategoryAttributes[Prod.SubCategory][4] <= 0)) {
+						var earnings = Math.round(getMonetaryValue(Prod) * SubCategoryAttributes[Prod.SubCategory][3] * TotalPayoutRate * (1.4 - 0.2 * (GetDifficultyConstant(TheGame.Settings.Difficulty))));
+						if (TheGame.PatentTracker) {
+							patentOwnerID = doIPayRoyalties(Prod, TheGame.PatentTracker);
+							if (patentOwnerID !== -1) {
+								cashOwed = Math.round(earnings / 10);
+								earnings -= cashOwed;
+								TheGame.Players[patentOwnerID].Money += cashOwed;
+							}
 						}
+						Net += earnings;
 					}
-					Net += earnings;
 				}
 			}
+			Net = Net - ((BaseCosts.PayDev * Ply.NumDevs) + (BaseCosts.PayQA * Ply.NumQA) + (BaseCosts.PayCreative * Ply.NumCreative));
+			Ply.Money = Ply.Money + Net;
 		}
-		Net = Net - ((BaseCosts.PayDev * Ply.NumDevs) + (BaseCosts.PayQA * Ply.NumQA) + (BaseCosts.PayCreative * Ply.NumCreative));
-		Ply.Money = Ply.Money + Net;
 	}
 	TheGame.CurrentRound = TheGame.CurrentRound + 1;
 	if (TheGame.CurrentPlayer.Type === "Computer") {
@@ -1034,11 +1108,12 @@ function NewRoundCalc() {
 	if(!Online){
 		RandomEventIterator();
 	}else if(Host){
-		RandomEventIterator();
-		if (RandomEventsToIterate.length > 0){
-			var Vents=JSON.stringify(RandomEventsToIterate);
-			Send(GameId,ClientID,8,Vents);
+		var TheVents = [];
+		for (var AnEvent in RandomEventsToIterate){
+			TheVents.push($.extend(true, {}, RandomEventsToIterate[AnEvent]));
 		}
+		Send(GameId,ClientID,8,JSON.stringify(TheVents));
+		RandomEventIterator();
 	}
 	UpdatePlayerDisplay();
 	if (CurrentlySelectedProduct) {
@@ -1047,8 +1122,8 @@ function NewRoundCalc() {
 }
 function RandomEventsGo(online,cid,args){
 	if(!online){alert("you cant do this");return;}
-	if(cid==ClientID){alert("don't do this");return;}
-	RandomEventsToIterate=JSON.parse(args[0]);
+	if(cid===ClientID){alert("don't do this");return;}
+	RandomEventsToIterate=JSON.parse(args);
 	RandomEventIterator();
 	UpdatePlayerDisplay();
 	if(CurrentlySelectedProduct){
@@ -1103,7 +1178,7 @@ function PatentTracker() {
 }
 
 
-//This is here for unit testing purposes.
+//This is here for unit testing purposes. And also because it works offline for sure.
 function OldTryToBuyPatent(product, game) {
  	var cost = 2000;
  	var patentMessage = "Product " + product.Name + " was successfully patented!";
@@ -1171,7 +1246,7 @@ function TryToBuyPatent() {
 	} else if (!hasTheMoney) {
 		patentMessage = "You are $" + (cost - game.CurrentPlayer.Money).toString() + " short!";
 	} else {
-		PatentProduct(Online,ClientID);
+		PatentProduct(Online,ClientID,[product.GlobalID,cost]);
 	}
 
 	return patentMessage;
@@ -1185,7 +1260,7 @@ function PatentProduct(online,cid,args){
 		ply=TheGame.Players[cid];
 	}
 	var categoryIndex = TheGame.PatentTracker.Categories.indexOf(product.SubCategory);
-	ply.Money -= cost;
+	ply.Money -= parseInt(args[1],10);
 	TheGame.PatentTracker.Records[categoryIndex][1] = ply.GlobalID;
 	TheGame.PatentTracker.Records[categoryIndex][2] = product.GlobalID;
 	TheGame.PatentTracker.numPatents++;
@@ -1268,9 +1343,12 @@ function RandomEventSelector() {
 				if (IterateThroughThese.indexOf(TheGame.RandomEvents[i]) < 0) {
 					if ((TheGame.RandomEvents[i].TurnsUntilActive <= 0) && (TheGame.RandomEvents[i].Likeliness >= Math.random())) {
 						if (TheGame.RandomEvents[i].AreaOfEffect === "OnePlayer") {
-							TheGame.RandomEvents[i].Target = TheGame.Players[Math.floor(Math.random() * TheGame.Players.length)];
+							TheGame.RandomEvents[i].Target = Math.floor(Math.random() * TheGame.Players.length);
 						} else {
-							TheGame.RandomEvents[i].Target = TheGame.Players;
+							TheGame.RandomEvents[i].Target = [];
+							for (var PlyNum in TheGame.Players){
+								TheGame.RandomEvents[i].Target.push(PlyNum);
+							}
 						}
 						
 						if (TheGame.RandomEvents[i].Type === "AssetDestruction"){
@@ -1334,8 +1412,16 @@ function RandomEventIterator() {
 		var AllCaps = (Event.Message === Event.Message.toUpperCase());
 		var Action = Event.Type;
 		var Value = Event.Value;
-		var Target = Event.Target;
-
+		var TargetNum = Event.Target;
+		var Target = null;
+		
+		if (Array.isArray(TargetNum)){
+			Target = TheGame.Players;
+		}
+		else {
+			Target = TheGame.Players[TargetNum];
+		}
+		
 		if (Action === "CashChange") {
 			if (Array.isArray(Target)) {
 				Desc += "All players receive $" + Value.toString() + "!";
@@ -1592,12 +1678,19 @@ function SwitchToFinalResults() {
 	}, 50);
 }
 
-function QuitNetworkedGame(online,cid){
+function QuitNetworkedGame(online,cid,args){
 	if(!online){alert("what in the world...?");return;}
-	if(cid==ClientID){
-		// [NW] this client just tried to quit. Your code goes here.
-		Send(GameId, ClientID,4,[]);
+	if(cid===ClientID && args==="NoRecursion"){
+		Send(GameId, ClientID,4,Host.toString());
 	}else{
 		// [NW] someone else tried to quit the game. cid is their GlobalID (which is the same as the ClientID on THEIR MACHINE). Your code goes here
+		TheGame.Players[cid].isActive = false;
+		var WereTheyHost = args === "true";
+		if (WereTheyHost){
+			TheGame.Players[cid].isHost = false;
+			TheGame.Players[(cid+1)%(TheGame.Players.length)].isHost = true;
+			Host = parseInt(ClientID,10)===((cid+1)%(TheGame.Players.length));
+			localStorage.setItem("Host", Host.toString());
+		}
 	}
 }

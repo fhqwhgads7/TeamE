@@ -14,11 +14,11 @@ function joinGame(gameId) {
     query.get(gameId, {
       success: function(game) {
         var playersList = game.get("players");
-        if (playersList.length < 6) {
+        if (playersList.length < game.get("capacity")) {
             if (playersList.indexOf(currentUsername) == -1) {
                 playersList.push(currentUsername);
                 game.set("players", playersList);
-                if(playersList.length >= 6) {
+                if(playersList.length >= game.get("capacity")) {
                     game.set("open", false);
                 }
                 game.save(null, {
@@ -56,7 +56,7 @@ function leaveGame(gameId) {
         if (indexOfPlayerBouncing > -1) {
             playersList.splice(indexOfPlayerBouncing,1);
             game.set("players", playersList);
-            if(playersList.length < 6) {
+            if(playersList.length < game.get("capacity")) {
                 game.set("open", true);
             }
             game.save(null, {

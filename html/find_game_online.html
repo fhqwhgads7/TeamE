@@ -53,6 +53,7 @@
 						var newHostElement = $("<td>").html(host);
 
 						$(newGameElement).dblclick(function(){
+							playSound(GameSounds.ButtonSelect);
 							if (window.getSelection) {
 						        window.getSelection().removeAllRanges();
 							} else if (document.selection) {
@@ -211,7 +212,7 @@
 				
 				<div class="OptionsBox" id="OptionsBox" style="left:20%;top:20%;">
 					<div id="game-list-container">
-						<table id="game-list">
+						<table id="game-list" style="overflow:auto">
 							<tr>
 								<th>Name</th>
 								<th>Host</th>

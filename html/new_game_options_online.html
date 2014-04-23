@@ -161,6 +161,7 @@
 							TheBrandNewGame.Players[playerKey].Type = "Player";
 							TheBrandNewGame.Players[playerKey].Color = $(playersBoxesColors[index]).val();
 						});	
+						localStorage.setItem("TheBrandNewGame", JSON.stringify(TheBrandNewGame));
 						localStorage.setItem("Online",true);
 						localStorage.setItem("Host", isHost);
 						localStorage.setItem("ClientID",players.indexOf(currentUsername));

@@ -3,37 +3,141 @@
 	<head>
 		<script src="../js/jquery.js"></script>
 		<script src="../js/shared.js"></script>
+		<script src="https://www.parsecdn.com/js/parse-1.2.18.min.js"></script>
+		<script src="http://cdn.pubnub.com/pubnub.min.js"></script>
+		<script src="../js/networking.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
 		<script>
+
 			var TheBrandNewGame=null;
 			var GameName;
 			var GameDifficulty;			//EASY, NORMAL, HARD, LUNATIC
 			var NumberOfRounds;			//Between 40 and 60
 			var PatentingEnabled;		//true/false
+			var GameHasStarted = false;
+			var Countdown = 6;
+			var TheGameID;
 			
 			function Initialize()
 			{
-				goToCreateGame();
-				PopulatePlayerColorFields();
+				window.addEventListener('message', Peace, false);
 				GlobalInitialize();
+				PopulatePlayerColorFields();
 				changeCurrentBGM("MainMenu");
+
 				if(localStorage.getItem("TheBrandNewGame")){
 					TheBrandNewGame=JSON.parse(localStorage.getItem("TheBrandNewGame"));
 				}
-				LoadOptions();
+
+				var joinedGame = localStorage.getItem("joinedGame");
+				if(joinedGame){
+					LoadOptions();
+					var joinedGameId = localStorage.getItem("joinedGameId");
+					var joinedGameName = localStorage.getItem("joinedGameName");
+					goToLobby(false, joinedGameId, joinedGameName);
+				} else {
+					goToCreateGame();
+				}
+
+							}
+			function Peace(event){
+				if (event.data === 'Logout'){
+					leaveGame(TheGameID);	
+					GoBackToMainMenu();
+				}
 			}
-			
 			function HostTheGame(){
-				SaveOptions();
-				//Not yet complete
-				//The idea is to check if the game name is taken, then if it isn't, send all the data to pubhub and such
-				//Then start hosting the game
-				goToLobby();
+				if ($("#GameName").val().length < 5){
+					ShowAlert("Game name must be at least 5 characters long.", "fail.png");
+					playSound(GameSounds.Wrong_BAD);
+				} else if (HasNonAlphaNumerics($("#GameName").val())){
+					ShowAlert("Game name must contain only letters, numbers, or spaces.", "fail.png");
+					playSound(GameSounds.Wrong_BAD);
+				}
+				else {
+					var newGame = new ParseGame();
+					newGame.set("host", currentUsername);
+					newGame.set("open", true);
+					newGame.set("players", [currentUsername]);
+					newGame.set("capacity", 6);
+
+					var newGameName = $("#GameName").val();
+					newGame.set("name", newGameName);
+					var TheBrandNewGame = SaveOptions(newGameName);
+					newGame.set("optionsObject", TheBrandNewGame);
+
+					ShowAlert("Hosting game " + newGameName + "...", "loading_thing.gif");
+					playSound(GameSounds.ButtonSelect);
+					$("#AlertButton").attr('disabled', true);
+					
+					var query = new Parse.Query(ParseGame).equalTo("name", newGameName);
+					query.count({
+						success: function(message){
+							if (parseInt(message,10) > 0) {
+								ShowAlert("Game name already exists.", "fail.png");
+								$("#AlertButton").attr('disabled', false);
+							}
+							else {
+								newGame.save(null, {
+									success: function(newGame) {
+										pubnub.publish({
+											channel: 'gameList',
+											message: {"refreshGames": newGameName}
+										});	
+										ShowAlert("Game has been hosted!", "success.png");
+										$("#AlertButton").attr('disabled', false);
+										goToLobby(true, newGame.id, newGameName);
+									},
+									error: function(newGame, error) {
+										ShowAlert("Error creating game. Try again?", "fail.png");
+										$("#AlertButton").attr('disabled', false);
+									}
+								});
+							}
+						},
+						error: function(error){
+							ShowAlert("Error creating game. Try again?", "fail.png");
+							$("#AlertButton").attr('disabled', false);
+						}
+					});
+				}
 			}
+
 			function GoBackToMainMenu(){
 				SwitchToPage("title.html");
 			}
-			function BeginGame(){
+			function BeginGame(gameId, isHost){
+				$("#back-button").attr('disabled',true);
+				$("#begin-game-button").attr('disabled',true);
+				GameHasStarted = true;
+				setTimeout(function(){
+					if (Countdown <= 0) {
+						//Actual game starting logic goes here.
+						BuildTheBrandNewGameOnline(gameId, isHost);
+						// Set game to closed
+						var query = new Parse.Query(ParseGame);
+						query.get(gameId, {
+						  success: function(game) {
+							game.set("open", false);
+							game.save();
+							game.destroy();
+							localStorage.setItem("LoadingAGame", null);
+							SwitchToPage("game_board.html");
+						  },
+						  error: function(object, error) {
+							console.log("Oops, couldn't refresh players list: " + error.message);
+						  }
+						});
+					} else {
+						Countdown--;
+						if (Countdown < 6) {
+							$("#Countdown").show();
+							$("#Countdown").text(Countdown.toString());
+							playSound(GameSounds.Countdown);
+						}
+						BeginGame(gameId, isHost);
+					}
+				},1000);
 			}
 			
 			function LoadOptions()
@@ -50,33 +154,136 @@
 					}
 				}
 			}
-			function SaveOptions()
+			function SaveOptions(gameName)
 			{
 				if(!TheBrandNewGame){TheBrandNewGame=new Object();}
 				TheBrandNewGame.Options=new Object();
-				TheBrandNewGame.Options.GameName=$("#GameName").val();
+				TheBrandNewGame.Options.GameName=gameName;
 				TheBrandNewGame.Options.GameDifficulty=$("#GameDifficulty option:selected").val();
+				TheBrandNewGame.Options.CPUIntelligence="STANDARD";
 				TheBrandNewGame.Options.NumberOfRounds=$("#NumberOfRounds option:selected").val().toString();
 				TheBrandNewGame.Options.PatentingEnabled=$("#Patenting option:selected").val().toString();
+				TheBrandNewGame.GameType = "Online";
 				localStorage.setItem("TheBrandNewGame",JSON.stringify(TheBrandNewGame));
+
+				return TheBrandNewGame;
 			}
-			function RestorePrevious()
-			{
-				LoadOptions();
-				alert("Your previous settings have been restored.");
+
+			function BuildTheBrandNewGameOnline(gameId, amIHost) {
+				var query = new Parse.Query(ParseGame);
+				query.get(gameId, {
+					success: function(game) {
+						// The object was retrieved successfully.
+						TheBrandNewGame = game.get("optionsObject");
+						var players = game.get("players");
+				        var playersBoxesColors = $(".PlayerBox").find("select.TwoColumnSecond");
+						TheBrandNewGame.Players = [];
+						$.each(players, function(index,player){
+							TheBrandNewGame.Players[index] = new Object();
+							TheBrandNewGame.Players[index].Name = player;
+							TheBrandNewGame.Players[index].Type = "Player";
+							TheBrandNewGame.Players[index].Color = $(playersBoxesColors[index]).val();
+							TheBrandNewGame.Players[index].isHost = amIHost;
+						});	
+						localStorage.setItem("TheBrandNewGame", JSON.stringify(TheBrandNewGame));
+						localStorage.setItem("gameId", gameId);
+						localStorage.setItem("Host", amIHost.toString());
+						localStorage.setItem("ClientID",players.indexOf(currentUsername));
+					},
+					error: function(object, error) {
+						alert("you got problems" + error.message);
+					}
+				});
+
 			}
-			
+
+			function RemoveThisGame(gameId){
+				RemoveGame(gameId);
+				pubnub.publish({
+					channel: 'gameList',
+					message: {"refreshGames": gameId}
+				});
+			}
 			function ValueToDropDownSelection(theValue, dropdown)
 			{
 				$('[id=dropdown] option').filter(function() { 
 					return ($(this).value() == theValue);
 				}).prop('selected', true);
 			}
-			
-			
-			function goToLobby() {
+
+			function refreshPlayerBoxes(gameId) {
+			    var query = new Parse.Query(ParseGame);
+			    query.get(gameId, {
+			      success: function(game) {
+			        var playersList = game.get("players");
+			        var playersBoxes = $(".PlayerBox");
+			        var playersBoxesPlayerNames = $(playersBoxes).find("textarea");
+					var playersBoxesPlayerStatuses = $(playersBoxes).find(".TwoColumnFirst");
+			        $(playersBoxes).addClass("empty");
+			        $(playersBoxesPlayerNames).val("");
+					if (localStorage.getItem("Host") === "true"){
+						$(playersBoxesPlayerStatuses).attr('disabled',false);
+					}
+			        $.each(playersList, function(index, player) {
+				        $(playersBoxes[index]).removeClass("empty");
+				        $(playersBoxesPlayerNames[index]).val(player);
+				        $(playersBoxesPlayerStatuses[index]).attr('disabled',true);
+			        })
+			      },
+			      error: function(object, error) {
+			        console.log("Oops, couldn't refresh players list: " + error.message);
+			      }
+			    });
+			}
+
+			function goToLobby(isHost, gameId, gameName) {
+				localStorage.removeItem("joinedGame");
+				parent.postMessage("HideIt","*");
+				TheGameID = gameId;
+				if(isHost) {
+					$("#back-button").click(function () {
+						parent.postMessage("ShowIt","*");
+						RemoveThisGame(gameId);
+						goToCreateGame();
+					});
+					$("#begin-game-button").click(function() {
+						if (!GameHasStarted){
+							pubnub.publish({
+								channel: gameId,
+								message: {"startGame": currentUsername}
+							}); 
+						}
+					});
+				}
+				else {
+					$("#back-button").click(function () {
+						leaveGame(gameId);	
+						SwitchToPage("find_game_online.html");
+					});
+					$(".TwoColumnFirst").attr('disabled', true);
+				}
+				$("#begin-game-button").attr('disabled',!isHost);
+				$("#new-game-name").text(gameName);
 				$("#create-game-wrapper").hide();
 				$("#lobby-wrapper").show();
+
+				// Subscribe to current game's channel	
+				refreshPlayerBoxes(gameId);
+                pubnub.publish({
+                        channel: gameId,
+                        message: {"refreshPlayers": currentUsername}
+                }); 
+
+				pubnub.subscribe({
+					channel: gameId,
+					message: function(message){
+						if("refreshPlayers" in message){
+							refreshPlayerBoxes(gameId);
+						} else if ("startGame" in message) {
+							BeginGame(gameId, isHost);
+						}
+					}
+				});
 			} 
 			function goToCreateGame() {
 				$("#lobby-wrapper").hide();
@@ -107,7 +314,18 @@
 				var Col=$("#"+id+" option:selected").val();
 				Box.parent().css("border-color",Col);
 			}
-			
+			function ShowAlert(message, image){
+				$("#create-game-wrapper").children().attr('disabled',true);
+				$("#AlertOverlay").show();
+				$("#Alerts").show();
+				$("#AlertMessage").text(message);
+				$("#AlertImage").attr('src', "../images/icons/" + image);
+			}
+			function CloseAlert() {
+				$("#create-game-wrapper").children().attr('disabled',false);
+				$("#AlertOverlay").hide();
+				$("#Alerts").hide();
+			}
 		</script>
 		<style>
 			div.OptionsBox{
@@ -147,6 +365,10 @@
 				-webkit-border-radius:10px;
 				border-radius:10px;
 			}
+			div.PlayerBox.empty{
+				border-color: #463E3F !important;
+				box-shadow: none !important;
+			}
 			div.PlayerBox:hover{
 				background:rgba(255,255,255,.1);
 			}
@@ -158,6 +380,13 @@
 	<body onload="Initialize()">
 		<div id="MainBackground">
 			<div id="ContentContainer">
+				<div class="PopupOverlay" id="AlertOverlay">
+					<div class="Popup" id="Alerts" style="left:30%;width:40%;top:30%;height:40%">
+						<img id="AlertImage" src="../images/icons/fail.png" style="position:absolute;left:34%;top:5%;width:100px;height:100px"></img>
+						<div class="StandardText" id="AlertMessage" style="font-size:12px;margin:0px;width:100%;top:55%;">Failing...</div>															
+						<button class="Standard" id="AlertButton" onclick="CloseAlert()" style="top:70%;left:20%;width:60%">OK</button>
+					</div>
+				</div>
 				<div id="create-game-wrapper">
 					<div class="OptionsBox" id="OptionsBox" style="left:20%;top:32.5%;">
 					
@@ -178,6 +407,10 @@
 								<option value="Off">Off</option>
 							</select>
 							<select class="Options" id="NumberOfRounds" style="top:79%;">
+								<option value=20>20</option>
+								<option value=25>25</option>
+								<option value=30>30</option>
+								<option value=35>35</option>
 								<option value=40 selected="selected">40</option>
 								<option value=45>45</option>
 								<option value=50>50</option>
@@ -187,13 +420,12 @@
 						
 					</div>
 					<div class="StandardText" id="OptionsTitle" style="font-size:40px;margin:10px;width:800px;top:19%;">New Online Game</div> 
-					<button class="Standard" onclick="HostTheGame()" style="right:19%;width:28%;top:73%;font-size:20px">Continue</button>
+					<button class="Standard" onclick="HostTheGame(); noSound()" style="right:19%;width:28%;top:73%;font-size:20px">Continue</button>
 					<button class="Standard" onclick="GoBackToMainMenu()" style="left:20%;width:28%;top:73%;font-size:20px">Main Menu</button>
 				</div>
 				<div id="lobby-wrapper">
-					<div class="StandardText" id="StartNewGameTitle" style="font-size:40px;margin:0px;width:100%;top:7%;">New Game: Players</div> 
-					<div class="StandardText" id="NameOfTheGame" style="font-size:15px;margin:0px;width:100%;top:16%;">Game Name: <span id="new-game-name">Borked</span></div> 
-					<div class="PlayerBox" id="PlayerOneBox" style="border-color:red;left:13%;top:22%;">
+					<div class="StandardText" id="StartNewGameTitle" style="font-size:40px;margin:0px;width:100%;top:7%;">New Game: <span id="new-game-name">Borked</span></div> 
+					<div class="PlayerBox empty" id="PlayerOneBox" style="border-color:red;left:13%;top:22%;">
 						<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business One</div>
 						<textarea disabled maxlength=10 id="PlayerOneName" class="OneColumn" placeholder="Business/Player Name" style="position:absolute;overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
 						<select class="TwoColumnFirst" id="PlayerOneStatus" style="top:70%;">
@@ -204,7 +436,7 @@
 							<!-- dynamic -->
 						</select>
 					</div>
-					<div class="PlayerBox" id="PlayerTwoBox" style="border-color:blue;right:13%;top:22%;">
+					<div class="PlayerBox empty" id="PlayerTwoBox" style="border-color:blue;right:13%;top:22%;">
 						<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business Two</div>
 						<textarea disabled maxlength=10 id="PlayerTwoName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
 						<select class="TwoColumnFirst" id="PlayerTwoStatus" style="top:70%;">
@@ -215,7 +447,7 @@
 							<!-- dynamic -->
 						</select>
 					</div>
-					<div class="PlayerBox" id="PlayerThreeBox" style="border-color:green;left:13%;top:42%;">
+					<div class="PlayerBox empty" id="PlayerThreeBox" style="border-color:green;left:13%;top:42%;">
 						<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business Three</div>
 						<textarea disabled maxlength=10 id="PlayerThreeName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
 						<select class="TwoColumnFirst" id="PlayerThreeStatus" style="top:70%;">
@@ -226,7 +458,7 @@
 							<!-- dynamic -->
 						</select>
 					</div>
-					<div class="PlayerBox" id="PlayerFourBox" style="border-color:yellow;right:13%;top:42%;">
+					<div class="PlayerBox empty" id="PlayerFourBox" style="border-color:yellow;right:13%;top:42%;">
 						<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business Four</div>
 						<textarea disabled maxlength=10 id="PlayerFourName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
 						<select class="TwoColumnFirst" id="PlayerFourStatus" style="top:70%;">
@@ -237,7 +469,7 @@
 							<!-- dynamic -->
 						</select>
 					</div>
-					<div class="PlayerBox" id="PlayerFiveBox" style="border-color:black;left:13%;top:62%;">
+					<div class="PlayerBox empty" id="PlayerFiveBox" style="border-color:black;left:13%;top:62%;">
 						<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business Five</div>
 						<textarea disabled maxlength=10 id="PlayerFiveName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
 						<select class="TwoColumnFirst" id="PlayerFiveStatus" style="top:70%;">
@@ -248,7 +480,7 @@
 							<!-- dynamic -->
 						</select>
 					</div>
-					<div class="PlayerBox" id="PlayerSixBox" style="border-color:white;right:13%;top:62%;">
+					<div class="PlayerBox empty" id="PlayerSixBox" style="border-color:white;right:13%;top:62%;">
 						<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business Six</div>
 						<textarea disabled maxlength=10 id="PlayerSixName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
 						<select class="TwoColumnFirst" id="PlayerSixStatus" style="top:70%;">
@@ -259,8 +491,9 @@
 							<!-- dynamic -->
 						</select>
 					</div>
-					<button class="Standard" onclick="goToCreateGame()" style="left:16%;top:82%;width:28%;font-size:20px">Back</button>
-					<button id="begin-game-button" class="Standard" onclick="BeginGame()" style="right:16%;top:82%;width:28%;font-size:20px">Start Game</button>
+					<button id="back-button" class="Standard" onclick="" style="left:16%;top:82%;width:28%;font-size:20px">Back</button>
+					<div id="Countdown" class="StandardText" style="display:none;margin:0px;width:100%;top:82%;">Fail</div>
+					<button id="begin-game-button" class="Standard" style="right:16%;top:82%;width:28%;font-size:20px">Start Game</button>
 				</div>
 			</div>
 		</div>

@@ -1,3 +1,0 @@
-All files here that do not have transparency (the background images for instance) should be Quality-100 JPGs. Make sure to use a program that lets you choose the quality setting when exporting as a JPG. For images with transparency, PNG is acceptable, as most browsers sadly don't have native support for JP2 (JPG 2000) or JNG (JPEG Network Graphics) yet.
-
-We need the compression. Large size is unnaceptable for a lightweight web application. We're not making another Scrumwise.

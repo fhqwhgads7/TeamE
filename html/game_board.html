@@ -5,23 +5,30 @@
 		You have to go up one level in order to access files from other folders.
 		.. = One folder up from the current folder.
 		-->
+		<script type="text/javascript">
+			var RotateDir=0;
+			var Rotation=0;
+			var Online=false;
+			var GameId;
+			var ClientID=0;
+			var Host=false;
+		</script>
 		<script src="../js/jquery.js"></script>
 		<script src="../js/shared.js"></script>
+		<script src="https://www.parsecdn.com/js/parse-1.2.18.min.js"></script>
+		<script src="http://cdn.pubnub.com/pubnub.min.js"></script>
+		<script src="../js/networking.js"></script>
 		<script src="../js/CircularJSON.js"></script>
 		<script src="../js/virtual_intelligence.js"></script>
 		<script src="../js/primary_gameboard_operation.js"></script>
 		<script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
 		<script type="text/javascript">
-
-			var RotateDir=0;
-			var Rotation=0;
-			
-			function Initialize()
-			{
+			function Initialize() {
 				changeCurrentBGM("InGame");
 				GlobalInitialize();
 				GameInitialize();
+				parent.postMessage("HideIt","*");
 				setInterval("RotateThink();",50);
 			}
 			function RotateBegin(dir){
@@ -40,9 +47,12 @@
 				}
 			}
 			function SaveThink(){
-				if (TheGame)
-					if (TheGame.GameState=="ACTIVE")
+				if(Online){return;}
+				if (TheGame){
+					if (TheGame.GameState=="ACTIVE"){
 						SaveThisGame("LastSavedGame");
+					}
+				}
 			}
 			function displayNewProductDialog() {
 				$("#PopupOverlay").show();
@@ -61,7 +71,7 @@
 			function hideEmployeeDialog() {
 				$("#employee-dialog").hide();
 				$("#PopupOverlay").hide();
-				HireTheEmployees();
+				HireTheEmployees(Online,ClientID);
 			}
 			function ShowAllPlayers(){
 				$("#PopupOverlay").show();
@@ -73,12 +83,17 @@
 				$("#PopupOverlay").hide();
 			}
 			function EndCurrentTurn(){
-				CycleTurn();
+				CycleTurn(Online,ClientID);
 			}
 			function TryToPatentProduct(){
 				$("#PopupOverlay").show();
 				$("#PatentDialog").show();
-				PatentMessageDisplay(TryToBuyPatent(CurrentlySelectedProduct, TheGame));
+				if (Online){
+					PatentMessageDisplay(TryToBuyPatent());
+				}
+				else{
+					PatentMessageDisplay(OldTryToBuyPatent(CurrentlySelectedProduct, TheGame));
+				}
 			}
 			function ClosePatentDialog(){
 				$("#PatentDialog").hide();
@@ -123,12 +138,17 @@
 				TriggeredEventIterator(TheGame.CurrentPlayer.TriggeredEvents);
 			}
 			function TryToQuitGame(){
-				$("#PopupOverlay").show();
+				$("#QuitOverlay").show();
 				$("#QuitDialog").show();
 			}
 			function QuitGame(){
-				if (TheGame.GameType=="Local"){
-					SaveThisGame("LastSavedGame");
+				if(Online){
+					QuitNetworkedGame(true,ClientID,"NoRecursion");
+				}
+				else {
+					if (TheGame.GameType=="Local"){
+						SaveThisGame("LastSavedGame");
+					}
 				}
 				CloseQuitDialog();
 				TheGame=null;
@@ -137,7 +157,13 @@
 			}
 			function CloseQuitDialog(){
 				$("#QuitDialog").hide();
-				$("#PopupOverlay").hide();
+				$("#QuitOverlay").hide();
+			}
+			function UIProductAdvance(){
+				TryToAdvanceProduct(Online,ClientID);
+			}
+			function UIProductRevert(){
+				TryToRevertProduct(Online,ClientID);
 			}
 		</script>
 		<style>
@@ -224,7 +250,7 @@
 				width:1000px;
 				height:1000px;
 				display:none;
-				z-index:999;
+				z-index:500;
 				background-image:url('../images/vi_overlay.jpg');
 				opacity:0.2;
 				background-repeat:repeat-x;
@@ -244,13 +270,13 @@
 						<div class="StandardText" style="font-size:18px;left:8%;top:35%;color:rgb(160,160,160)">$<span id="CurPlyMoney" style="color:white">nil</span><sup style="font-size:8px">.00</sup></div>
 						
 						<div class="StandardText" style="font-size:10px;left:8%;top:62%;color:rgb(160,160,160);font-size:10px;text-align:left">Products:</div>
-						<div id="CurPlyProds" class="StandardText" style="color:white;font-size:10px;left:42%;top:62%;font-size:10px;text-align:right">nil</div>
+						<div id="CurPlyProds" class="StandardText" style="color:white;font-size:10px;right:52%;top:62%;font-size:10px;text-align:right">nil</div>
 						
 						<div class="StandardText" style="font-size:10px;left:50%;top:62%;color:rgb(160,160,160);font-size:10px;text-align:left">Developers:</div>
 						<div id="CurPlyDevs" class="StandardText" style="color:white;font-size:10px;right:8%;top:62%;font-size:10px;text-align:right">nil</div>
 						
 						<div class="StandardText" style="font-size:10px;left:8%;top:77%;color:rgb(160,160,160);font-size:10px;text-align:left">Designers:</div>
-						<div id="CurPlyDsgns" class="StandardText" style="color:white;font-size:10px;left:42%;top:77%;font-size:10px;text-align:right">nil</div>
+						<div id="CurPlyDsgns" class="StandardText" style="color:white;font-size:10px;right:52%;top:77%;font-size:10px;text-align:right">nil</div>
 						
 						<div class="StandardText" style="font-size:10px;left:50%;top:77%;color:rgb(160,160,160);font-size:10px;text-align:left">Testers:</div>
 						<div id="CurPlyTsts" class="StandardText" style="color:white;font-size:10px;right:8%;top:77%;font-size:10px;text-align:right">nil</div>
@@ -278,8 +304,8 @@
 						
 						<div class="StandardText" style="text-overflow:hidden;left:6%;top:58%;font-size:8px;visibility:hidden"><span style="color:rgb(120,120,120)">Phase </span><span id="DisplayPPhase">nil</span></div>
 						<div class="StandardText" style="left:6%;top:63%;font-size:10px;visibility:hidden"><span style="color:rgb(120,120,120)">PFID </span><span id="DisplayPFID">0</span></div>
-						<button class="Standard Compact" id="CurProdAdvanceButton" style="top:66%;left:6%;height:15%;width:42%;" onmouseover="noSound()" onclick="TryToAdvanceProduct(); noSound();" disabled>Progress</button>
-						<button class="Standard Compact" id="CurProdRevertButton" style="top:66%;left:52%;height:15%;width:42%;" onmouseover="noSound()" onclick="TryToRevertProduct(); noSound();" disabled>Regress</button>
+						<button class="Standard Compact" id="CurProdAdvanceButton" style="top:66%;left:6%;height:15%;width:42%;" onmouseover="noSound()" onclick="UIProductAdvance(); noSound();" disabled>Progress</button>
+						<button class="Standard Compact" id="CurProdRevertButton" style="top:66%;left:52%;height:15%;width:42%;" onmouseover="noSound()" onclick="UIProductRevert(); noSound();" disabled>Regress</button>
 						<button class="Standard Compact" id="CurProdDetailsButton" style="top:82%;left:6%;height:15%;width:42%;" onmouseover="noSound()" onclick="ShowProductStats();" disabled>Details</button>
 						<button class="Standard Compact" id="CurProdPatentButton" style="top:82%;left:52%;height:15%;width:42%;" onmouseover="noSound()" onclick="TryToPatentProduct(); noSound();" disabled>Patent</button>
 					</div>
@@ -288,14 +314,21 @@
 					<button id="showplayers_button" class="Standard Compact" style="padding:0.4em 0em;top:88%;left:3%;width:11%;height:8%;" onclick="ShowAllPlayers()">Show Players</button>
 					<button id="EndTurnBtn" class="Standard Compact" style="padding:0.4em 0em;top:88%;left:14%;width:11%;height:8%;" onclick="EndCurrentTurn(); noSound()">End Turn</button>
 					
-					<button class="Standard Compact" style="top:90%;left:90%;width:8%;height:5%;" onclick="TryToQuitGame()">Quit</button>
+					<button class="Standard Compact" style="top:90%;left:90%;width:8%;height:5%;z-index:510" onclick="TryToQuitGame()">Quit</button>
+					<div class="PopupOverlay" id="QuitOverlay" style="z-index:510">
+						<div class="Popup" id="QuitDialog" style="top:25%;height:50%;width:56%;left:22%">
+							<div class="StandardText" style="font-size:40px;margin:0px;width:100%;top:10%">Are you sure you want to quit?</div>
+							<button class="Standard" style="font-size:20px;left:14%;top:55%;width:72%" onclick="QuitGame()">Yes, I'm Done</button>
+							<button class="Standard" style="font-size:20px;left:14%;top:75%;width:72%" onclick="CloseQuitDialog()">No, I misclicked</button>
+						</div>
+					</div>
 
 					<div class="PopupOverlay" id="PopupOverlay">
-						<div class="Popup" id="new-product-dialog">
+						<div class="Popup" id="new-product-dialog" style="top:25%;height:50%;width:60%;left:20%">
 							<div class="StandardText" style="margin:0px;width:100%;top:10%">New Product</div>
-							<textarea id="NewProdName" maxlength=25 placeholder="New Product Name" style="position:absolute;resize:none;top:35%;left:19.5%;width:60%"></textarea>
-							<div class="StandardText" style="left:20%;top:53%;font-size:12px">Category</div>
-							<select class="OneColumn" id="NewProductCategory" style="top:53%;left:40%;width:40%;" onchange="SelectProductCategory()">
+							<input type="text" id="NewProdName" maxlength=25 placeholder="New Product Name" style="position:absolute;resize:none;top:35%;left:19.5%;width:60%"></input>
+							<div class="StandardText" style="left:20%;top:50%;font-size:12px">Category</div>
+							<select class="OneColumn" id="NewProductCategory" style="top:50%;left:40%;width:40%;" onchange="SelectProductCategory()">
 								<!-- dynamic -->
 							</select>
 							<div class="StandardText" style="left:20%;top:60%;font-size:12px">Subcategory</div>
@@ -415,28 +448,25 @@
 								
 							<button class="Standard" style="left:20%;top:82%;width:60%" onclick="CloseDetailsDialog()">OK</button>
 						</div>
-						<div class="Popup" id="RemoveDialog">
-							<div id="RemoveMessage" class="StandardText" style="margin:0px;width:100%;top:10%">Are you sure you want to remove this product from the gameboard?</div>
-							<button class="Standard" id="CancelRemoveButton" style="left:10%;top:75%;width:30%" onclick="CloseRemoveDialog()">Cancel</button>
-							<button class="Standard" id="ConfirmRemoveButton" style="right:10%;top:75%;width:30%" onclick="removeProduct(CurrentlySelectedProduct); CloseRemoveDialog(); noSound()">Remove</button>
-						</div>
-						<div class="Popup" id="QuitDialog" style="top:25%;height:50%;width:56%;left:22%">
-							<div class="StandardText" style="font-size:40px;margin:0px;width:100%;top:10%">Are you sure you want to quit?</div>
-							<button class="Standard" style="font-size:20px;left:14%;top:55%;width:72%" onclick="QuitGame()">Yes, I'm Done</button>
-							<button class="Standard" style="font-size:20px;left:14%;top:75%;width:72%" onclick="CloseQuitDialog()">No, I misclicked</button>
+						<div class="Popup" id="RemoveDialog" style="top:25%;height:50%;">
+							<div id="RemoveMessage" class="StandardText" style="font-size:35px;margin:0px;width:100%;top:7%">Are you sure you want to remove this product from the gameboard?</div>
+							<button class="Standard" id="CancelRemoveButton" style="font-size:20px;left:10%;top:75%;width:30%" onclick="CloseRemoveDialog()">Cancel</button>
+							<button class="Standard" id="ConfirmRemoveButton" style="font-size:20px;right:10%;top:75%;width:30%" onclick="removeProduct(CurrentlySelectedProduct); CloseRemoveDialog(); noSound()">Remove</button>
 						</div>
 						<div class="Popup" id="EventDialog" style="top:10%;height:80%;width:60%;left:20%">
 							<div class="StandardText" id="EventTitle" style="font-size:35px;margin:0px;width:100%;top:3%;">Code is broken!</div>
 							<div class="StandardText" id="EventDesc" style="font-size:20px;margin:0px;width:100%;top:60%;">Something went wrong probably because of lack of quality code practices!</div>
-							<img id="EventImage" src="../images/events/event_cyberattack.png" style="position:absolute;left:29%;top:15%;width:200px;height:200px"></img>
+							<img id="EventImage" src="../images/events/event_fail.png" style="position:absolute;left:29%;top:15%;width:200px;height:200px"></img>
 							<button class="Standard" id="EventButton" onclick="CloseEventDialog()" style="left:20%;top:84%;width:60%">Continue</button>
 						</div>
 						<div class="Popup" id="TriggerDialog" style="top:20%;height:60%;width:60%;left:20%">
-							<img id="TriggerImage" src="../images/events/event_cyberattack.png" style="position:absolute;left:29%;top:3%;width:200px;height:200px"></img>
+							<img id="TriggerImage" src="../images/events/event_fail.png" style="position:absolute;left:29%;top:3%;width:200px;height:200px"></img>
 							<div class="StandardText" id="TriggerDesc" style="font-size:15px;margin:0px;width:100%;top:62%;">Something went wrong probably because of lack of quality code practices!</div>
 							<button class="Standard" id="TriggerButton" onclick="CloseTriggerDialog()" style="left:20%;top:80%;width:60%">Continue</button>
 						</div>
-						<div id="GameOverDisplay" style="z-index:6">
+					</div>
+					<div class="PopupOverlay" id="GameOverOverlay" style="z-index:600">
+						<div id="GameOverDisplay">
 							<div id="GameOverTitle">GAME OVER</div>
 							<button class="Standard" id="FinishGameButton" onclick="SwitchToFinalResults()" style="display:none;opacity:0;left:35%;top:65%;width:30%" disabled>Continue</button>
 						</div>
@@ -447,13 +477,14 @@
 					<span id="CashFour" class="CashAlert">0</span>
 					<span id="CashFive" class="CashAlert">0</span>
 					<span id="CashSix" class="CashAlert">0</span>
+					<span id="CashOnline" class="CashAlert">0</span>
 					<div class="StandardText" id="TipSpan" style="font-size:12px;transition:none;white-space:nowrap;color:rgba(255,255,255,.8);top:97%;left:980px;">Welcome to the stage of Entrepreneurship!</div>
 					<div class="StandardText" id="RoundNumberDisplay" style="font-size:20px;transition:none;top:1%;right:1%;text-align:right">Round Borked!</div>
 				</div>
+				<div id="ControlLock"></div>
 			</div>
 			<div id="RoundAnnouncer">ROUND<br>1</div>
 		</div>
 		<div id="Blanket" class="Blanket" style="position:fixed;left:0px;top:0px;display:none;"></div>
-		<div id="ControlLock"></div>
 	</body>
 </html>

@@ -2,14 +2,26 @@
 <html>
 	<meta charset="utf-8"> 
 	<head>
-		<Title>Entrepreneurship: The Movie: The Game</Title>
+		<Title>You're the Boss!</Title>
 		<script src="../js/jquery.js"></script>
 		<script src="../js/shared.js"></script>
+		<script src='http://code.jquery.com/jquery-migrate-1.2.1.js'></script>
+		<script src="https://www.parsecdn.com/js/parse-1.2.18.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="../css/shared.css"></link>
 		<script>
+			Parse.initialize("xjUxyY8bghFGuSnM3ptEZkV3BiWOlD3VhkRLt4kz", "iZCS2S7ZuWn9keMoooLaHMlB7HMXpcqD1M60JVjp");
+			
 			localStorage.setItem("BGMMute", "");
 			localStorage.setItem("SFXMute", "");
 			function Initialize(){
+				if (!IsBrowserCompatible()){
+					$("#BrowserFailOverlay").show();
+					$("#BrowserFail").show();
+				}
+				if (Parse.User.current()){
+					ShowUser();
+				}
+				NetworkButtonDisableCheck();
 				$(":button.Standard").mouseenter( function(){
 					if (this.getAttribute("onmouseover") == null)
 						playSound(GameSounds.ButtonHover);
@@ -23,6 +35,7 @@
 						playSound(GameSounds.ButtonSelect);
 				});
 				LoadOptions();
+				window.addEventListener('message', UserDataControls, false);
 			}
 			function ShowAudioSettings(){
 				$("#AudioSettings").show();
@@ -60,24 +73,230 @@
 				if (localStorage.getItem("BGMMute")=="Muted"){
 					localStorage.setItem("BGMMute", "");
 					$("#BGMSwitcher").attr("class","Standard");
-					$("#BGMSwitcher").css("background-image","url(../images/muzak_unmuted.png)");
+					$("#BGMSwitcher").css("background-image","url(../images/icons/muzak_unmuted.png)");
 				}
 				else{
 					localStorage.setItem("BGMMute","Muted");
 					$("#BGMSwitcher").attr("class","Muted");
-					$("#BGMSwitcher").css("background-image","url(../images/muzak_muted.png)");
+					$("#BGMSwitcher").css("background-image","url(../images/icons/muzak_muted.png)");
 				}
 			}
 			function SFXSwitch(){
 				if (localStorage.getItem("SFXMute")=="Muted"){
 					localStorage.setItem("SFXMute", "");
 					$("#SFXSwitcher").attr("class","Standard");
-					$("#SFXSwitcher").css("background-image","url(../images/speaker_unmuted.png)");
+					$("#SFXSwitcher").css("background-image","url(../images/icons/speaker_unmuted.png)");
 				}
 				else{
 					localStorage.setItem("SFXMute","Muted");
 					$("#SFXSwitcher").attr("class","Muted");
-					$("#SFXSwitcher").css("background-image","url(../images/speaker_muted.png)");
+					$("#SFXSwitcher").css("background-image","url(../images/icons/speaker_muted.png)");
+				}
+			}
+			
+			function PlayerStats(){
+				GetStats();
+				$("#PopupOverlay").show();
+				$("#Stats").show();	
+			}
+			function HidePlayerStats(){
+				$("#Stats").hide();
+				$("#PopupOverlay").hide();
+			}
+			function ShowLoginWindow(){
+				$("#PopupOverlay").show();
+				$("#LoginView").show();
+				$("#AlertButton").attr('onclick', 'CloseAlert()');
+			}
+			function HideLoginWindow(){
+				$("#PopupOverlay").hide();
+				$("#LoginView").hide();
+			}
+			function ShowRegisterWindow(){
+				$("#PopupOverlay").show();
+				$("#RegisterView").show();
+				$("#AlertButton").attr('onclick', 'CloseAlert()');
+			}
+			function HideRegisterWindow(){
+				$("#PopupOverlay").hide();
+				$("#RegisterView").hide();
+			}
+			function GetStats(){
+				var CurrentUser = Parse.User.current();
+				if (CurrentUser){
+					var GamesPlayed = CurrentUser.get("gamesplayed");
+					var GamesWon = CurrentUser.get("gameswon");
+					
+					$("#StatsUsername").text(CurrentUser.get("username"));
+					$("#StatsGamesPlayed").text(GamesPlayed.toString());
+					$("#StatsGamesWon").text(GamesWon.toString());
+					
+					if (GamesPlayed === 0){
+						$("#StatsWinPercentage").text("N/A");
+					}
+					else{
+						$("#StatsWinPercentage").text((Math.round(10000*GamesWon/GamesPlayed)/100).toString() + "%");
+					}
+					$("#StatsRanking").text("TBD");
+				}
+			}	
+			
+			function SubmitRegistration(){
+				var NewUser = new Parse.User();
+				
+			    if ($("#RegisterUsername").val().length < 6){
+					ShowAlert("Username must be at least 6 characters long.", "fail.png");
+					playSound(GameSounds.Wrong_BAD);
+				}
+				else if (HasNonAlphaNumerics($("#RegisterUsername").val())){
+					ShowAlert("Username must contain only letters, numbers, or spaces.", "fail.png");
+					playSound(GameSounds.Wrong_BAD);
+				}
+				else if ($("#RegisterPassword").val().length < 6){
+					ShowAlert("Password must be at least 6 characters long.", "fail.png");
+					playSound(GameSounds.Wrong_BAD);
+				}
+				else if (HasNonAlphaNumerics($("#RegisterPassword").val())){
+					ShowAlert("Password must contain only letters, numbers, or spaces.", "fail.png");
+					playSound(GameSounds.Wrong_BAD);
+				}
+				else if ($("#RegisterPassword").val().length != $("#ReenterRegisterPassword").val().length){
+					ShowAlert("Passwords do not match.", "fail.png");
+					playSound(GameSounds.Wrong_BAD);
+				}
+				else if (!IsValidEmailAddress($("#RegisterEmail").val())){
+					ShowAlert("Invalid email address.", "fail.png");
+					playSound(GameSounds.Wrong_BAD);
+				}
+				else {
+					var inputUsername = $("#RegisterUsername").val();
+					var inputPassword = $("#RegisterPassword").val();
+					var inputEmail = $("#RegisterEmail").val();
+					playSound(GameSounds.ButtonSelect);
+					$("#AlertButton").attr('disabled', true);
+					
+					NewUser.set("username", inputUsername);
+					NewUser.set("password", inputPassword);
+					NewUser.set("email", inputEmail);
+					NewUser.set("gamesplayed", 0);
+					NewUser.set("gameswon", 0);
+					
+					ShowAlert("Registering...", "loading_thing.gif");
+
+					NewUser.signUp(null, {
+						success: function(NewUser) {
+							ShowAlert("You have been successfully registered and logged in!", "success.png");
+							$("#AlertButton").attr('onclick', 'CloseAlert(); HideRegisterWindow();');
+							$("#AlertButton").attr('disabled', false);
+							ShowUser();
+						},
+						error: function(NewUser, Error) {
+							ShowAlert("Error: " + " " + Error.message, "fail.png");
+							$("#AlertButton").attr('disabled', false);
+						}
+					});
+					
+					
+				}
+			}
+			function IsValidEmailAddress(sEmail) {
+				var filter = /^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
+				return filter.test(sEmail);
+			}
+			function UserCheck(){
+				
+				var inputUsername = $("#LoginUsername").val();
+				var inputPassword = $("#LoginPassword").val();
+				ShowAlert("Logging in...", "loading_thing.gif");
+				$("#AlertButton").attr('disabled', true);
+				
+				Parse.User.logIn(inputUsername, inputPassword, {
+					success: function(user) {
+						ShowAlert("You have been logged in!", "success.png");
+						$("#AlertButton").attr('onclick', 'CloseAlert(); HideLoginWindow();');
+						$("#AlertButton").attr('disabled', false);
+						ShowUser();
+					},
+					error: function(user, error) {
+						ShowAlert("Failed to log in: " + error.message, "fail.png");
+						$("#AlertButton").attr('disabled', false);
+					}
+				});
+			}
+			function ShowUser(){
+				var CurrentUser = Parse.User.current();
+				if (CurrentUser){
+					$("#NotLoggedIn").hide();
+					$("#LoggedIn").show();
+					$("#Username").text(CurrentUser.get("username"));
+				}
+				NetworkButtonDisableCheck();
+			}
+			function LogOut(){
+				$("#LoggedIn").hide();
+				$("#NotLoggedIn").show();
+				$("#Username").text("sir. If you can see this, fix your code");
+				var anotherFunction = "";
+				var CurrentWindow = document.getElementById("MainGamePage");
+				Parse.User.logOut();
+				NetworkButtonDisableCheck();
+				$("#AlertButton").attr('onclick', 'CloseAlert(); document.getElementById("MainGamePage").contentWindow.postMessage("Logout", "*");');
+				ShowAlert("You have been logged out. If this was an accident, please log back in.", "success.png");
+			}
+			function NetworkButtonDisableCheck(){
+				
+				var CurrentWindow = document.getElementById("MainGamePage");
+				var CurrentUser = Parse.User.current() !== null;
+				if (CurrentUser){
+					CurrentWindow.contentWindow.postMessage('UserExists', '*');
+				}
+				else{
+					CurrentWindow.contentWindow.postMessage('NoUser', '*');
+				}
+			}
+			function ShowAlert(){
+				$("#RegisterView").children().attr('disabled',true);
+				$("#LoginView").children().attr('disabled',true);
+				$("#AlertOverlay").show();
+				$("#Alerts").show();
+			}
+			function ShowAlert(message, image){
+				$("#RegisterView").children().attr('disabled',true);
+				$("#LoginView").children().attr('disabled',true);
+				$("#AlertOverlay").show();
+				$("#Alerts").show();
+				$("#AlertMessage").text(message);
+				$("#AlertImage").attr('src', "../images/icons/" + image);
+			}
+			function CloseAlert() {
+				$("#RegisterView").children().attr('disabled',false);
+				$("#LoginView").children().attr('disabled',false);
+				$("#AlertOverlay").hide();
+				$("#Alerts").hide();
+			}		
+			function UserDataControls(event){
+				if (event.data === "HideIt"){
+					$("#UserControls").hide();
+				}
+				else {
+					$("#UserControls").show();
+					if (event.data === "GiveMeUsername"){
+						localStorage.setItem("CurrentUsername", Parse.User.current().get("username").toString());
+					}
+					else {
+						localStorage.setItem("CurrentUsername", null);
+					}
+					var TheEvent = event.data.toString();
+					if (TheEvent.indexOf("FinishedGame") > -1){
+						var CurrentUser = Parse.User.current();
+						if (CurrentUser){
+							CurrentUser.set("gamesplayed", CurrentUser.get("gamesplayed") + 1);
+							if (TheEvent === "FinishedGameAndWon"){
+								CurrentUser.set("gameswon", CurrentUser.get("gameswon") + 1);
+							}
+							CurrentUser.save();
+						}
+					}
 				}
 			}
 		</script>
@@ -145,13 +364,42 @@
 				color:rgba(200,0,0,0.75);
 				box-shadow:inset 1px 1px 1px rgba(255,255,255,0.05),inset 0 0 35px rgba(0,0,0,0.6),0 10px 10px -6px rgba(0,0,0,0.75);
 			}
+			div.UserBox{
+				position:absolute;
+				border-style:solid;
+				border-width:7px;
+				width:150px;
+				height:60px;
+				overflow:hidden;
+				box-shadow: 0px 0px 40px 5px #AAAAAA;
+				background:rgba(0,0,0,.1);
+				-moz-border-radius:10px;
+				-webkit-border-radius:10px;
+				border-radius:10px;
+				z-index:3;
+			}
+			div.UserBox:hover{
+				background:rgba(255,255,255,.1);
+			}
 		</style>
 	</head>
 	
-	<body onload="Initialize()">
-		<button class="Standard" onclick="ShowAudioSettings();" style="padding:0.4em 0em;left:2px;top:2px;width:40px;font-size:8px;z-index:2">Volume</button>
-		<button class="Standard" id="BGMSwitcher" onclick="BGMSwitch();" style="background-position: -1px -1px;background-image:url(../images/muzak_unmuted.png);padding:0em 0em;left:42px;top:2px;width:20px;font-size:14px;z-index:2"><br></button>
-		<button class="Standard" id="SFXSwitcher" onclick="SFXSwitch();" style="background-position: -1px -1px;background-image:url(../images/speaker_unmuted.png);padding:0em 0em;left:62px;top:2px;width:20px;font-size:14px;z-index:2"><br></button>
+	<body onload="Initialize();">
+		<div id="UserControls" style="position:absolute;width:800px;height:600px">
+			<div id="NotLoggedIn" class="UserBox" style="right:10px;top:-7px;z-index:3">
+				<div class="StandardText" style="font-size:10px;margin:0px;width:100%;top:10%;z-index:3">Welcome, guest.</div>
+				<button class="Standard" onclick="ShowLoginWindow();" style="padding:0.4em 0em;left:15%;top:50%;width:30%;font-size:8px;z-index:3">Log In</button>
+				<button class="Standard" onclick="ShowRegisterWindow();" style="padding:0.4em 0em;right:15%;top:50%;width:30%;font-size:8px;z-index:3">Register</button>
+			</div>
+			<div id="LoggedIn" class="UserBox" style="display:none;right:10px;top:-7px;z-index:3">
+				<div class="StandardText" style="font-size:10px;margin:0px;width:100%;top:5%;z-index:3">Welcome, <span id="Username">Nobody</span>.</div>
+				<button class="Standard" onclick="PlayerStats();" style="padding:0.4em 0em;left:15%;top:60%;width:30%;font-size:8px;z-index:3">Stats</button>
+				<button class="Standard" onclick="LogOut();" style="padding:0.4em 0em;right:15%;top:60%;width:30%;font-size:8px;z-index:3">Log Out</button>
+			</div>
+		</div>
+		<button class="Standard" onclick="ShowAudioSettings();" style="padding:0.4em 0em;left:2px;top:2px;width:40px;font-size:8px;z-index:3">Volume</button>
+		<button class="Standard" id="BGMSwitcher" onclick="BGMSwitch();" style="background-position: -1px -1px;background-image:url(../images/icons/muzak_unmuted.png);padding:0em 0em;left:42px;top:2px;width:20px;font-size:14px;z-index:3"><br></button>
+		<button class="Standard" id="SFXSwitcher" onclick="SFXSwitch();" style="background-position: -1px -1px;background-image:url(../images/icons/speaker_unmuted.png);padding:0em 0em;left:62px;top:2px;width:20px;font-size:14px;z-index:3"><br></button>
 		<div id="AudioSettings" style="display:none;position:absolute;background-color:rgba(0,0,0,.75);top:0px;left:0px;width:800px;height:600px;z-index:5;">
 				<div class="OptionsBox" id="OptionsBox" style="left:20%;top:35%;">
 					<div class="StandardText" style="font-size:30px;left:3%;top:18%;">BGM Volume</div>
@@ -167,11 +415,57 @@
 				<button class="Standard" onclick="HideAudioSettings();" style="left:35%;top:68%;width:30%">Done</button>
 		</div>
 		<div id="MainGame" style="position:absolute;top:0px;left:0px;width:800px;height:600px;z-index:1;">
-			<iframe src="title.html" style="top:0px;left:0px;width:800px;height:600px;" frameborder="0" allowtransparency="yes" scrolling="no"></iframe>
+			<iframe id="MainGamePage" src="title.html" style="top:0px;left:0px;width:800px;height:600px;" frameborder="0" allowtransparency="yes" scrolling="no" onLoad="NetworkButtonDisableCheck()"></iframe>
 		</div>
 		<div id="Background" style="position:absolute;top:0px;left:0px;width:800px;height:600px;z-index:0;">
 			<iframe src="background.html" style="top:0px;left:0px;width:100%;height:100%;background-color:rgb(128,128,128,0);" frameborder="0" allowtransparency="no" scrolling="no"></iframe>
 		</div>
+		
+		<div class="PopupOverlay" id="PopupOverlay">
+			<div class="Popup" id="Stats" style="left:25%;top:25%;width:50%;height:50%;">
+				<div class="StandardText" id="StatsUsername" style="font-size:30px;top:7%;width:100%;">Nobody because error</div>	
+				<div class="StandardText" style="font-size:20px;left:10%;top:27%;">Games Played:</div>	
+				<div class="StandardText" id="StatsGamesPlayed" style="font-size:20px;right:10%;text-align:right;top:27%">nil</div>							
+				<div class="StandardText" style="font-size:20px;left:10%;top:39%;">Games Won:</div>
+				<div class="StandardText" id="StatsGamesWon" style="font-size:20px;right:10%;text-align:right;top:39%">nil</div>							
+				<div class="StandardText" style="font-size:20px;left:10%;top:51%;">Win Percentage:</div>
+				<div class="StandardText" id="StatsWinPercentage" style="font-size:20px;right:10%;text-align:right;top:51%">nil</div>							
+				<div class="StandardText" style="font-size:20px;left:10%;top:63%;">Ranking:</div>
+				<div class="StandardText" id="StatsRanking" style="font-size:20px;right:10%;text-align:right;top:63%">nil</div>														
+				<button class="Standard" id="StatsClose" onclick="HidePlayerStats()" style="top:77%;left:20%;width:60%;height:20%">OK</button>
+			</div>
+			<div class="Popup" id="LoginView" style="left:25%;width:50%;">
+				<div class="FancyText" id="LoginTitle" style="margin:0px;width:100%;top:10%;">Log In</div> 
+				<input type="text" id="LoginUsername" class="OneColumn" placeholder="Username" style="font-family:'Arial';font-size:15px;font-weight:900;overflow:hidden;resize:none;top:45%;left:15%;height:5%;width:69.5%;"></input>
+				<input type="password" id="LoginPassword" class="OneColumn" placeholder="Password" style="font-family:'Arial';font-size:15px;font-weight:900;overflow:hidden;resize:none;top:55%;left:15%;height:5%;width:69.5%;"></input>
+				<button class="Standard" style="padding:0.4em 0em;font-size:20px;left:15%;top:75%;width:32%" onclick="UserCheck()">Log In</button>
+				<button class="Standard" style="padding:0.4em 0em;font-size:20px;right:15%;top:75%;width:32%" onclick="HideLoginWindow()">Cancel</button>
+			</div>
+			<div class="Popup" id="RegisterView" style="left:25%;width:50%;">
+				<div class="FancyText" id="RegisterTitle" style="margin:0px;width:100%;top:10%;">Register</div> 
+				<input type="text" id="RegisterUsername" maxlength=20 class="OneColumn" placeholder="Username" style="font-family:'Arial';font-size:15px;font-weight:900;overflow:hidden;resize:none;top:39%;left:15%;height:5%;width:69.5%;"></input>
+				<input type="password" id="RegisterPassword" maxlength=30 class="OneColumn" placeholder="Password" style="font-family:'Arial';font-size:15px;font-weight:900;overflow:hidden;resize:none;top:46%;left:15%;height:5%;width:69.5%;"></input>
+				<input type="password" id="ReenterRegisterPassword" maxlength=30 input type="password" class="OneColumn" placeholder="Re-Enter Password" style="font-family:'Arial';font-size:15px;font-weight:900;overflow:hidden;resize:none;top:53%;left:15%;height:5%;width:69.5%;"></input>
+				<input type="text" id="RegisterEmail" class="OneColumn" placeholder="Email" style="font-family:'Arial';font-size:15px;font-weight:900;overflow:hidden;resize:none;top:60%;left:15%;height:5%;width:69.5%;"></input>
+				<button class="Standard" style="padding:0.4em 0em;font-size:20px;left:15%;top:75%;width:32%" onclick="SubmitRegistration(); noSound();">Register</button>
+				<button class="Standard" style="padding:0.4em 0em;font-size:20px;right:15%;top:75%;width:32%" onclick="HideRegisterWindow()">Cancel</button>
+			</div>
+		</div>	
+		<div class="PopupOverlay" id="AlertOverlay">
+			<div class="Popup" id="Alerts" style="left:30%;width:40%;top:30%;height:40%">
+				<img id="AlertImage" src="../images/icons/fail.png" style="position:absolute;left:34%;top:5%;width:100px;height:100px"></img>
+				<div class="StandardText" id="AlertMessage" style="font-size:12px;margin:0px;width:100%;top:55%;">Failing...</div>															
+				<button class="Standard" id="AlertButton" onclick="CloseAlert()" style="top:70%;left:20%;width:60%">OK</button>
+			</div>
+		</div>
+		<div class="PopupOverlay" id="BrowserFailOverlay">
+			<div class="Popup" id="BrowserFail" style="z-index:999;top:30%;height:40%">
+				<div class="StandardText" style="margin:0px;width:100%;font-size:20px;top:10%;">
+					Your browser is not fully compatible with this application. We recommend running it in one of these browsers instead:
+				</div>															
+				<button class="Standard" id="DownloadFirefox" onclick="window.location='http://www.mozilla.org/en-US/firefox/new/';" style="padding:0.4em 0em;font-size:14px;top:50%;left:10%;width:30%;height:40%"><image src="../images/icons/firefoxlogo.png" style="width:50px;height:50px"></image><br>Mozilla Firefox</button>
+				<button class="Standard" id="DownloadChrome" onclick="window.location='https://www.google.com/intl/en/chrome/browser/';" style="padding:0.4em 0em;font-size:14px;top:50%;right:10%;width:30%;height:40%"><image src="../images/icons/chromelogo.png" style="width:50px;height:50px"></image><br>Google Chrome</button>
+			</div>
+		</div>
 	</body>
-	
 </html>

@@ -155,9 +155,12 @@
 			    query.get(gameId, {
 			      success: function(game) {
 			        var playersList = game.get("players");
-			        var playersBoxesPlayerNames = $(".PlayerBox").find("textarea");
+			        var playersBoxes = $(".PlayerBox");
+			        var playersBoxesPlayerNames = $(playersBoxes).find("textarea");
+			        $(playersBoxes).addClass("empty");
 			        $(playersBoxesPlayerNames).val("");
 			        $.each(playersList, function(index, player) {
+				        $(playersBoxes[index]).removeClass("empty");
 				        $(playersBoxesPlayerNames[index]).val(player);
 			        })
 			      },
@@ -168,7 +171,7 @@
 			}
 
 			function goToLobby(isHost, gameId, gameName) {
-				localStorage.removeItem("joinedGame");
+				// localStorage.removeItem("joinedGame");
 				if(!isHost) {
 					$("#back-button").attr('onclick', 'SwitchToPage("find_game_online.html")'); 
 				}
@@ -274,6 +277,10 @@
 				-webkit-border-radius:10px;
 				border-radius:10px;
 			}
+			div.PlayerBox.empty{
+				border-color: #463E3F !important;
+				box-shadow: none !important;
+			}
 			div.PlayerBox:hover{
 				background:rgba(255,255,255,.1);
 			}
@@ -330,7 +337,7 @@
 				</div>
 				<div id="lobby-wrapper">
 					<div class="StandardText" id="StartNewGameTitle" style="font-size:40px;margin:0px;width:100%;top:7%;">New Game: <span id="new-game-name">Borked</span></div> 
-					<div class="PlayerBox" id="PlayerOneBox" style="border-color:red;left:13%;top:22%;">
+					<div class="PlayerBox empty" id="PlayerOneBox" style="border-color:red;left:13%;top:22%;">
 						<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business One</div>
 						<textarea disabled maxlength=10 id="PlayerOneName" class="OneColumn" placeholder="Business/Player Name" style="position:absolute;overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
 						<select class="TwoColumnFirst" id="PlayerOneStatus" style="top:70%;">
@@ -341,7 +348,7 @@
 							<!-- dynamic -->
 						</select>
 					</div>
-					<div class="PlayerBox" id="PlayerTwoBox" style="border-color:blue;right:13%;top:22%;">
+					<div class="PlayerBox empty" id="PlayerTwoBox" style="border-color:blue;right:13%;top:22%;">
 						<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business Two</div>
 						<textarea disabled maxlength=10 id="PlayerTwoName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
 						<select class="TwoColumnFirst" id="PlayerTwoStatus" style="top:70%;">
@@ -352,7 +359,7 @@
 							<!-- dynamic -->
 						</select>
 					</div>
-					<div class="PlayerBox" id="PlayerThreeBox" style="border-color:green;left:13%;top:42%;">
+					<div class="PlayerBox empty" id="PlayerThreeBox" style="border-color:green;left:13%;top:42%;">
 						<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business Three</div>
 						<textarea disabled maxlength=10 id="PlayerThreeName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
 						<select class="TwoColumnFirst" id="PlayerThreeStatus" style="top:70%;">
@@ -363,7 +370,7 @@
 							<!-- dynamic -->
 						</select>
 					</div>
-					<div class="PlayerBox" id="PlayerFourBox" style="border-color:yellow;right:13%;top:42%;">
+					<div class="PlayerBox empty" id="PlayerFourBox" style="border-color:yellow;right:13%;top:42%;">
 						<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business Four</div>
 						<textarea disabled maxlength=10 id="PlayerFourName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
 						<select class="TwoColumnFirst" id="PlayerFourStatus" style="top:70%;">
@@ -374,7 +381,7 @@
 							<!-- dynamic -->
 						</select>
 					</div>
-					<div class="PlayerBox" id="PlayerFiveBox" style="border-color:black;left:13%;top:62%;">
+					<div class="PlayerBox empty" id="PlayerFiveBox" style="border-color:black;left:13%;top:62%;">
 						<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business Five</div>
 						<textarea disabled maxlength=10 id="PlayerFiveName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
 						<select class="TwoColumnFirst" id="PlayerFiveStatus" style="top:70%;">
@@ -385,7 +392,7 @@
 							<!-- dynamic -->
 						</select>
 					</div>
-					<div class="PlayerBox" id="PlayerSixBox" style="border-color:white;right:13%;top:62%;">
+					<div class="PlayerBox empty" id="PlayerSixBox" style="border-color:white;right:13%;top:62%;">
 						<div class="StandardText" style="margin:0;width:100%;top:5%;font-size:20px">Business Six</div>
 						<textarea disabled maxlength=10 id="PlayerSixName" class="OneColumn" placeholder="Business/Player Name" style="overflow:hidden;resize:none;top:40%;height:15%;width:77%;"></textarea>
 						<select class="TwoColumnFirst" id="PlayerSixStatus" style="top:70%;">

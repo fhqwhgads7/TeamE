@@ -371,10 +371,12 @@ function ActuallyCreateNewProduct(online,cid,args){
 		prodCat=args[2];
 		subCat=args[3];
 	}
+	if ((!online) || ((online)&&(cid==ClientID))){
+		hideNewProductDialog();
+	}
 	var prod = Product(ply, nam, prodCat, subCat, ply.Color);
 	prod.Phase = "Idea";
 	CreateProductDisplay(prod);
-	hideNewProductDialog();
 	playSound(GameSounds.ProductPlacement);
 	ply.hasMadeProductThisTurn = true;
 	if((online)&&(cid==ClientID)){

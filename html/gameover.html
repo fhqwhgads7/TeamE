@@ -39,13 +39,28 @@
 				for(var PlyNum in ThePlayers){
 					var Ply=ThePlayers[PlyNum];
 					var Str="";
-					if(PlyNum==0){Str="PlyOne";}else if(PlyNum==1){Str="PlyTwo";}else if(PlyNum==2){Str="PlyThree";}else if(PlyNum==3){Str="PlyFour";}else if(PlyNum==4){Str="PlyFive";}else if(PlyNum==5){Str="PlySix";}
+					if(PlyNum==0){
+						Str="PlyOne";
+					}else if(PlyNum==1){
+						Str="PlyTwo";
+					}else if(PlyNum==2){
+						Str="PlyThree";
+					}else if(PlyNum==3){
+						Str="PlyFour";
+					}else if(PlyNum==4){
+						Str="PlyFive";
+					}else if(PlyNum==5){
+						Str="PlySix";
+					}
 					$("#"+Str+"ScbdBox").show();
 					$("#"+Str+"ScbdBox").css("border-color",Ply.Color);
 					$("#"+Str+"ScbdName").html(Ply.Name);
 					$("#"+Str+"ScbdMoney").html(Ply.Money);
 					$("#"+Str+"ScbdProds").html(Ply.NumProducts);
 					$("#"+Str+"ScbdEmps").html(Ply.NumEmployees);
+					if (!(Ply.isActive)){
+						$("#" + Str + "ScbdBox").css('opacity',0.5);
+					}
 				}
 				if (localStorage.getItem("CurrentUsername") !== null){
 					SendStatModifications(localStorage.getItem("CurrentUsername"));
@@ -67,7 +82,7 @@
 			var amount = 0;
 			
 			for (var i = 0; i < ThePlayers.length; i++){
-				if (amount < ThePlayers[i].Money){
+				if (amount < ThePlayers[i].Money && ThePlayers[i].isActive){
 					index = i;
 					amount = ThePlayers[i].Money;
 				}

@@ -254,12 +254,6 @@ function TipThink() {
 	Elem.css("left", (NewPos).toString() + "px");
 }
 function TransferGameStartupInfo(from, to) {
-	for (var i = 0; i < 5; i++) {
-		var Ply = from.Players[i];
-		if (Ply) {
-			new Player(to, Ply.Name, Ply.Type, Ply.Color);
-		}
-	}
 	to.Settings = {};
 	to.Settings.Difficulty = from.Options.GameDifficulty;
 	to.Settings.CPUIntelligence = from.Options.CPUIntelligence;
@@ -267,6 +261,22 @@ function TransferGameStartupInfo(from, to) {
 	to.Settings.NumberOfRounds = from.Options.NumberOfRounds;
 	to.GameType = from.GameType;
 	Online = to.GameType === "Online";
+	var IndexOffset = 0;
+	if (!Online){
+		IndexOffset = 1;
+	}
+	for (var i = IndexOffset; i <= 5+IndexOffset; i++) {
+		var Ply;
+		if (Online){
+			Ply = from.Players[i];
+		}
+		else {
+			Ply = from.Players["Ply" + NumberNameTable[i]];
+		}
+		if (Ply) {
+			new Player(to, Ply.Name, Ply.Type, Ply.Color);
+		}
+	}
 	if(Online){
 		Host=localStorage.getItem("Host")==="true";
 		ClientID=parseInt(localStorage.getItem("ClientID"),10);
@@ -1663,6 +1673,7 @@ function GetFinalResults() {
 		Plyr[PlyNum].Color = Ply.Color;
 		Plyr[PlyNum].NumProducts = Ply.NumProducts;
 		Plyr[PlyNum].NumEmployees = (Ply.NumQA + Ply.NumDevs + Ply.NumCreative);
+		Plyr[PlyNum].isActive = Ply.isActive;
 		Plyr.length++;
 
 	}

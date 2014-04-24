@@ -69,10 +69,10 @@
 				for(var i=1;i<=6;i++){
 					var Num=NumberNameTable[i];
 					if($("#Player"+Num+"Name").val()){
-						Plys[i-1]=new Object();
-						Plys[i-1].Name=$("#Player"+Num+"Name").val();
-						Plys[i-1].Type=$("#Player"+Num+"Type option:selected").text();
-						Plys[i-1].Color=$("#Player"+Num+"Color option:selected").text();
+						Plys["Ply"+Num]=new Object();
+						Plys["Ply"+Num].Name=$("#Player"+Num+"Name").val();
+						Plys["Ply"+Num].Type=$("#Player"+Num+"Type option:selected").text();
+						Plys["Ply"+Num].Color=$("#Player"+Num+"Color option:selected").text();
 					}
 					else if (returnBoolean && ($("#Player"+Num+"Type option:selected").text()=="Player")){
 						returnBoolean = false;

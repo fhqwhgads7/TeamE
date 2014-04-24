@@ -109,7 +109,6 @@
 			function BeginGame(gameId, isHost){
 				$("#back-button").attr('disabled',true);
 				$("#begin-game-button").attr('disabled',true);
-				GameHasStarted = true;
 				setTimeout(function(){
 					if (Countdown <= 0) {
 						//Actual game starting logic goes here.
@@ -235,7 +234,6 @@
 			      }
 			    });
 			}
-
 			function goToLobby(isHost, gameId, gameName) {
 				localStorage.removeItem("joinedGame");
 				parent.postMessage("HideIt","*");
@@ -245,9 +243,12 @@
 						parent.postMessage("ShowIt","*");
 						RemoveThisGame(gameId);
 						goToCreateGame();
+						$("#begin-game-button").attr("onclick","");
+						$("#back-button").attr("onclick","");
 					});
 					$("#begin-game-button").click(function() {
 						if (!GameHasStarted){
+							GameHasStarted = true;
 							pubnub.publish({
 								channel: gameId,
 								message: {"startGame": currentUsername}

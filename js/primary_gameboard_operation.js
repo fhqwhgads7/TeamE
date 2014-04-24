@@ -152,7 +152,7 @@ function NewGameInitialize() {
 	TransferGameStartupInfo(GameCreationInfo, TheGame);
 
 	if(Online){
-		TheGame.CurrentPlayerNum=parseInt(ClientID,10);
+		TheGame.CurrentPlayerNum=ClientID;
 	}
 	else{
 		TheGame.CurrentPlayerNum=0;
@@ -269,7 +269,7 @@ function TransferGameStartupInfo(from, to) {
 	Online = to.GameType === "Online";
 	if(Online){
 		Host=localStorage.getItem("Host")==="true";
-		ClientID=localStorage.getItem("ClientID");
+		ClientID=parseInt(localStorage.getItem("ClientID"),10);
 		GameId = localStorage.getItem("gameId");
 		pubnub.publish({
 			channel: GameId,
@@ -473,8 +473,14 @@ function removeProductOnline(online,cid,args){
 		},400);
 	}
 	else {
-		if(!online){alert("This is a guard statement.");return;}
-		if(cid===ClientID){alert("It is made of guard and statement.");return;}
+		if (!online) {
+			alert("This is a guard statement.");
+			return;
+		}
+		if (cid===ClientID) {
+			alert("It is made of guard and statement.");
+			return;
+		}
 		ProdElemID=parseInt(JSON.parse(args),10);
 		if (ProdElemID !== null) {
 			playSound(GameSounds.LoseMoney);
@@ -755,11 +761,11 @@ function TryToAdvanceProduct(online,cid,args) {
 	if((online)&&(cid==ClientID)){
 		Args=[prod.GlobalID.toString()];
 		Send(GameId, ClientID,6,Args);
+		UpdateCurProdDisplay(prod.DisplayItemID);
 	}
 
 	UpdateProductListDisplayPosition(GetProductsInSamePhase(prod));
 	UpdateProductListDisplayPosition(GetProductsInThisPhase(CurPhase, prod.Owner));
-	UpdateCurProdDisplay(prod.DisplayItemID);
 	UpdatePlayerDisplay();
 }
 function TryToRevertProduct(online,cid,args) {
@@ -803,11 +809,13 @@ function TryToRevertProduct(online,cid,args) {
 	if((online)&&(cid==ClientID)){
 		Args=[prod.GlobalID.toString()];
 		Send(GameId, ClientID,7,Args);
+		if (!removeCheck){
+			UpdateCurProdDisplay(prod.DisplayItemID);
+		}
 	}
 	if (!removeCheck) {
 		UpdateProductListDisplayPosition(GetProductsInSamePhase(prod));
 		UpdateProductListDisplayPosition(GetProductsInThisPhase(CurPhase, prod.Owner));
-		UpdateCurProdDisplay(prod.DisplayItemID);
 		UpdatePlayerDisplay();
 	}
 }
@@ -1126,9 +1134,6 @@ function RandomEventsGo(online,cid,args){
 	RandomEventsToIterate=JSON.parse(args);
 	RandomEventIterator();
 	UpdatePlayerDisplay();
-	if(CurrentlySelectedProduct){
-		UpdateCurProdDisplay(CurrentlySelectedProduct.DisplayItemID);
-	}
 }
 function DecrementCategoryChanges() {
 	for (SubCat in SubCategoryAttributes) {
@@ -1266,9 +1271,9 @@ function PatentProduct(online,cid,args){
 	TheGame.PatentTracker.numPatents++;
 	if((online)&&(cid==ClientID)){
 		Send(GameId, ClientID,3,[product.GlobalID]);
+		UpdateCurProdDisplay(product.DisplayItemID);
 	}
 	UpdatePlayerDisplay();
-	UpdateCurProdDisplay(product.DisplayItemID);
 }
 function isThisCategoryPatented(prod, game) {
 	return (game.PatentTracker.Records[(game.PatentTracker.Categories.indexOf(prod.SubCategory))][1] !== null);
@@ -1683,13 +1688,12 @@ function QuitNetworkedGame(online,cid,args){
 	if(cid===ClientID && args==="NoRecursion"){
 		Send(GameId, ClientID,4,Host.toString());
 	}else{
-		// [NW] someone else tried to quit the game. cid is their GlobalID (which is the same as the ClientID on THEIR MACHINE). Your code goes here
 		TheGame.Players[cid].isActive = false;
 		var WereTheyHost = args === "true";
 		if (WereTheyHost){
 			TheGame.Players[cid].isHost = false;
 			TheGame.Players[(cid+1)%(TheGame.Players.length)].isHost = true;
-			Host = parseInt(ClientID,10)===((cid+1)%(TheGame.Players.length));
+			Host = ClientID===((cid+1)%(TheGame.Players.length));
 			localStorage.setItem("Host", Host.toString());
 		}
 	}

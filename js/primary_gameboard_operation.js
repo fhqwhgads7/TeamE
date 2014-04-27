@@ -34,6 +34,17 @@ var ProductPhases = {
 	PostDepTesting : "PostDeploymentTesting",
 	Maintenance : "Maintenance"
 };
+var ProductPhaseNames = {
+	Idea : "Idea",
+	Design : "Design",
+	Prototype : "Prototype",
+	PrototypeTesting : "Prototype Testing",
+	Development : "Development",
+	PreDepTesting : "Pre-deployment Testing",
+	Deployment : "Deployment",
+	PostDepTesting : "Post-deployment Testing",
+	Maintenance : "Maintenance"
+};
 var PhasePositions = {
 	Idea : [270 + 225 * Math.cos(13 * Math.PI / 8), 270 + 225 * Math.sin(13 * Math.PI / 8)],
 	Design : [270 + 225 * Math.cos(15 * Math.PI / 8), 270 + 225 * Math.sin(15 * Math.PI / 8)],
@@ -328,7 +339,7 @@ function UpdatePlayerDisplay() {
 	$("#CurPlyDsgns").html(Ply.NumCreative.toString());
 	$("#CurPlyDevs").html(Ply.NumDevs.toString());
 	$("#CurPlyTsts").html(Ply.NumQA.toString());
-	VisualCashAlert();//setTimeout(VisualCashAlert, 100);
+	VisualCashAlert();
 }
 function PopulateNewProdCategories() {
 	var Sel = $("#NewProductCategory");
@@ -764,8 +775,6 @@ function TryToAdvanceProduct(online,cid,args) {
 	} else if (CurPhase === ProductPhases.Maintenance) {
 		if(cid==ClientID){playSound(GameSounds.Wrong_Low)};
 	}
-
-	//This if-block is for patenting reasons.
 	if (prod.isANewProduct && prod.Phase === ProductPhases.Maintenance) {
 		prod.isANewProduct = false;
 	}
@@ -775,7 +784,9 @@ function TryToAdvanceProduct(online,cid,args) {
 		Send(GameId, ClientID,6,Args);
 		UpdateCurProdDisplay(prod.DisplayItemID);
 	}
-
+	else if (!online) {
+		UpdateCurProdDisplay(prod.DisplayItemID);
+	}
 	UpdateProductListDisplayPosition(GetProductsInSamePhase(prod));
 	UpdateProductListDisplayPosition(GetProductsInThisPhase(CurPhase, prod.Owner));
 	UpdatePlayerDisplay();
@@ -824,6 +835,9 @@ function TryToRevertProduct(online,cid,args) {
 		if (!removeCheck){
 			UpdateCurProdDisplay(prod.DisplayItemID);
 		}
+	}
+	else if (!online && !removeCheck) {
+		UpdateCurProdDisplay(prod.DisplayItemID);
 	}
 	if (!removeCheck) {
 		UpdateProductListDisplayPosition(GetProductsInSamePhase(prod));
@@ -976,6 +990,35 @@ function ActuallyCycleTurn(roundOnly){
 	}
 	TheGame.CurrentPlayer.TurnInit();
 }
+function CheckForBrokenProducts(){
+	var TheBrokenProducts = [];
+	var BrokenRate;
+	for (var ProdNum in TheGame.PlayerProducts){
+		BrokenRate = 0;
+		if (TheGame.PlayerProducts[ProdNum].Phase === ProductPhases.Maintenance){
+			BrokenRate = DoesItBreak(TheGame.PlayerProducts[ProdNum]);
+		}
+		TheBrokenProducts.push(BrokenRate);
+	}
+	SetBrokenProducts(Online, ClientID, JSON.stringify(TheBrokenProducts));
+}
+function SetBrokenProducts(online, cid, args){
+	var TheBrokenProducts = JSON.parse(args);
+	for (var ProdNum in TheGame.PlayerProducts){
+		TheGame.PlayerProducts[ProdNum].BugAmount = TheBrokenProducts[ProdNum];
+	}
+	if (online && cid===ClientID){
+		Send(ClientID,10,args);
+	}
+}
+function CashChangeOnline(online, cid, args){
+	var Ply = TheGame.Players[parseInt(args[0],10)];
+	var CashChange = parseInt(args[1], 10);
+	Ply.Money -= CashChange;
+	if (cid === ClientID){
+		Send(cid,0,args);
+	}
+}
 function DisplayNewRoundEvent() {
 	TheGame.Players.forEach(function(ply){
 		ply.FinishedCurrentTurn=false;
@@ -984,6 +1027,9 @@ function DisplayNewRoundEvent() {
 	var Num = TheGame.CurrentRound + 1;
 	$('.Standard').attr("disabled", true);
 	if (Num <= TheGame.Settings.NumberOfRounds) {
+		if (!Online || Host){
+			CheckForBrokenProducts();
+		}
 		if (TheGame.Settings.NumberOfRounds - Num <= 5) {
 			changeCurrentBGM("TimeRunningOut");
 		}
@@ -1063,6 +1109,7 @@ function NewRoundCalc() {
 					Prod.DesignStrength = Prod.DesignStrength + Math.ceil(20 * Ply.NumCreative * (Math.log(3) / Math.log(3 + Ply.NumCreative)) / (numOnSameSpot + Prod.turnsInSamePhase));
 				} else if (Prod.Phase === ProductPhases.Prototype) {
 					Prod.hasPrototype = true;
+					MoveItSoon(Ply, Prod);
 				} else if (Prod.Phase === ProductPhases.PrototypeTesting) {
 					EmployeeReductionCheck("tes", Ply, Prod);
 					Prod.DesignStrength = Prod.DesignStrength + Math.ceil(Ply.NumQA * 12 * (Math.log(3) / Math.log(3 + Ply.NumQA)) / (numOnSameSpot + Prod.turnsInSamePhase));
@@ -1076,15 +1123,18 @@ function NewRoundCalc() {
 					Prod.TestingStrength += (Prod.BuildStrength * 0.1 * Ply.NumQA * (Math.log(3) / Math.log(3 + Ply.NumCreative)) / (numOnSameSpot + Prod.turnsInSamePhase));
 				} else if (Prod.Phase === ProductPhases.Deployment) {
 					Prod.readyToDeploy = true;
+					MoveItSoon(Ply, Prod);
 				} else if (Prod.Phase === ProductPhases.PostDepTesting) {
 					EmployeeReductionCheck("tes", Ply, Prod);
 					Prod.TestingStrength += Math.ceil(0.05 * (Prod.DesignStrength + Prod.BuildStrength) * Ply.NumQA * (Math.log(3) / Math.log(3 + Ply.NumCreative)) / (numOnSameSpot + Prod.turnsInSamePhase));
 				} else if (Prod.Phase === ProductPhases.Maintenance) {
-					var Broken = DoesItBreak(Prod);
+					var Broken = Prod.BugAmount;
 					if (Broken > 0) {
 						var Damages = Math.ceil((BaseCosts.PostDepBugCost) + getMonetaryValue(Prod) * Broken);
-						Ply.Money = Ply.Money - Damages;
-						IsItSoBadItGetsRemoved(Ply, Prod, Damages);
+						CashChangeOnline(Online, ClientID, [Ply.Number.toString(),Damages.toString()]); //Ply.Money = Ply.Money - Damages;
+						if (!Online || (Online && Ply.Number === ClientID)){
+							IsItSoBadItGetsRemoved(Ply, Prod, Damages);
+						}
 						Prod.TestingStrength += (Prod.DesignStrength + Prod.BuildStrength);
 					}
 				}
@@ -1193,7 +1243,6 @@ function PatentTracker() {
 
 	return newPatentTracker;
 }
-
 
 //This is here for unit testing purposes. And also because it works offline for sure.
 function OldTryToBuyPatent(product, game) {
@@ -1374,16 +1423,18 @@ function RandomEventSelector() {
 								for (var l = 0; l < TheGame.RandomEvents[i].Target.length; l++) {
 									var numProd = 0;
 									var tries = 0;
-									if (TheGame.RandomEvents[i].Target[l].Products.length > 0) {
-										for (k = 0; ((numProd < TheGame.RandomEvents[i].Value) && numProd < TheGame.RandomEvents[i].Target[l].Products.length && (tries < 2 * TheGame.RandomEvents[i].Value)); k++) {
-											k = (k % (TheGame.RandomEvents[i].Target[l].Products.length));
+									var playerNumber = TheGame.RandomEvents[i].Target[l];
+									var ply = TheGame.Players[playerNumber];
+									if (ply.Products.length > 0) {
+										for (k = 0; ((numProd < TheGame.RandomEvents[i].Value) && numProd < ply.Products.length && (tries < 2 * TheGame.RandomEvents[i].Value)); k++) {
+											k = (k % (ply.Products.length));
 											if (k === 0) {
 												tries++;
 											}
 											if (Math.random() > 0.85) {
 												numProd++;
-												if (TheGame.RandomEvents[i].toBeRemoved.indexOf(TheGame.RandomEvents[i].Target[l].Products[k].GlobalID) <= -1){
-													TheGame.RandomEvents[i].toBeRemoved.push(TheGame.RandomEvents[i].Target[l].Products[k].GlobalID);
+												if (TheGame.RandomEvents[i].toBeRemoved.indexOf(ply.Products[k].GlobalID) <= -1){
+													TheGame.RandomEvents[i].toBeRemoved.push(ply.Products[k].GlobalID);
 												}
 											}
 										}
@@ -1393,16 +1444,18 @@ function RandomEventSelector() {
 							else {
 								var numProd = 0;
 								var tries = 0;
-								if (TheGame.RandomEvents[i].Target.Products.length > 0) {
-									for (k = 0; (numProd < TheGame.RandomEvents[i].Value && numProd < TheGame.RandomEvents[i].Target.Products.length && (tries < 2 * TheGame.RandomEvents[i].Value)); k++) {
-										k = (k % (TheGame.RandomEvents[i].Target.Products.length));
+								var playerNumber = TheGame.RandomEvents[i].Target;
+								var ply = TheGame.Players[playerNumber];
+								if (ply.Products.length > 0) {
+									for (k = 0; (numProd < TheGame.RandomEvents[i].Value && numProd < ply.Products.length && (tries < 2 * TheGame.RandomEvents[i].Value)); k++) {
+										k = (k % (ply.Products.length));
 										if (k === 0) {
 											tries++;
 										}
 										if (Math.random() > 0.85) {
 											numProd++;
-											if (TheGame.RandomEvents[i].toBeRemoved.indexOf(TheGame.RandomEvents[i].Target.Products[k].GlobalID) <= -1){
-												TheGame.RandomEvents[i].toBeRemoved.push(TheGame.RandomEvents[i].Target.Products[k].GlobalID);
+											if (TheGame.RandomEvents[i].toBeRemoved.indexOf(ply.Products[k].GlobalID) <= -1){
+												TheGame.RandomEvents[i].toBeRemoved.push(ply.Products[k].GlobalID);
 											}
 										}
 									}
@@ -1525,13 +1578,42 @@ function getMonetaryValue(prod) {
 }
 
 function DoesItBreak(prod) {
-	return (prod.Volatility - Math.random()) * SubCategoryAttributes[prod.SubCategory][0];
+	prod.BugAmount = (prod.Volatility - Math.random()) * SubCategoryAttributes[prod.SubCategory][0];
+	return prod.BugAmount;
 }
 
 function MoveItSoon(Ply, prod) {
-	if (prod.turnsInSamePhase >= 6) {
+	var TheName = prod.Name;
+	var ThePhase = ProductPhaseNames[prod.Phase];
+	
+	if (prod.Phase === ProductPhases.Prototype) {
 		Ply.TriggeredEvents.push(function () {
-			TriggeredEventDisplay("Your product " + prod.Name + " has been in the " + prod.Phase + " phase for a while. Consider moving it along.", GameSounds.MoveitMessage, "longtime");
+			if (prod){
+				TriggeredEventDisplay(Ply.Name + ", the prototype for your product " + TheName + " has been completed.", GameSounds.MoveitMessage, "longtime");
+			}
+			else {
+				TriggeredEventDisplay(Ply.Name + ", the prototype for your product " + TheName + " had been completed, but it no longer exists.", GameSounds.MoveitMessage, "longtime");
+			}
+		});
+	}
+	else if (prod.Phase === ProductPhases.Deployment) {
+		Ply.TriggeredEvents.push(function () {
+			if (prod){
+				TriggeredEventDisplay(Ply.Name + ", your product " + TheName + " is ready for deployment.", GameSounds.MoveitMessage, "longtime");
+			}
+			else {
+				TriggeredEventDisplay(Ply.Name + ", your product " + TheName + " was ready for deployment, but it no longer exists.", GameSounds.MoveitMessage, "longtime");
+			}
+		});
+	}
+	else if (prod.turnsInSamePhase >= 6) {
+		Ply.TriggeredEvents.push(function () {
+			if (prod){
+				TriggeredEventDisplay(Ply.Name + ", your product " + TheName + " has been in the " + ThePhase + " phase for a while. Consider moving it along.", GameSounds.MoveitMessage, "longtime");
+			}
+			else {
+				TriggeredEventDisplay(Ply.Name + ", your product " + TheName + " was in the " + ThePhase + " phase for a while before it was lost.", GameSounds.MoveitMessage, "longtime");
+			}
 		});
 	}
 }
@@ -1540,7 +1622,7 @@ function EmployeeReductionCheck(employeeType, Ply, prod) {
 	var numLost = 0;
 	var messagePart;
 	if (prod.turnsInSamePhase >= 8) {
-		numLost = Math.ceil(Math.random() * 3);
+		numLost = Math.ceil(Math.random() * 5);
 		if (employeeType === "des") {
 			if (numLost > Ply.NumCreative) {
 				numLost = Ply.NumCreative;
@@ -1561,9 +1643,19 @@ function EmployeeReductionCheck(employeeType, Ply, prod) {
 			messagePart = numLost.toString() + " of your testers just quit!";
 		}
 		if (numLost > 0) {
+			if(Online){
+				var Args=[Ply.NumCreative.toString(),Ply.NumDev.toString(),Ply.NumQA.toString()];
+				Send(GameId, ClientID,1,Args);
+			}
+			var TheName = prod.Name;
 			Ply.TriggeredEvents.push(function () {
 				EventFlash();
-				TriggeredEventDisplay("Your " + prod.Name + " has been in the same phase for too long! " + messagePart, GameSounds.Event, "employeeloss");
+				if (prod) {
+					TriggeredEventDisplay(Ply.Name + ", your " + TheName + " has been in the same phase for too long! " + messagePart, GameSounds.Event, "employeeloss");
+				}
+				else {
+					TriggeredEventDisplay(Ply.Name + ", prior to being destroyed, your " + TheName + " was in the same phase for too long, and " + messagePart, GameSounds.Event, "employeeloss");
+				}
 				UpdatePlayerDisplay();
 			});
 		} else {
@@ -1665,10 +1757,8 @@ function GameOverDisplay() {
 function GetFinalResults() {
 	var Plyr = {};
 	Plyr.length = 0;
-
 	for (PlyNum in TheGame.Players) {
 		var Ply = TheGame.Players[PlyNum];
-
 		Plyr[PlyNum] = {};
 		Plyr[PlyNum].Name = Ply.Name;
 		Plyr[PlyNum].Money = Ply.Money;
@@ -1677,9 +1767,7 @@ function GetFinalResults() {
 		Plyr[PlyNum].NumEmployees = (Ply.NumQA + Ply.NumDevs + Ply.NumCreative);
 		Plyr[PlyNum].isActive = Ply.isActive;
 		Plyr.length++;
-
 	}
-
 	localStorage.setItem("FinalResults", JSON.stringify(Plyr));
 	localStorage.setItem("WasItOnline", Online.toString());
 }

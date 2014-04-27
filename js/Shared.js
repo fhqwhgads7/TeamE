@@ -184,14 +184,15 @@ function Product(player,name,category,sub,color){
 	newProduct.DesignStrength=0;
 	newProduct.BuildStrength=0;
 	newProduct.TestingStrength=0;
-	newProduct.Volatility=1; //The chance of the product breaking (1=100%)
+	newProduct.Volatility=1;
+	newProduct.BugAmount=0;
 	newProduct.Phase="nil";
 	newProduct.turnsInSamePhase=0;
 	newProduct.PhaseAtStartOfTurn="nil";
 	newProduct.justStarted=true;
 	newProduct.hasPrototype=false;
 	newProduct.readyToDeploy=false;
-	newProduct.isANewProduct=true; //This is for patenting-related reasons.
+	newProduct.isANewProduct=true;
 	if(player){
 		player.Products.push(newProduct);
 		newProduct.Number=player.Products.length-1;
@@ -292,7 +293,7 @@ function Send(gameId, initiatorNum,funcNum,argBundle){
 }
 function Receive(initiatorNum,funcNum,argBundle){
 	var SendableFuncs=[
-		null,
+		CashChangeOnline,
 		HireTheEmployees,
 		CycleTurn,
 		PatentProduct,
@@ -301,7 +302,8 @@ function Receive(initiatorNum,funcNum,argBundle){
 		TryToAdvanceProduct,
 		TryToRevertProduct,
 		RandomEventsGo,
-		removeProductOnline
+		removeProductOnline,
+		SetBrokenProducts
 	];
 	if(initiatorNum!=ClientID){
 		SendableFuncs[funcNum](true,initiatorNum,argBundle);

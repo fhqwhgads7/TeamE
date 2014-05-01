@@ -124,18 +124,22 @@
 				$("#PopupOverlay").show();
 			}
 			function CloseEventDialog(){
-				$("#EventDialog").hide();
-				$("#PopupOverlay").hide();
-				RandomEventIterator();
+				if (!ProductsBeingRemoved){
+					$("#EventDialog").hide();
+					$("#PopupOverlay").hide();
+					RandomEventIterator();
+				}
 			}
 			function ShowTriggerDialog(){
 				$("#TriggerDialog").show();
 				$("#PopupOverlay").show();
 			}
 			function CloseTriggerDialog(){
-				$("#TriggerDialog").hide();
-				$("#PopupOverlay").hide();
-				TriggeredEventIterator(TheGame.CurrentPlayer.TriggeredEvents);
+				if (!ProductsBeingRemoved){
+					$("#TriggerDialog").hide();
+					$("#PopupOverlay").hide();
+					TriggeredEventIterator(TheGame.CurrentPlayer.TriggeredEvents);
+				}
 			}
 			function TryToQuitGame(){
 				$("#QuitOverlay").show();

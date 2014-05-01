@@ -471,10 +471,10 @@ function removeProduct(prod) {
 			CurrentlySelectedProduct = null;
 		}
 		$("#ProductDisplayItem_" + theID.toString()).css('opacity', '0');
-		$("#ProductDisplayItem_" + theID.toString()).css('transition', '500ms ease-out');
+		$("#ProductDisplayItem_" + theID.toString()).css('transition', '390ms ease-out');
 		setTimeout(function () {
 			$("div").remove("#ProductDisplayItem_" + theID.toString());
-		}, 500);
+		}, 390);
 		if (prod.justStarted) {
 			TheGame.CurrentPlayer.hasMadeProductThisTurn = false;
 		}
@@ -515,10 +515,10 @@ function removeProductOnline(online,cid,args){
 				CurrentlySelectedProduct = null;
 			}
 			$("#ProductDisplayItem_" + ProdElemID.toString()).css('opacity', '0');
-			$("#ProductDisplayItem_" + ProdElemID.toString()).css('transition', '500ms ease-out');
+			$("#ProductDisplayItem_" + ProdElemID.toString()).css('transition', '390ms ease-out');
 			setTimeout(function () {
 				$("div").remove("#ProductDisplayItem_" + ProdElemID.toString());
-			}, 500);
+			}, 390);
 			TheOwner = TheGame.PlayerProducts[ProdElemID].Owner;
 			TheOwner.Products.splice(TheOwner.Products.indexOf(TheGame.PlayerProducts[ProdElemID]), 1);
 			var ThePlayerAtLoss = TheGame.Players.indexOf(TheOwner);
@@ -1014,8 +1014,8 @@ function SetBrokenProducts(online, cid, args){
 function CashChangeOnline(online, cid, args){
 	var Ply = TheGame.Players[parseInt(args[0],10)];
 	var CashChange = parseInt(args[1], 10);
-	Ply.Money -= CashChange;
-	if (cid === ClientID){
+	Ply.Money += CashChange;
+	if (online && cid===ClientID){
 		Send(cid,0,args);
 	}
 }
@@ -1081,7 +1081,9 @@ function NewRoundCalc() {
 	DecrementCategoryChanges();
 	for (var i = 0; i < TheGame.Players.length; i++) {
 		var Ply = TheGame.Players[i];
+		Ply.HadAProductThisTurn = false;
 		if (Ply.NumProducts > 0 && Ply.isActive) {
+			Ply.HadAProductThisTurn = true;
 			for (var j = 0; j < Ply.Products.length; j++) {
 				var Prod = Ply.Products[j];
 				if (Prod.Phase !== Prod.PhaseAtStartOfTurn) {
@@ -1131,7 +1133,7 @@ function NewRoundCalc() {
 					var Broken = Prod.BugAmount;
 					if (Broken > 0) {
 						var Damages = Math.ceil((BaseCosts.PostDepBugCost) + getMonetaryValue(Prod) * Broken);
-						CashChangeOnline(Online, ClientID, [Ply.Number.toString(),Damages.toString()]); //Ply.Money = Ply.Money - Damages;
+						CashChangeOnline(Online, ClientID, [Ply.Number.toString(),-Damages.toString()]);
 						if (!Online || (Online && Ply.Number === ClientID)){
 							IsItSoBadItGetsRemoved(Ply, Prod, Damages);
 						}
@@ -1146,9 +1148,7 @@ function NewRoundCalc() {
 		var Ply = TheGame.Players[i];
 		var Net = 0;
 		if (Ply.isActive){
-			if (Ply.NumProducts < 1) {
-				Net = Math.round(BasePayouts.DayJobEachTurn * TotalPayoutRate * (1.4 - 0.2 * (GetDifficultyConstant(TheGame.Settings.Difficulty))));
-			} else {
+			if (Ply.NumProducts > 0) {
 				for (var j = 0; j < Ply.Products.length; j++) {
 					var Prod = Ply.Products[j];
 					if (Prod.Phase === ProductPhases.Maintenance && (SubCategoryAttributes[Prod.SubCategory][4] <= 0)) {
@@ -1164,6 +1164,9 @@ function NewRoundCalc() {
 						Net += earnings;
 					}
 				}
+			}
+			else if (!(Ply.HadAProductThisTurn)) {
+				Net = Math.round(BasePayouts.DayJobEachTurn * TotalPayoutRate * (1.4 - 0.2 * (GetDifficultyConstant(TheGame.Settings.Difficulty))));
 			}
 			Net = Net - ((BaseCosts.PayDev * Ply.NumDevs) + (BaseCosts.PayQA * Ply.NumQA) + (BaseCosts.PayCreative * Ply.NumCreative));
 			Ply.Money = Ply.Money + Net;
@@ -1670,12 +1673,8 @@ function IsItSoBadItGetsRemoved(Ply, Prod, AmountLost) {
 	if ((AmountLost >= getMonetaryValue(Prod))/2 || getMonetaryValue(Prod) <= 0) {
 		Ply.TriggeredEvents.push(function () {
 			EventFlash();
-			if (Prod) {
-				removeProduct(Prod);
-				TriggeredEventDisplay("Your " + Prod.Name + " was just recalled due to a massive net loss! Try again with something new!", GameSounds.Event, "fail");
-			} else {
-				TriggeredEventDisplay("Your " + Prod.Name + " would have been recalled due to a massive net loss, if it had not been destroyed already!", GameSounds.Event, "fail");
-			}
+			removeMultipleProducts([Prod]);
+			TriggeredEventDisplay("Your " + Prod.Name + " was just recalled! Try again with something new!", GameSounds.Event, "fail");
 		});
 	}
 }

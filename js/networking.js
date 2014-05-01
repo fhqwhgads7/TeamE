@@ -1,6 +1,9 @@
 Parse.initialize("xjUxyY8bghFGuSnM3ptEZkV3BiWOlD3VhkRLt4kz", "iZCS2S7ZuWn9keMoooLaHMlB7HMXpcqD1M60JVjp");
 var CurrentUser = Parse.User.current();
-var currentUsername = CurrentUser.get("username");
+var currentUsername;
+if (CurrentUser) {
+	currentUsername = CurrentUser.get("username");
+}
 var ParseGame = Parse.Object.extend("Game");
 
 // PubNub business 

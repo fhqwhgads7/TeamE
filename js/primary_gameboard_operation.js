@@ -1673,7 +1673,7 @@ function IsItSoBadItGetsRemoved(Ply, Prod, AmountLost) {
 	if ((AmountLost >= getMonetaryValue(Prod))/2 || getMonetaryValue(Prod) <= 0) {
 		Ply.TriggeredEvents.push(function () {
 			EventFlash();
-			removeMultipleProducts([Prod]);
+			removeProduct(Prod);
 			TriggeredEventDisplay("Your " + Prod.Name + " was just recalled! Try again with something new!", GameSounds.Event, "fail");
 		});
 	}

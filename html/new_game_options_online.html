@@ -17,6 +17,8 @@
 			var GameHasStarted = false;
 			var Countdown = 6;
 			var TheGameID;
+			var IAmTheHost;
+			var MyInterval;
 			
 			function Initialize()
 			{
@@ -39,7 +41,7 @@
 					goToCreateGame();
 				}
 
-							}
+			}
 			function Peace(event){
 				if (event.data === 'Logout'){
 					leaveGame(TheGameID);	
@@ -60,6 +62,7 @@
 					newGame.set("open", true);
 					newGame.set("players", [currentUsername]);
 					newGame.set("capacity", 6);
+					newGame.set("ping",1);
 
 					var newGameName = $("#GameName").val();
 					newGame.set("name", newGameName);
@@ -86,6 +89,7 @@
 										});	
 										ShowAlert("Game has been hosted!", "success.png");
 										$("#AlertButton").attr('disabled', false);
+										localStorage.setItem("ClientID","0");
 										goToLobby(true, newGame.id, newGameName);
 									},
 									error: function(newGame, error) {
@@ -105,6 +109,9 @@
 
 			function GoBackToMainMenu(){
 				SwitchToPage("title.html");
+			}
+			function GoBackToFindGame(){
+				SwitchToPage("find_game_online.html");
 			}
 			function BeginGame(gameId, isHost){
 				$("#back-button").attr('disabled',true);
@@ -138,7 +145,69 @@
 					}
 				},1000);
 			}
-			
+			function HostPingHandler(){
+				var query = new Parse.Query(ParseGame);
+				query.get(TheGameID, {
+					success: function(game){
+						var playersList = game.get("players");
+						for (i = 0; i < 6; i++){
+							if (PlayerPingsForHost[i] > -1){
+								PlayerPingsForHost[i]--;
+							}
+							else {
+								while(playersList.indexOf("") != -1) {
+									playersList.splice(playersList.indexOf(""),1);
+								}
+								if (playersList.length > i){
+									playersList.splice(i,1);
+									game.set("players",playersList);
+									game.save();
+								}
+									
+								refreshPlayerBoxes(TheGameID);
+								pubnub.publish({
+									channel: TheGameID,
+									message: {"refreshPlayers": currentUsername}
+								});
+							}
+						} 
+					},
+					error: function(object, error) {
+						console.log("I am error. Also, " + error.message);
+					}
+				});
+			}
+			function PingHandler(){
+				if (MyCurrentPing > 0){
+					MyCurrentPing--;
+				}
+				else {
+					IAmConnected = false;
+					ShowAlert("You have been disconnected.", "alert.png");
+					$("#AlertButton").attr('onclick', 'CloseAlert(); GoBackToMainMenu();');
+					ClearTheInterval();
+				}
+			}
+			function CheckForGame(){
+				var query = new Parse.Query(ParseGame);
+				query.get(TheGameID, {
+					success: function(game) {
+						if (IAmTheHost){
+							game.set("ping",1);
+							game.save();
+						}
+					},
+					error: function(object, error) {
+						IAmConnected = false;
+						ShowAlert("Connection to the game has been lost.", "alert.png");
+						$("#AlertButton").attr('onclick', 'CloseAlert(); GoBackToFindGame();');
+						ClearTheInterval();
+					}
+				});
+			}
+			function ClearTheInterval(){
+				window.clearInterval(MyInterval);
+			}
 			function LoadOptions()
 			{
 				if(TheBrandNewGame){
@@ -177,7 +246,7 @@
 						var players = game.get("players");
 				        var playersBoxesColors = $(".PlayerBox").find("select.TwoColumnSecond");
 
-						alert(players.length);
+						//alert(players.length);
 
 						var indexToRemove;
 						while(players.indexOf("") != -1) {
@@ -186,7 +255,7 @@
 							playersBoxesColors.splice(indexToRemove,1);
 						}
 
-						alert(players.length);
+						//alert(players.length);
 
 						TheBrandNewGame.Players = [];
 						$.each(players, function(index,player){
@@ -232,9 +301,6 @@
 					var playersBoxesPlayerStatuses = $(playersBoxes).find(".TwoColumnFirst");
 			        $(playersBoxes).addClass("empty");
 			        $(playersBoxesPlayerNames).val("");
-					if (localStorage.getItem("Host") === "true"){
-						$(playersBoxesPlayerStatuses).attr('disabled',false);
-					}
 			        $.each(playersList, function(index, player) {
 			        	if(player === "") {
 					        $(playersBoxesPlayerStatuses[index]).find('option')[1].selected = true;
@@ -243,7 +309,8 @@
 					        $(playersBoxesPlayerNames[index]).val(player);
 					        $(playersBoxesPlayerStatuses[index]).attr('disabled',true);
 			        	}
-			        })
+			        });
+					localStorage.setItem("ClientID",playersList.indexOf(currentUsername));
 			      },
 			      error: function(object, error) {
 			        console.log("Oops, couldn't refresh players list: " + error.message);
@@ -254,13 +321,19 @@
 				localStorage.removeItem("joinedGame");
 				parent.postMessage("HideIt","*");
 				TheGameID = gameId;
+				IAmTheHost = isHost;
 				if(isHost) {
 					$("#back-button").click(function () {
 						parent.postMessage("ShowIt","*");
 						RemoveThisGame(gameId);
 						goToCreateGame();
+						ClearTheInterval();
 						$("#begin-game-button").attr("onclick","");
 						$("#back-button").attr("onclick","");
+						pubnub.publish({
+							channel: gameId,
+							message: {"hostHasLeft": currentUsername}
+						}); 
 					});
 					$("#begin-game-button").click(function() {
 						if (!GameHasStarted){
@@ -270,7 +343,14 @@
 								message: {"startGame": currentUsername}
 							}); 
 						}
+						ClearTheInterval();
 					});
+					MyInterval = setInterval(function(){
+						//PingSend(gameId, true, parseInt(localStorage.getItem("ClientID"),10));
+						CheckForGame();
+						//HostPingHandler();
+						//PingHandler();
+					},1000);
 				}
 				else {
 					$("#back-button").click(function () {
@@ -278,13 +358,16 @@
 						SwitchToPage("find_game_online.html");
 					});
 					$(".TwoColumnFirst").attr('disabled', true);
+					MyInterval = setInterval(function(){
+						CheckForGame();
+						//PingHandler();
+					},1000);
 				}
 				$("#begin-game-button").attr('disabled',!isHost);
 				$("#new-game-name").text(gameName);
 				$("#create-game-wrapper").hide();
 				$("#lobby-wrapper").show();
 
-				// Subscribe to current game's channel	
 				refreshPlayerBoxes(gameId);
                 pubnub.publish({
                         channel: gameId,
@@ -298,6 +381,13 @@
 							refreshPlayerBoxes(gameId);
 						} else if ("startGame" in message) {
 							BeginGame(gameId, isHost);
+							ClearTheInterval();
+						} else if ("pingIt" in message) {
+							PingReceive(gameId, message.senderHost, message.playerID);
+						} else if ("hostHasLeft" in message) {
+							if (!isHost){
+								HostHasLeft();
+							}
 						}
 					}
 				});
@@ -342,6 +432,10 @@
 				$("#create-game-wrapper").children().attr('disabled',false);
 				$("#AlertOverlay").hide();
 				$("#Alerts").hide();
+			}
+			function HostHasLeft(){
+				ShowAlert("The game host has left.", "alert.png");
+				$("#AlertButton").attr('onclick', 'CloseAlert(); GoBackToFindGame();');
 			}
 		</script>
 		<style>

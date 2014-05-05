@@ -3,11 +3,11 @@ var RotateDir = 0;
 var Rotation = 0;
 var CurrentlySelectedProduct;
 var ShowCashAlert = false;
-var EVENT_CHANCE = 0.5;
 var BOARD_WIDTH = 800;
 var TotalPayoutRate = 1;
 var ProductsBeingRemoved;
 var RandomEventsToIterate;
+var OnlineInterval;
 
 var BaseCosts = {
 	HireDev : 20,
@@ -121,32 +121,32 @@ var ProductCategories = {
 	Other : ["School", "Shoes", "Musical", "Key Holder"]
 };
 //The attributes are, in order: Volatility multiplier (Index 0), Prototype Cost multiplier (Index 1), and Idea Strength increase multiplier (Index 2)
-//Also included are Payout multipliers (Index 3) and TurnsShutdown (Index 4), for events
+//Also included are Payout multipliers (Index 3) and TurnsShutdown (Index 4), for events, plus a "worth" multiplier (Index 5)
 var SubCategoryAttributes = {
-	"Hydroelectric" : [1, 1, 1, 1, 0],
-	"Solar" : [1, 0.8, 0.8, 1, 0],
-	"Fossil Fuel" : [1.1, 0.9, 1.1, 1, 0],
-	"Wind" : [0.7, 0.8, 0.6, 1, 0],
-	"Space" : [3, 2, 2, 1, 0],
-	"Air" : [2.5, 1.5, 2, 1, 0],
-	"Land" : [1.6, 1.5, 1.5, 1, 0],
-	"Sea" : [1.8, 1.7, 1.7, 1, 0],
-	"Desktop" : [0.5, 0.7, 0.3, 1, 0],
-	"Laptop" : [1, 0.5, 0.3, 1, 0],
-	"Peripheral" : [1.3, 0.7, 1, 1, 0],
-	"Printer" : [0.4, 0.8, 0.7, 1, 0],
-	"Communication" : [0.6, 0.4, 0.8, 1, 0],
-	"Office Program" : [0.3, 0.1, 0.3, 1, 0],
-	"Video Game" : [0.8, 0.3, 1.2, 1, 0],
-	"Web Application" : [0.5, 0.2, 0.8, 1, 0],
-	"Cleaning" : [1.2, 0.9, 1.3, 1, 0],
-	"Furniture" : [0.4, 0.7, 0.5, 1, 0],
-	"Kitchen" : [1.2, 0.9, 0.3, 1, 0],
-	"Barbecue" : [1.1, 0.5, 0.6, 1, 0],
-	"School" : [0.5, 0.6, 1, 1, 0],
-	"Shoes" : [0.3, 0.9, 0.4, 1, 0],
-	"Musical" : [0.2, 0.4, 0.6, 1, 0],
-	"Key Holder" : [0.1, 0.2, 0.2, 1, 0]
+	"Hydroelectric" : [1, 1, 1, 1, 0, 1],
+	"Solar" : [1, 0.8, 0.8, 1, 0, 1.4],
+	"Fossil Fuel" : [1.1, 0.9, 1.1, 1, 0, 2],
+	"Wind" : [0.7, 0.8, 0.6, 1, 0, 1.6],
+	"Space" : [4, 3, 2.5, 1, 0, 1],
+	"Air" : [2.5, 1.5, 2, 1, 0, 0.8],
+	"Land" : [2.7, 1.5, 1.5, 1, 0, 1],
+	"Sea" : [1.8, 1.7, 1.7, 1, 0, 1],
+	"Desktop" : [0.5, 0.7, 0.3, 1, 0, 3],
+	"Laptop" : [1, 0.5, 0.3, 1, 0, 3.5],
+	"Peripheral" : [1.3, 0.7, 1, 1, 0, 1],
+	"Printer" : [0.4, 0.8, 0.7, 1, 0, 1.6],
+	"Communication" : [0.6, 0.4, 0.8, 1, 0, 1.3],
+	"Office Program" : [0.3, 0.1, 0.3, 1, 0, 1.8],
+	"Video Game" : [0.8, 0.3, 1.2, 1, 0, 1],
+	"Web Application" : [0.5, 0.2, 0.8, 1, 0, 0.5],
+	"Cleaning" : [1.2, 0.9, 1.3, 1, 0, 0.9],
+	"Furniture" : [0.4, 0.7, 0.5, 1, 0, 1.1],
+	"Kitchen" : [1.2, 0.9, 0.3, 1, 0, 0.7],
+	"Barbecue" : [1.1, 0.5, 0.6, 1, 0, 0.8],
+	"School" : [0.5, 0.6, 1, 1, 0, 1],
+	"Shoes" : [0.3, 0.9, 0.4, 1, 0, 0.8],
+	"Musical" : [0.2, 0.4, 0.6, 1, 0, 1.2],
+	"Key Holder" : [0.1, 0.2, 0.2, 1, 0, 1.7]
 };
 function GameInitialize() {
 	var doILoadGame = localStorage.getItem("LoadingAGame");
@@ -239,6 +239,7 @@ function LoadGameInitialize(gameName) {
 		setInterval(function () {
 			TipThink();
 		}, 10);
+		StartTheClock();
 		setTimeout(function () {
 			TheGame.CurrentPlayer.TurnInit();
 		}, 1000);
@@ -259,7 +260,7 @@ function TipThink() {
 	var NewPos = Pos - 1;
 	if (NewPos <= -(Elem.width()) - 30) {
 		NewPos = BOARD_WIDTH + 1;
-		SelectedTip = Math.floor(Math.random() * Tips.length * 0.5 * (1 + (TheGame.CurrentRound / TheGame.Settings.NumberOfRounds)));
+		SelectedTip = Math.floor(Math.random() * Tips.length * 0.25 * (1 + 3*(TheGame.CurrentRound / TheGame.Settings.NumberOfRounds)));
 		Elem.text(Tips[SelectedTip]);
 	}
 	Elem.css("left", (NewPos).toString() + "px");
@@ -292,6 +293,10 @@ function TransferGameStartupInfo(from, to) {
 		Host=localStorage.getItem("Host")==="true";
 		ClientID=parseInt(localStorage.getItem("ClientID"),10);
 		GameId = localStorage.getItem("gameId");
+		PlayerPingsForHost = [];
+		for (var i = 0; i < TheGame.Players.length; i++){
+			FlaggedForPossibleDisconnect.push(false);
+		}
 		pubnub.publish({
 			channel: GameId,
 			message: {"gameInitialize": ClientID} 
@@ -304,6 +309,12 @@ function TransferGameStartupInfo(from, to) {
 					var functionNum = message.gameAction.functionNum;
 					var args = JSON.parse(message.gameAction.args);
 					Receive(clientId, functionNum, args);
+				} else if ("pingIt" in message) {
+					PingReceive(GameId, message.senderHost, message.playerID);
+				} else if ("isItJustMe" in message) {
+					NoItIsNotJustYou(GameId, message.playerID);
+				} else if ("noItIsNot" in message) {
+					OKJustChecking();
 				}
 			}
 		});
@@ -562,20 +573,6 @@ function GetProductsInThisPhase(ThisPhase, Ply) {
 	}
 
 	return ProdsInSameSpot;
-}
-
-function UpdatePlayerProductDisplayPosition(Ply) {
-	var ProductPhaseArray = [];
-	if (Ply.Products.length > 0) {
-		for (i = 0; i < Ply.Products.length; i++) {
-			if (ProductPhaseArray.indexOf(Ply.Products[i].Phase) <= -1) {
-				ProductPhaseArray.push(Ply.Products[i].Phase);
-			}
-		}
-		for (i = 0; i < ProductPhaseArray.length; i++) {
-			UpdateProductListDisplayPosition(GetProductsInThisPhase(ProductPhaseArray[i], Ply));
-		}
-	}
 }
 
 function UpdateProductListDisplayPosition(ProdList) {
@@ -1016,10 +1013,11 @@ function CashChangeOnline(online, cid, args){
 	var CashChange = parseInt(args[1], 10);
 	Ply.Money += CashChange;
 	if (online && cid===ClientID){
-		Send(cid,0,args);
+		Send(cid,11,args);
 	}
 }
 function DisplayNewRoundEvent() {
+	window.clearInterval(TimerInterval);
 	TheGame.Players.forEach(function(ply){
 		ply.FinishedCurrentTurn=false;
 	});
@@ -1059,6 +1057,7 @@ function DisplayNewRoundEvent() {
 				$("#ProductWindow").hide();
 				$("#RoundNumberDisplay").text("ROUND " + Num.toString());
 				CurrentlySelectedProduct = null;
+				StartTheClock();
 				setTimeout(function () {
 					var Elem = document.getElementById("MainBoard");
 					Elem.style.transition = "none";
@@ -1324,20 +1323,21 @@ function TryToBuyPatent() {
 function PatentProduct(online,cid,args){
 	var product=CurrentlySelectedProduct;
 	var ply=TheGame.CurrentPlayer;
+	var cost = parseInt(args[1],10);
 	if((online)&&(cid!=ClientID)){
 		product=TheGame.PlayerProducts[parseInt(args[0], 10)];
 		ply=TheGame.Players[cid];
 	}
 	var categoryIndex = TheGame.PatentTracker.Categories.indexOf(product.SubCategory);
-	ply.Money -= parseInt(args[1],10);
+	ply.Money -= cost;
 	TheGame.PatentTracker.Records[categoryIndex][1] = ply.GlobalID;
 	TheGame.PatentTracker.Records[categoryIndex][2] = product.GlobalID;
 	TheGame.PatentTracker.numPatents++;
 	if((online)&&(cid==ClientID)){
-		Send(GameId, ClientID,3,[product.GlobalID]);
+		Send(GameId, ClientID,3,[product.GlobalID,cost]);
+		UpdatePlayerDisplay();
 		UpdateCurProdDisplay(product.DisplayItemID);
 	}
-	UpdatePlayerDisplay();
 }
 function isThisCategoryPatented(prod, game) {
 	return (game.PatentTracker.Records[(game.PatentTracker.Categories.indexOf(prod.SubCategory))][1] !== null);
@@ -1357,14 +1357,15 @@ function PatentMessageDisplay(theMessage) {
 	$("#PatentText").text(theMessage);
 	var theSound = GameSounds.Event;
 
-	if (theMessage.indexOf("successfully") > -1) {
+	if (theMessage.indexOf("successfully patented!") > -1) {
 		$("#PatentTitle").text("SUCCESS!");
+		EventFlash();
 	} else {
 		$("#PatentTitle").text("FAILURE!");
 		theSound = GameSounds.Wrong_BAD;
 	}
 
-	if (theMessage.indexOf("successfully") > -1) {
+	if (theMessage.indexOf("successfully patented!") > -1) {
 		$("#PatentTip").text("Now you earn revenue off of other players with the same type of product!");
 		$("#PatentTip").show();
 	} else if (theMessage.indexOf("impressive") > -1) {
@@ -1577,7 +1578,7 @@ function RandomEventIterator() {
 }
 
 function getMonetaryValue(prod) {
-	return Math.ceil(Math.pow(prod.IdeaStrength, 2) * Math.pow(prod.DesignStrength, 1.1) * Math.pow(prod.BuildStrength, 1.1) / 1000);
+	return Math.ceil(Math.pow(prod.IdeaStrength, 2) * Math.pow(prod.DesignStrength, 1.1) * Math.pow(prod.BuildStrength, 1.1) / 1000) * SubCategoryAttributes[prod.SubCategory][5];
 }
 
 function DoesItBreak(prod) {

@@ -12,6 +12,9 @@
 			var GameId;
 			var ClientID=0;
 			var Host=false;
+			var Timer;
+			var TimerInterval;
+			var FlaggedForPossibleDisconnect = [];
 		</script>
 		<script src="../js/jquery.js"></script>
 		<script src="../js/shared.js"></script>
@@ -40,10 +43,46 @@
 			function RotateThink(){
 				if(RotateDir!=0){
 					Rotation+=RotateDir;
-					RotateDir%=360;
+					Rotation%=360;
 					document.getElementById("GameBoardCircle").style.webkitTransform="rotate("+Rotation.toString()+"deg)";
 					document.getElementById("GameBoardCircle").style.MozTransform="rotate("+Rotation.toString()+"deg)";
 					var Prods=document.getElementsByClassName("ProductDisplayItem");
+				}
+			}
+			function StartTheClock(){
+				Timer = 121;
+				TimerThink();
+				TimerInterval = setInterval(function () {
+					TimerThink();
+				}, 1000);
+			}
+			function TimerThink(){
+				if (Timer > 0){
+					if (Online || !($("#QuitDialog").is(":visible"))){
+						Timer--;
+					}
+					var timeDisplay = Math.floor(Timer/60).toString() + ":";
+					if (Timer%60 < 10){
+						timeDisplay+="0";
+					}
+					timeDisplay+=(Timer%60).toString();
+					$("#TimerDisplay").text(timeDisplay);
+					if ((Timer < 60) && $("#PopupOverlay").is(":visible")){
+						if (!ProductsBeingRemoved){
+							if ($("#EventDialog").is(":visible")){
+								$("#EventButton").trigger("click");
+							}
+							else if ($("#TriggerDialog").is(":visible")){
+								$("#TriggerButton").trigger("click");
+							}
+						}
+					}
+					if (Timer < 11){
+						playSound(GameSounds.Countdown);
+					}
+				}
+				else {
+					$("#EndTurnBtn").click();
 				}
 			}
 			function SaveThink(){
@@ -169,6 +208,31 @@
 			function UIProductRevert(){
 				TryToRevertProduct(Online,ClientID);
 			}
+			function HostPingHandler(){
+				for (i = 0; i < 6; i++){
+					if (PlayerPingsForHost[i] > -5){
+						PlayerPingsForHost[i]--;
+					}
+					else {
+						Send(GameId,i,4,"false");
+					}
+				} 
+			}
+			function PingHandler(){
+				if (MyCurrentPing > 0){
+					MyCurrentPing--;
+				}
+				else if (MyCurrentPing > -5){
+					MyCurrentPing--;
+					IsItJustMe(GameId, ClientId);
+				}
+				else {
+					IAmConnected = false;
+					ShowAlert("You have been disconnected.", "alert.png");
+					$("#AlertButton").attr('onclick', 'CloseAlert(); GoBackToMainMenu();');
+					window.clearInterval(OnlineInterval);
+				}
+			}
 		</script>
 		<style>
 			#GameBoardCircle{
@@ -291,6 +355,7 @@
 						<div id="GameBoardCenter"></div>
 						<div id="GameBoardCircle"></div>
 						<button class="Standard Compact" id="TurnBoardCCWButton" style="top:24%;left:4%;width:2%;height:7%;padding:.2em 1.6em" onmousedown="RotateBegin(-1)" onmouseup="RotateEnd()" onmouseout="RotateEnd()" onmouseover="noSound()" onclick="noSound()"><b><</b></button>
+						<div class="StandardText" style="font-size:25px;top:25%;left:10.5%" id="TimerDisplay">0:00</div>
 						<button class="Standard Compact" id="TurnBoardCWButton" style="top:24%;left:19%;width:2%;height:7%;padding:.2em 1.6em" onmousedown="RotateBegin(1)" onmouseup="RotateEnd()" onmouseout="RotateEnd()" onmouseover="noSound()" onclick="noSound()"><b>></b></button>
 					</div>
 					<div id="ProductWindow" class="PlayerBox" style="overflow:hidden;display:none">

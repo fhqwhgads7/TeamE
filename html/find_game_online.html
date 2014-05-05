@@ -13,6 +13,17 @@
 				window.addEventListener('message', Peace, false);
 				GlobalInitialize();
 				updateGameList();
+				pubnub.subscribe({
+					channel: 'gameList',
+					message: function(message){
+						if("refreshGames" in message){
+							updateGameList();
+						}
+					}
+				});
+				setInterval(function(){
+					updateGameList();
+				},10000);
 			}
 			function GoBackToMainMenu() {
 				SwitchToPage("title.html");
@@ -25,20 +36,12 @@
 
 		</script>
 
-		<script>
-			pubnub.subscribe({
-				channel: 'gameList',
-				message: function(message){
-					if("refreshGames" in message){
-						updateGameList();
-					}
-				}
-			});	
+		<script>	
 
 			function updateGameList() {
 				var query = new Parse.Query(ParseGame);
 
-				query.equalTo("open", true);
+				query.equalTo("open", true).notEqualTo("ping",0);
 
 				query.find({
 				  success: function(results) {
@@ -48,9 +51,13 @@
 				  	results.forEach(function(game){
 						var name = game.get("name");
 						var host = game.get("host");
+						var gameOptions = game.get("optionsObject");
 						var newGameElement = $("<tr>", {class: "game-row"});
-						var newNameElement = $("<td>").html(name);
-						var newHostElement = $("<td>").html(host);
+						var newNameElement = $("<td>").html(name).css("font-size","15px").css("text-align","center");
+						var newHostElement = $("<td>").html(host).css("font-size","15px").css("text-align","center");
+						var newDifficultyElement = $("<td>").html(gameOptions.Options.GameDifficulty).css("font-size","15px").css("text-align","center");
+						var newPatentingElement = $("<td>").html(gameOptions.Options.PatentingEnabled).css("font-size","15px").css("text-align","center");
+						var newRoundsElement = $("<td>").html(gameOptions.Options.NumberOfRounds).css("font-size","15px").css("text-align","center");
 
 						$(newGameElement).dblclick(function(){
 							playSound(GameSounds.ButtonSelect);
@@ -72,7 +79,7 @@
 							})
 						});
 
-						$(newGameElement).append(newNameElement, newHostElement).appendTo(gameListElement);
+						$(newGameElement).append(newNameElement, newHostElement, newDifficultyElement, newRoundsElement, newPatentingElement).appendTo(gameListElement);
 				  	});
 				  },
 
@@ -101,7 +108,7 @@
 				position:absolute;
 				border-style:solid;
 				border-width:5px;
-				width:60%;
+				width:80%;
 				height:60%;
 				box-shadow: 0px 0px 40px 5px #AAAAAA;
 			}
@@ -207,15 +214,20 @@
 			<div id="find-game-wrapper">
 				<div class="StandardText" id="MainTitle" style="margin:0;width:800px;top:7%">
 					Find Online Game
-					<p>Double-click to Join</p>
+				</div>
+				<div class="StandardText" id="HelperTitle" style="font-size:15px;margin:0;width:800px;top:15%">
+					(Double click to join)
 				</div>
 				
-				<div class="OptionsBox" id="OptionsBox" style="left:20%;top:20%;">
+				<div class="OptionsBox" id="OptionsBox" style="left:10%;top:20%;">
 					<div id="game-list-container">
 						<table id="game-list" style="overflow:auto">
 							<tr>
-								<th>Name</th>
-								<th>Host</th>
+								<th style="font-size:15px;margin:0;width:800px;top:15%">Name</th>
+								<th style="font-size:15px;margin:0;width:800px;top:15%">Host</th>
+								<th style="font-size:15px;margin:0;width:800px;top:15%">Difficulty</th>
+								<th style="font-size:15px;margin:0;width:800px;top:15%">Rounds</th>
+								<th style="font-size:15px;margin:0;width:800px;top:15%">Patenting</th>
 							</tr>
 						</table>
 					</div>

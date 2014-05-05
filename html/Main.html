@@ -19,7 +19,7 @@
 					$("#BrowserFail").show();
 				}
 				if (Parse.User.current()){
-					ShowUser();
+					Parse.User.logOut();
 				}
 				NetworkButtonDisableCheck();
 				$(":button.Standard").mouseenter( function(){
@@ -46,7 +46,6 @@
 			function SaveChanges(){
 				localStorage.setItem("BGMVolume", $("#BGMVolumeNum").text());
 				localStorage.setItem("SFXVolume", $("#SFXVolumeNum").text());
-				unsavedChanges = false;
 			}
 			function LoadOptions(){
 				var BGMVolume = parseInt(localStorage.getItem("BGMVolume"));
@@ -65,8 +64,6 @@
 				$("#"+id).val(value);
 			}
 			function ChangeVolume(id, value){
-				if ($("#"+id).text() != value)
-					unsavedChanges = true;
 				$("#"+id).text(value);
 			}
 			function BGMSwitch(){
@@ -139,7 +136,7 @@
 					}
 					$("#StatsRanking").text("TBD");
 				}
-			}	
+			}
 			
 			function SubmitRegistration(){
 				var NewUser = new Parse.User();
@@ -434,14 +431,14 @@
 				<div class="StandardText" id="StatsRanking" style="font-size:20px;right:10%;text-align:right;top:63%">nil</div>														
 				<button class="Standard" id="StatsClose" onclick="HidePlayerStats()" style="top:77%;left:20%;width:60%;height:20%">OK</button>
 			</div>
-			<div class="Popup" id="LoginView" style="left:25%;width:50%;">
+			<div class="Popup" id="LoginView" style="left:25%;width:50%;" onkeypress="if (event.keyCode == 13) {UserCheck();}">
 				<div class="FancyText" id="LoginTitle" style="margin:0px;width:100%;top:10%;">Log In</div> 
 				<input type="text" id="LoginUsername" class="OneColumn" placeholder="Username" style="font-family:'Arial';font-size:15px;font-weight:900;overflow:hidden;resize:none;top:45%;left:15%;height:5%;width:69.5%;"></input>
 				<input type="password" id="LoginPassword" class="OneColumn" placeholder="Password" style="font-family:'Arial';font-size:15px;font-weight:900;overflow:hidden;resize:none;top:55%;left:15%;height:5%;width:69.5%;"></input>
 				<button class="Standard" style="padding:0.4em 0em;font-size:20px;left:15%;top:75%;width:32%" onclick="UserCheck()">Log In</button>
 				<button class="Standard" style="padding:0.4em 0em;font-size:20px;right:15%;top:75%;width:32%" onclick="HideLoginWindow()">Cancel</button>
 			</div>
-			<div class="Popup" id="RegisterView" style="left:25%;width:50%;">
+			<div class="Popup" id="RegisterView" style="left:25%;width:50%;" onkeypress="if (event.keyCode == 13) {SubmitRegistration();}">
 				<div class="FancyText" id="RegisterTitle" style="margin:0px;width:100%;top:10%;">Register</div> 
 				<input type="text" id="RegisterUsername" maxlength=20 class="OneColumn" placeholder="Username" style="font-family:'Arial';font-size:15px;font-weight:900;overflow:hidden;resize:none;top:39%;left:15%;height:5%;width:69.5%;"></input>
 				<input type="password" id="RegisterPassword" maxlength=30 class="OneColumn" placeholder="Password" style="font-family:'Arial';font-size:15px;font-weight:900;overflow:hidden;resize:none;top:46%;left:15%;height:5%;width:69.5%;"></input>

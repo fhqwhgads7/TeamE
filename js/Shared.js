@@ -1,7 +1,12 @@
+var PINGCONSTANT = 5;
+var MyCurrentPing = PINGCONSTANT;
+var IAmConnected = true;
+var PlayerPingsForHost = [];
+			
 /*
 	Make sure that each page that uses this next function has the following line in the head:
 	<script src='http://code.jquery.com/jquery-migrate-1.2.1.js'></script>
-*/
+*/			
 function IsBrowserCompatible(){
 	var compatible = false;
 	var CompatibleBrowsers = [$.browser.webkit, $.browser.mozilla];
@@ -293,7 +298,7 @@ function Send(gameId, initiatorNum,funcNum,argBundle){
 }
 function Receive(initiatorNum,funcNum,argBundle){
 	var SendableFuncs=[
-		CashChangeOnline,
+		null,
 		HireTheEmployees,
 		CycleTurn,
 		PatentProduct,
@@ -303,9 +308,49 @@ function Receive(initiatorNum,funcNum,argBundle){
 		TryToRevertProduct,
 		RandomEventsGo,
 		removeProductOnline,
-		SetBrokenProducts
+		SetBrokenProducts,
+		CashChangeOnline
 	];
 	if(initiatorNum!=ClientID){
 		SendableFuncs[funcNum](true,initiatorNum,argBundle);
 	}
+	FlaggedForPossibleDisconnect[initiatorNum] = false;
+}
+function PingSend(gameId, senderIsHost, playerNum){
+	pubnub.publish({
+		channel: gameId,
+		message: {"pingIt": {
+			senderHost: senderIsHost,
+			playerID: playerNum
+		}} 
+	});
+}
+function PingReceive(gameId, senderIsHost, playerNum){
+	MyCurrentPing = PINGCONSTANT;
+	if (senderIsHost){
+		PingSend(gameId, false, parseInt(localStorage.getItem("ClientID"),10));
+	}
+	else {
+		PlayerPingsForHost[0] = PINGCONSTANT;
+		PlayerPingsForHost[playerNum] = PINGCONSTANT;
+	}
+}
+function IsItJustMe(gameId, playerNum){
+	pubnub.publish({
+		channel: gameId,
+		message: {"isItJustMe": {
+			playerID: playerNum
+		}} 
+	});
+}
+function NoItIsNotJustYou(gameId, playerNum){
+	pubnub.publish({
+		channel: gameId,
+		message: {"noItIsNot": {
+			playerID: playerNum
+		}} 
+	});
+}
+function OKJustChecking(){
+
 }

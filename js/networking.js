@@ -18,6 +18,7 @@ function joinGame(gameId) {
       success: function(game) {
         var playersList = game.get("players");
         if (playersList.length < game.get("capacity")) {
+			localStorage.setItem("ClientID",playersList.length.toString());
             if (playersList.indexOf(currentUsername) == -1) {
                 playersList.push(currentUsername);
                 game.set("players", playersList);

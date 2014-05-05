@@ -1,9 +1,7 @@
-Team E Project Files
-====================
-The files for the current project.
-
-If you can read this, excellent!
-
-Codeline policies:
-branch `master`: https://gist.github.com/ryanalane/0d0593e52797fc9487a2
-branch `prod`: https://gist.github.com/ryanalane/7d3098db01227edbafef
+Setup Instructions
+==================
+1. Click "Download ZIP"
+2. Save the file somewhere you can find it.
+3. Extract the contents.
+4. To run the game, double click "index.html".
+5. That's all there is to it. It runs best in Firefox, but Chrome and Safari also work.

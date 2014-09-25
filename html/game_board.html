@@ -122,6 +122,9 @@
 				$("#PopupOverlay").hide();
 			}
 			function EndCurrentTurn(){
+				Timer = 121;
+				window.clearInterval(TimerInterval);
+				StartTheClock();
 				CycleTurn(Online,ClientID);
 			}
 			function TryToPatentProduct(){

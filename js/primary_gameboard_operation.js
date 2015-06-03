@@ -29,9 +29,9 @@ var ProductPhases = {
 	Prototype : "Prototype",
 	PrototypeTesting : "PrototypeTesting",
 	Development : "Development",
-	PreDepTesting : "PreDeploymentTesting",
+	PreDepTesting : "PreDepTesting",
 	Deployment : "Deployment",
-	PostDepTesting : "PostDeploymentTesting",
+	PostDepTesting : "PostDepTesting",
 	Maintenance : "Maintenance"
 };
 var ProductPhaseNames = {
@@ -51,9 +51,9 @@ var PhasePositions = {
 	Prototype : [270 + 225 * Math.cos(1 * Math.PI / 8), 270 + 225 * Math.sin(1 * Math.PI / 8)],
 	PrototypeTesting : [270 + 225 * Math.cos(3 * Math.PI / 8), 270 + 225 * Math.sin(3 * Math.PI / 8)], 
 	Development : [270 + 225 * Math.cos(5 * Math.PI / 8), 270 + 225 * Math.sin(5 * Math.PI / 8)], 
-	PreDeploymentTesting : [270 + 225 * Math.cos(7 * Math.PI / 8), 270 + 225 * Math.sin(7 * Math.PI / 8)],
+	PreDepTesting : [270 + 225 * Math.cos(7 * Math.PI / 8), 270 + 225 * Math.sin(7 * Math.PI / 8)],
 	Deployment : [270 + 225 * Math.cos(9 * Math.PI / 8), 270 + 225 * Math.sin(9 * Math.PI / 8)], 
-	PostDeploymentTesting : [270 + 225 * Math.cos(11 * Math.PI / 8), 270 + 225 * Math.sin(11 * Math.PI / 8)], 
+	PostDepTesting : [270 + 225 * Math.cos(11 * Math.PI / 8), 270 + 225 * Math.sin(11 * Math.PI / 8)], 
 	Maintenance : [270, 270]
 };
 function RandomEvent(newName, newMessage, newTarget, newScale, newType, newValue, newPicture, newLikeliness, newOccurrenceInterval){

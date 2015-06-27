@@ -90,7 +90,7 @@ var Tips=[
 	"One way to secure your assets is by patenting a product. Be sure to patent a good product, though!",
 	"Pay attention to current events to help you with decision making!",
 	"It takes some time to prototype or deploy a product. Patience!",
-	"Do NOT go into debt if you can avoid it! Interest is a real thing, and debt will force you to pay more money than you would otherwise have to!"
+	"Do NOT go into debt if you can avoid it! Interest is a real thing, and debt will force you to pay more money than you would otherwise have to!",
 	"Don't leave a product in the same outer phase for too long. Spending too much time on one thing produces diminishing results!",
 	"It takes time to build a prototype or deploy a product; this is why progression from these phases is not immediate.",
 	"Try to hold on to your employees; it costs money just to get them started!",

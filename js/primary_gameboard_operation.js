@@ -162,13 +162,13 @@ function NewGameInitialize() {
 	TheGame = new Game("2947");
 	TransferGameStartupInfo(GameCreationInfo, TheGame);
 	if (GetDifficultyConstant(TheGame.Settings.Difficulty) > 1){
-		TheGame.InterestRate += 0.2;
+		TheGame.InterestRate += 0.1;
 	}
 	if (GetDifficultyConstant(TheGame.Settings.Difficulty) > 2){
-		TheGame.InterestRate += 0.5;
+		TheGame.InterestRate += 0.3;
 	}
 	if (GetDifficultyConstant(TheGame.Settings.Difficulty) > 3){
-		TheGame.InterestRate += 0.9;
+		TheGame.InterestRate += 0.6;
 	}
 	if(Online){
 		TheGame.CurrentPlayerNum=ClientID;

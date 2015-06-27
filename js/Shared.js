@@ -90,6 +90,7 @@ var Tips=[
 	"One way to secure your assets is by patenting a product. Be sure to patent a good product, though!",
 	"Pay attention to current events to help you with decision making!",
 	"It takes some time to prototype or deploy a product. Patience!",
+	"Do NOT go into debt if you can avoid it! Interest is a real thing, and debt will force you to pay more money than you would otherwise have to!"
 	"Don't leave a product in the same outer phase for too long. Spending too much time on one thing produces diminishing results!",
 	"It takes time to build a prototype or deploy a product; this is why progression from these phases is not immediate.",
 	"Try to hold on to your employees; it costs money just to get them started!",
@@ -111,7 +112,8 @@ var Tips=[
 	"2 + 2 = Fish!",
 	"Nineteen!",
 	"Don't fail too hard or else flying monkeys will appear out of nowhere and eat your face.",
-	"If you can read this, you have mastered visual recognition and probably don't need glasses. Or are wearing glasses already."
+	"If you can read this, you have mastered visual recognition and probably don't need glasses. Or are wearing glasses already.",
+	"Pink fluffy unicorns dancing on rainbows!"
 ];
 var GameSounds={
 	ButtonHover: '../sounds/sfx/button_hover.wav',
@@ -269,6 +271,7 @@ function Game(id){
 	newGame.CurrentRound=0;
 	newGame.PatentTracker=null;
 	newGame.GameType="nil";
+	newGame.InterestRate=1.0;
 	newGame.RandomEvents=[];
 	newGame.Settings={
 		Difficulty:null,

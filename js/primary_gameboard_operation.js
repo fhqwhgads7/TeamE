@@ -161,7 +161,15 @@ function NewGameInitialize() {
 	var GameCreationInfo = JSON.parse(localStorage.getItem("TheBrandNewGame"));
 	TheGame = new Game("2947");
 	TransferGameStartupInfo(GameCreationInfo, TheGame);
-
+	if (GetDifficultyConstant(TheGame.Settings.Difficulty) > 1){
+		TheGame.InterestRate += 0.2;
+	}
+	if (GetDifficultyConstant(TheGame.Settings.Difficulty) > 2){
+		TheGame.InterestRate += 0.5;
+	}
+	if (GetDifficultyConstant(TheGame.Settings.Difficulty) > 3){
+		TheGame.InterestRate += 0.9;
+	}
 	if(Online){
 		TheGame.CurrentPlayerNum=ClientID;
 	}
@@ -1166,6 +1174,9 @@ function NewRoundCalc() {
 			}
 			else if (!(Ply.HadAProductThisTurn)) {
 				Net = Math.round(BasePayouts.DayJobEachTurn * TotalPayoutRate * (1.4 - 0.2 * (GetDifficultyConstant(TheGame.Settings.Difficulty))));
+			}
+			if (Ply.Money < 0){
+				Net += Math.floor((Ply.Money * TheGame.InterestRate) - (Ply.Money))
 			}
 			Net = Net - ((BaseCosts.PayDev * Ply.NumDevs) + (BaseCosts.PayQA * Ply.NumQA) + (BaseCosts.PayCreative * Ply.NumCreative));
 			Ply.Money = Ply.Money + Net;
